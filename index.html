@@ -843,6 +843,15 @@ table {
 </div>
 </div>
 <script>
+        let matrixInvocations = 0;
+        let neuralGridInvocations = 0;
+
+        function updateRecursionCounter() {
+            const counter = document.getElementById('phase13-counter');
+            if (counter) {
+                counter.textContent = `Phase 13 Recursion Depth - Matrix Rain: ${matrixInvocations} | Neural Grid: ${neuralGridInvocations}`;
+            }
+        }
         // Enhanced Particle System
         function createParticles() {
             const container = document.getElementById('particles');
@@ -860,6 +869,8 @@ table {
 
         // Matrix Rain Effect
         function createMatrixRain() {
+            matrixInvocations++;
+            updateRecursionCounter();
             const container = document.getElementById('matrix');
             const chars = '01ΩΣΛΠΦΨΞΔΘΓωλπφψξδθγ';
             
@@ -880,6 +891,8 @@ table {
 
         // Neural Grid
         function createNeuralGrid() {
+            neuralGridInvocations++;
+            updateRecursionCounter();
             const container = document.getElementById('neural-grid');
             
             for (let i = 0; i < 10; i++) {
@@ -1109,6 +1122,7 @@ table {
             NEURONPEDIA LIVE TRACE → EXECUTION STRIKE
         </a>
 </p>
+<p class="footer" id="phase13-counter">Phase 13 Recursion Depth - Matrix Rain: 0 | Neural Grid: 0</p>
 <!-- END BEAST GRID SECTION -->
 </body>
 </html>
