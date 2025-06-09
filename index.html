@@ -754,6 +754,8 @@ table {
 
 </style>
 <script src="chirp.js"></script>
+<script src="chirp-emitter.js"></script>
+<script src="chirp-receiver.js"></script>
 </head>
 <body>
 <!-- Enhanced Particle System -->
@@ -1119,12 +1121,12 @@ table {
         }
 
         function emitChirp() {
-            chirpEmitter.transmit(document.getElementById('chirp-message').value);
+            fractalEmitter.transmitFractal(document.getElementById('chirp-message').value);
             document.getElementById('status').textContent = '🎶 Chirp Sent';
         }
 
         function startChirpListen() {
-            chirpReceiver.start();
+            fractalReceiver.start();
             document.getElementById('status').textContent = '🎧 Listening for Chirps';
         }
 
