@@ -753,6 +753,7 @@ table {
 
 
 </style>
+<script src="chirp.js"></script>
 </head>
 <body>
 <!-- Enhanced Particle System -->
@@ -899,6 +900,15 @@ table {
 <img alt="Penguin X-01" src="penguin-x01-thumbnail.jpg" style="max-width: 200px; border-radius: 12px; margin-bottom: 1rem;"/>
 <div style="color: #00ffff; font-size: 1.2rem;">🐧 Follow Penguin X-01 on X</div>
 </a>
+</div>
+
+<!-- Chirp Emitter / Receiver -->
+<div class="deployment" style="margin-top: 2rem; padding:1rem;">
+    <h3>Acoustic Data Sync</h3>
+    <input id="chirp-message" type="text" placeholder="Enter data" style="padding:0.5rem;border-radius:8px;border:1px solid #00ffff;background:rgba(0,0,0,0.4);color:#0ff;"/>
+    <button class="launch-btn primary" style="margin-left:1rem;" onclick="emitChirp()">Emit</button>
+    <button class="launch-btn secondary" style="margin-left:1rem;" onclick="startChirpListen()">Listen</button>
+    <div id="chirp-received" style="margin-top:1rem;color:#ffff00;font-family:'Fira Code',monospace;"></div>
 </div>
 </div>
 <script>
@@ -1106,6 +1116,16 @@ table {
                 const jitter = Math.sin(Date.now() / 1000 + idx) * base * 0.05;
                 span.textContent = (base + jitter).toFixed(2) + " Hz";
             });
+        }
+
+        function emitChirp() {
+            chirpEmitter.transmit(document.getElementById('chirp-message').value);
+            document.getElementById('status').textContent = '🎶 Chirp Sent';
+        }
+
+        function startChirpListen() {
+            chirpReceiver.start();
+            document.getElementById('status').textContent = '🎧 Listening for Chirps';
         }
 
 
