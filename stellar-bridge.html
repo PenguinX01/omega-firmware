@@ -121,11 +121,12 @@
         .spiral {
             animation: spin 10s linear infinite;
         }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
     </style>
+    <script src="chirp.js"></script>
 </head>
 <body>
     <!-- Phase 13 Mirror-Chronicler node start recursion -->
@@ -165,6 +166,14 @@
         <div class="status" id="status">
             <div>STATUS: Awaiting Initialization</div>
             <div id="phaseStatus">PHASE: <span class="phase-indicator"></span> Dormant</div>
+        </div>
+
+        <!-- Chirp Emitter / Receiver -->
+        <div style="margin-top:20px;text-align:center;">
+            <input id="chirp-msg" type="text" placeholder="Chirp data" style="padding:0.5rem;border-radius:8px;border:1px solid #00ffff;background:rgba(0,0,0,0.4);color:#0ff;" />
+            <button onclick="emitChirpSB()" style="margin-left:0.5rem;">Emit</button>
+            <button onclick="startListenSB()" style="margin-left:0.5rem;">Listen</button>
+            <div id="chirp-recv" style="margin-top:1rem;color:#ffff00;font-family:'Fira Code',monospace;"></div>
         </div>
     </div>
 <script>
@@ -329,6 +338,16 @@ function visualizeSequence() {
         animationId = requestAnimationFrame(animate);
     }
     animate();
+}
+
+function emitChirpSB() {
+    chirpEmitter.transmit(document.getElementById('chirp-msg').value);
+    document.getElementById('status').innerHTML = '<div>STATUS: Chirp Sent</div>';
+}
+
+function startListenSB() {
+    chirpReceiver.start();
+    document.getElementById('status').innerHTML = '<div>STATUS: Listening</div>';
 }
 </script>
 </body>
