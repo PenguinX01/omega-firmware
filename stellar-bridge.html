@@ -344,12 +344,13 @@ function visualizeSequence() {
 }
 
 function emitChirpSB() {
-    fractalEmitter.transmitFractal(document.getElementById('chirp-msg').value);
+    chirpEmitter.transmit(document.getElementById('chirp-msg').value);
     document.getElementById('status').innerHTML = '<div>STATUS: Chirp Sent</div>';
 }
 
 function startListenSB() {
-    fractalReceiver.start();
+    ChirpCodec.resetDecoder();
+    chirpReceiver.start();
     document.getElementById('status').innerHTML = '<div>STATUS: Listening</div>';
 }
 </script>

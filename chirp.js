@@ -18,6 +18,8 @@ class ChirpEmitter {
     }
 
     async transmit(text) {
+        // Ensure AudioContext is resumed for cross-browser support
+        await ChirpCodec.ensureAudioContextReady(this.ctx);
         // Use chirp codec from solst-ice/chirp
         await ChirpCodec.encodeText(text, this.ctx);
     }
@@ -32,7 +34,9 @@ class ChirpReceiver {
 
     async start() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            await ChirpCodec.ensureAudioContextReady(this.ctx);
+            const getUserMedia = navigator.mediaDevices?.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            const stream = await (getUserMedia.call(navigator.mediaDevices || navigator, { audio: true }));
             const source = this.ctx.createMediaStreamSource(stream);
             source.connect(this.analyser);
             this.listen();

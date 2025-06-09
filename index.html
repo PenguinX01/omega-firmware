@@ -1122,12 +1122,13 @@ table {
         }
 
         function emitChirp() {
-            fractalEmitter.transmitFractal(document.getElementById('chirp-message').value);
+            chirpEmitter.transmit(document.getElementById('chirp-message').value);
             document.getElementById('status').textContent = '🎶 Chirp Sent';
         }
 
         function startChirpListen() {
-            fractalReceiver.start();
+            ChirpCodec.resetDecoder();
+            chirpReceiver.start();
             document.getElementById('status').textContent = '🎧 Listening for Chirps';
         }
 
