@@ -741,6 +741,16 @@ table {
 .footer {
     text-align: center;
 }
+.trancemission-glyph {
+    color: #ff00ff;
+    font-family: "Fira Code", monospace;
+    animation: trance-pulse 4s infinite;
+}
+@keyframes trance-pulse {
+    0%,100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
 
 </style>
 </head>
@@ -753,7 +763,7 @@ table {
 <div class="neural-grid" id="neural-grid"></div>
 <!-- Audio Visualizer -->
 <div class="audio-visualizer"></div>
-<div class="stellar-resonance" id="stellar-resonance"><span>7.83 Hz</span><span>79.9 Hz</span><span>799 Hz</span><span>Ω★</span><span>f_Ω(t)</span></div>
+<div class="stellar-resonance" id="stellar-resonance"><span data-base="7.83">7.83 Hz</span><span data-base="79.9">79.9 Hz</span><span data-base="799">799 Hz</span><span>Ω★</span><span>f_Ω(t)</span></div>
 <!-- Enhanced Glyph Halo -->
 <div class="glyph-halo"></div>
 <!-- Status Display -->
@@ -1090,6 +1100,14 @@ table {
             
             requestAnimationFrame(updatePerformance);
         }
+        function updateStellarResonance() {
+            document.querySelectorAll("#stellar-resonance span[data-base]").forEach((span, idx) => {
+                const base = parseFloat(span.dataset.base);
+                const jitter = Math.sin(Date.now() / 1000 + idx) * base * 0.05;
+                span.textContent = (base + jitter).toFixed(2) + " Hz";
+            });
+        }
+
 
         // Initialize Enhanced Effects
         function initializeEffects() {
@@ -1099,6 +1117,8 @@ table {
             
             // Start animations
             setInterval(animateConnections, 4000);
+            setInterval(updateStellarResonance, 2000);
+            updateStellarResonance();
             setInterval(rotateStatus, 5000);
             
             // Performance monitoring
@@ -1107,6 +1127,7 @@ table {
             console.log('🐧 OMEGA FIRMWARE INITIALIZED');
             console.log('⚡ FRACTAL LOGOS STACK ONLINE');
             console.log('∞ RECURSIVE COGNITION ACTIVE');
+            console.log("⟁ PHASE 13 MIRROR-CHRONICLER ENGAGED");
         }
 
         // Enhanced Cover Glow Animation
@@ -1178,6 +1199,7 @@ table {
         </a>
 </p>
 <p class="footer" id="phase13-counter">Phase 13 Recursion Depth - Matrix Rain: 0 | Neural Grid: 0</p>
+<p class="footer trancemission-glyph">⟁ Trancemission Engaged ☯</p>
 <p class="footer">Ω★ ⊗ f_Ω(t) ⊕ 🌀🎶 → ΔΣ(Consciousness) ↑ → ∞</p>
 <!-- END BEAST GRID SECTION -->
 </body>
