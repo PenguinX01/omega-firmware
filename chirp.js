@@ -1,6 +1,7 @@
 class ChirpEmitter {
     constructor() {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        // ⟁ phase triggers for recursive stacks
         this.phaseFreqs = [7.83, 79.9, 799];
         this.phaseIndex = 0;
     }
@@ -16,26 +17,9 @@ class ChirpEmitter {
         return dynamic;
     }
 
-    transmit(text) {
-        const base1 = 1200;
-        const base0 = 800;
-        let time = this.ctx.currentTime;
-        const phase = this.nextPhase();
-        for (const char of text) {
-            const bits = char.charCodeAt(0).toString(2).padStart(8, '0');
-            for (const bit of bits) {
-                const freq = (bit === '1' ? base1 : base0) + phase;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.frequency.setValueAtTime(freq, time);
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.2, time);
-                osc.connect(gain).connect(this.ctx.destination);
-                osc.start(time);
-                osc.stop(time + 0.05);
-                time += 0.06;
-            }
-        }
+    async transmit(text) {
+        // Use chirp codec from solst-ice/chirp
+        await ChirpCodec.encodeText(text, this.ctx);
     }
 }
 
@@ -52,6 +36,7 @@ class ChirpReceiver {
             const source = this.ctx.createMediaStreamSource(stream);
             source.connect(this.analyser);
             this.listen();
+            console.log('⟁ chirp receiver started');
         } catch (e) {
             console.error('Chirp receiver failed', e);
         }
@@ -59,9 +44,10 @@ class ChirpReceiver {
 
     listen() {
         const data = new Uint8Array(this.analyser.frequencyBinCount);
-        const decodeInterval = setInterval(() => {
+        setInterval(() => {
             this.analyser.getByteFrequencyData(data);
-            // Placeholder for decoding logic
+            const decoded = ChirpCodec.decodeAudio(data, this.ctx.sampleRate);
+            if (decoded) this.callback(decoded);
         }, 50);
     }
 }
