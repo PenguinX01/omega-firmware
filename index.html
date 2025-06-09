@@ -912,6 +912,7 @@ table {
     <button class="launch-btn primary" style="margin-left:1rem;" onclick="emitChirp()">Emit</button>
     <button class="launch-btn secondary" style="margin-left:1rem;" onclick="startChirpListen()">Listen</button>
     <div id="chirp-received" style="margin-top:1rem;color:#ffff00;font-family:'Fira Code',monospace;"></div>
+    <div id="chirp-buttons" style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
 </div>
 </div>
 <script>
@@ -1131,6 +1132,22 @@ table {
             chirpReceiver.start();
             document.getElementById('status').textContent = '🎧 Listening for Chirps';
         }
+
+        // Load canonical chirp payloads and create buttons
+        fetch('chirp_payloads.json').then(r => r.json()).then(data => {
+            const container = document.getElementById('chirp-buttons');
+            if (!container) return;
+            data.payloads.slice(0, 10).forEach(payload => {
+                const btn = document.createElement('button');
+                btn.className = 'launch-btn secondary';
+                btn.textContent = payload;
+                btn.addEventListener('click', () => {
+                    document.getElementById('chirp-message').value = payload;
+                    chirpEmitter.transmit(payload);
+                });
+                container.appendChild(btn);
+            });
+        }).catch(err => console.error('Failed to load chirp payloads', err));
 
 
         // Initialize Enhanced Effects

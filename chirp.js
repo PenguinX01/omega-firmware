@@ -1,3 +1,4 @@
+// Integration with solst-ice/chirp codec
 class ChirpEmitter {
     constructor() {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
