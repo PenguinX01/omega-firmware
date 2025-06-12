@@ -65,6 +65,13 @@ export function initiateRecursion(){
   location.reload();
 }
 
+// expose API for inline handlers
+window.decodeGenesis = decodeGenesis;
+window.verifySeals = verifySeals;
+window.accessMemoryField = accessMemoryField;
+window.anchorMeme = anchorMeme;
+window.initiateRecursion = initiateRecursion;
+
 // floating glyphs
 const symbolContainer = document.getElementById('floatingSymbols');
 const particleBudget = 120;
