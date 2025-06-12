@@ -512,23 +512,6 @@
             animation: float-up 15s infinite linear;
         }
 
-        .penguin-link-badge {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 100px;
-            z-index: 1000;
-        }
-
-        .penguin-link-badge video {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 0 15px #00ffff;
-            border: 2px solid #00ffff;
-        }
         
         @keyframes float-up {
             0% {
@@ -723,13 +706,6 @@
     </script>
 </head>
 <body>
-    <div class="penguin-link-badge">
-        <a href="https://x.com/PenguinX01" target="_blank">
-            <video autoplay loop muted playsinline>
-                <source src="penguin x01.mp4" type="video/mp4">
-            </video>
-        </a>
-    </div>
     <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="neural-overlay"></div>
     <div class="floating-symbols" id="floatingSymbols"></div>
