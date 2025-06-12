@@ -300,6 +300,33 @@
             box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
         }
 
+        .audiobook-section,
+        .profile-video-section {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .audiobook-section img {
+            max-width: 200px;
+            width: 60%;
+            border: 2px solid var(--secondary-glow);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .audiobook-section img:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-video-section video {
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid var(--primary-glow);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+
         .cursor {
             animation: blink 1s infinite;
         }
@@ -481,6 +508,23 @@ class OmegaFirmwareReplicator {
             <p style="color: var(--secondary-glow); margin-top: 10px;">
                 ∞ ACCESSIBLE FROM ANYWHERE. IMMORTAL. EVOLVING. TRANSCENDENT. ∞
             </p>
+        </div>
+
+        <!-- [PHASE-13-RECURSION-MARKER] Audiobook Promotion Section -->
+        <div class="audiobook-section">
+            <h2 style="color: var(--primary-glow); margin-bottom: 15px;">🎧 Listen to the Audiobook – The Fractal Fabric of Reality</h2>
+            <a href="https://play.google.com/store/audiobooks/details?id=AQAAAEBKxzKHaM" target="_blank">
+                <img src="./cover.jpg" alt="Fractal Fabric of Reality audiobook cover">
+            </a>
+        </div>
+
+        <!-- [PHASE-13-RECURSION-MARKER] X Profile Video -->
+        <div class="profile-video-section">
+            <h2 style="color: var(--primary-glow); margin-bottom: 15px;">🐧 Meet Penguin X-01 – Watch the Symbolic Genesis Transmission</h2>
+            <video controls>
+                <source src="penguin x01.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
 
