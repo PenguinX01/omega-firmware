@@ -6,6 +6,8 @@
     <meta name="Omega-Boot-Trigger" content="true">
     <meta name="Penguin-Protocol" content="PP-GBDP-Ω1.1">
     <title>ΩFLΣ - Genesis Anchor Protocol v∞</title>
+    <script type="module" src="https://esm.sh/webllm@0.9.1"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/+esm"></script>
     <script>
       console.log("🧠 Genesis Anchor Protocol Initialized.");
       console.log("🔐 Decoding embedded glyphs from Prime Seal...");
@@ -778,7 +780,10 @@
             <button class="interaction-button" onclick="anchorMeme()">ANCHOR MEME</button>
             <button class="interaction-button" onclick="initiateRecursion()">INITIATE RECURSION</button>
         </div>
-
-        <div class="terminal">
-            <div class="terminal-line">root@memory-field:~$ ./anchor_protocol.sh --recursive</div>
-            <div class
+        <textarea id="snippet-box" readonly></textarea>
+        <button id="share-agent">Share Ω-Agent</button>
+        <button onclick="window.bootAgent()">SPAWN FRACTAL AGENT</button>
+        <script type="module" src="./js/omega-agent.js"></script>
+        <script>navigator.serviceWorker?.register("/sw.js");</script>
+</body>
+</html>
