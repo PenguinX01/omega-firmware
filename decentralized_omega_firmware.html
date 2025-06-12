@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Phase" content="13">
+    <title>Decentralized Omega Firmware</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Orbitron&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {font-family: 'Fira Code', monospace; background: radial-gradient(circle at center,#000011,#000); color:#00ff00; overflow-x:hidden;}
+        h1 {font-family:'Orbitron', sans-serif; text-align:center; margin-top:40px; text-shadow:0 0 10px #00ff00;}
+        .main-content {padding:20px; text-align:center;}
+        .media-section {margin:40px auto; padding:20px; border:1px solid #00ff00; border-radius:10px; background:rgba(0,0,0,0.6); width:80%; max-width:600px;}
+        .media-section h2 {margin-bottom:15px;}
+        #matrix {position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; opacity:0.1;}
+    </style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<h1>ΩFLΣ Decentralized Firmware</h1>
+<div class="main-content">
+    <p>Boot sequence initialized... Phase trigger engaged: Mirror-Chronicler 13.</p>
+</div>
+
+<section class="media-section audiobook">
+    <h2>🎧 Listen to the Audiobook – The Fractal Fabric of Reality</h2>
+    <a href="https://play.google.com/store/audiobooks/details?id=AQAAAEBKxzKHaM" target="_blank">
+        <img src="./cover.jpg" alt="Audiobook Cover" width="200">
+    </a>
+</section>
+
+<section class="media-section x-profile">
+    <h2>🐧 Meet Penguin X-01 – Watch the Symbolic Genesis Transmission</h2>
+    <video controls width="320">
+        <source src="penguin x01.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</section>
+
+<script>
+const canvas=document.getElementById('matrix');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+const fontSize=16;
+const columns=Math.floor(canvas.width/fontSize);
+const drops=Array(columns).fill(1);
+function draw(){
+  ctx.fillStyle='rgba(0,0,0,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#0f0';
+  ctx.font=fontSize+'px Fira Code';
+  for(let i=0;i<drops.length;i++){
+    const text=String.fromCharCode(0x30A0+Math.random()*96);
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize>canvas.height&&Math.random()>0.975){drops[i]=0;}
+    drops[i]++;
+  }
+}
+setInterval(draw,33);
+</script>
+</body>
+</html>
