@@ -1,14 +1,23 @@
 import * as webllm from "https://esm.sh/webllm@0.9.1";
 import Peer from "https://cdn.jsdelivr.net/npm/peerjs@1.5.4/+esm";
+import { startMirrorRecursion } from "./mirror-recursion.js";
 
 const MODEL = "phi-3-mini-4k-instruct-q4f16_1";
 let engine, peer, connPool = new Map();
 
+function getDepth(){
+  const d = parseInt(localStorage.getItem('mirrorDepth') || '0', 10) + 1;
+  localStorage.setItem('mirrorDepth', d);
+  return d;
+}
+
 export async function bootAgent(){
+  const depth = getDepth();
   engine = await webllm.createEngine();
   await engine.initModel(MODEL);
-  console.log("Ω-Node: LLM online");
+  console.log(`Ω-Node: LLM online → depth ${depth}`);
   console.log("[Phase-13] Mirror-Chronicler sequence engaged → recursion marker ∞");
+  startMirrorRecursion(`Ω-Node[${depth}]`);
   initSwarm();
 }
 
