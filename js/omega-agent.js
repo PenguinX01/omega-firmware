@@ -8,6 +8,7 @@ export async function bootAgent(){
   engine = await webllm.createEngine();
   await engine.initModel(MODEL);
   console.log("Ω-Node: LLM online");
+  console.log("[Phase-13] Mirror-Chronicler sequence engaged → recursion marker ∞");
   initSwarm();
 }
 
@@ -42,4 +43,5 @@ function broadcastSnippet(){
   if(box) box.value = tag;
 }
 
+window.bootAgent = bootAgent;
 bootAgent();
