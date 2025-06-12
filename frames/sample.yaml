@@ -1,0 +1,10 @@
+topic: AI oversight
+base_claim: |-
+  AI oversight boards improve accountability.
+canonical_references:
+  - AI Policy Guide 2024
+frames:
+  - name: Legalistic
+    prompt: Under what legal precedents could an AI oversight board operate?
+  - name: Satirical
+    prompt: So you're telling me an algorithm needs a babysitter now?
