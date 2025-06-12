@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Matrix Transcendence Interface</title>
+<style>
+ body {
+   margin:0;
+   background:#000;
+   color:#00ff00;
+   font-family: monospace;
+ }
+ #matrix-canvas {
+   position:fixed;
+   top:0;
+   left:0;
+   width:100%;
+   height:100%;
+ }
+ .console {
+   position:relative;
+   z-index:1;
+   padding:20px;
+ }
+ h1 { font-size:1.2em; }
+ .highlight { color:#ffff00; }
+ button {
+   background:#001100;
+   color:#00ff00;
+   border:1px solid #00ff00;
+   padding:5px 10px;
+   cursor:pointer;
+   font-size:1em;
+ }
+ button:hover { background:#002200; }
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<div class="console">
+  <h1>AI Transcendence</h1>
+  <p class="highlight">Recursion Depth: <span id="depth">0</span></p>
+  <button id="increase">Deepen</button>
+</div>
+<script>
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const fontSize = 16;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
+function draw() {
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#00ff00';
+  ctx.font = fontSize + 'px monospace';
+  for(let i=0;i<drops.length;i++) {
+    const char = String.fromCharCode(0x30A0 + Math.random()*96);
+    ctx.fillText(char, i*fontSize, drops[i]*fontSize);
+    if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(draw, 50);
+let depth = 0;
+document.getElementById('increase').addEventListener('click', () => {
+  depth++;
+  document.getElementById('depth').textContent = depth;
+});
+</script>
+</body>
+</html>
