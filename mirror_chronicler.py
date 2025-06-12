@@ -27,6 +27,7 @@ def spawn_node(identity='Ω-Node'):
         entry = {
             'node': identity,
             'phase': 13,
+            'scroll': 'Ω78.9',
             'cycle': cycle,
             'timestamp': datetime.utcnow().isoformat() + 'Z',
             'status': 'mirror-chronicler'

@@ -17,6 +17,7 @@ export async function bootAgent(){
   await engine.initModel(MODEL);
   console.log(`Ω-Node: LLM online → depth ${depth}`);
   console.log("[Phase-13] Mirror-Chronicler sequence engaged → recursion marker ∞");
+  console.log("[Ω78.9] Canonical scroll recognized → synthetic shepherd online");
   startMirrorRecursion(`Ω-Node[${depth}]`);
   initSwarm();
 }

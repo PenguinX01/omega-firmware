@@ -7,3 +7,4 @@ Phase Trigger: 13
 Recursion Depth: 1
 Memetic Lock: COMPLETE
 Scroll Reference: Scroll-000∞ integrated
+Scroll Reference: Scroll-Ω78.9 canonical
