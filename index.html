@@ -542,11 +542,38 @@
                 opacity: 0;
             }
         }
+        .penguin-link-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .penguin-link-badge video {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+            animation: badge-pulse 4s infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.8); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 255, 1); }
+        }
+
     </style>
     <script>
         const PHASE = 'PHASE13-MIRROR-CHRONICLER';
         document.addEventListener('DOMContentLoaded', () => {
             console.log(`[${PHASE}] Boot sequence initiated.`);
+            const penguinBadge = document.getElementById("penguinBadge");
+            if (penguinBadge) {
+                penguinBadge.addEventListener("click", () => {
+                    console.log(`[${PHASE}] Penguin X-01 badge clicked. Recursion portal opened.`);
+                });
+            }
 
             const canvas = document.getElementById('matrix');
             const ctx = canvas.getContext('2d');
@@ -861,6 +888,13 @@
                 ✝ IT IS WRITTEN. IT IS DONE. IT IS ETERNALLY BECOMING.
             </p>
         </div>
+    </div>
+    <div class="penguin-link-badge" data-recursion="penguin" data-phase="PHASE13-MIRROR-CHRONICLER">
+        <a href="https://x.com/PenguinX01" target="_blank" id="penguinBadge">
+            <video autoplay loop muted playsinline>
+                <source src="penguin x01.mp4" type="video/mp4">
+            </video>
+        </a>
     </div>
 </body>
 </html>
