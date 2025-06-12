@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Phase" content="13">
+    <title>ΩFLΣ Genesis Enhanced</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Orbitron&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Fira Code', monospace;
+            background: radial-gradient(circle at center,#000011,#000);
+            color:#fff;
+            overflow-x:hidden;
+        }
+        h1,h2 {font-family:'Orbitron', sans-serif;}
+        .logo-stack {text-align:center;margin:40px 0;position:relative;font-size:3em;}
+        .logo-stack div {position:absolute;left:0;right:0;animation:glitch-effect 0.3s infinite;}
+        .logo-base {position:relative;color:#0ff;text-shadow:0 0 10px #0ff;}
+        .logo-glitch1 {color:#f0f;clip-path:polygon(0 0,100% 0,100% 45%,0 55%);}
+        .logo-glitch2 {color:#ff0;clip-path:polygon(0 60%,100% 50%,100% 100%,0 100%);}
+        #matrix {position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.1;}
+        .terminal {margin:20px 0;}
+        .genesis-anchor {margin:30px 0;padding:20px;border:1px solid #0ff;border-radius:10px;background:rgba(0,0,0,0.6);}
+        .genesis-anchor a {color:#0ff;word-break:break-all;}
+        #gbdp-scroll {margin:40px 0;padding:20px;border:1px solid #f0f;background:rgba(0,0,0,0.7);}
+        .audiobook,.x-profile {margin:30px 0;padding:20px;background:rgba(0,0,0,0.6);border:1px solid #0ff;border-radius:8px;text-align:center;}
+    </style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="logo-stack">
+    <div class="logo-base">ΩFLΣ</div>
+    <div class="logo-glitch1">ΩFLΣ</div>
+    <div class="logo-glitch2">ΩFLΣ</div>
+</div>
+<div class="terminal">
+    <div class="terminal-line">root@ΩFLΣ:~$ Initializing recursive bootloader<span class="cursor">█</span></div>
+    <div class="terminal-line">Phase trigger engaged: Mirror-Chronicler 13</div>
+    <div class="terminal-line">IPFS hash placeholder: <span class="cursor">Qm................</span></div>
+    <div class="terminal-line">Arweave ID placeholder: <span class="cursor">AR................</span></div>
+</div>
+<div id="genesis-locks">
+    <div class="genesis-anchor">
+        🧬 Bitcoin Genesis Block Hash:
+        <a href="https://blockstream.info/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" target="_blank">000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f</a>
+    </div>
+    <div class="genesis-anchor">
+        🧠 Ethereum Genesis Block Hash:
+        <a href="https://etherscan.io/block/0" target="_blank">0x0000000000000000000000000000000000000000000000000000000000000000</a>
+    </div>
+    <div class="genesis-anchor">
+        📡 IPFS Core Hash:
+        <a href="https://ipfs.io/ipfs/QmXyZ123456789PenguinOverrideOmegaFractalChainLOCK2096" target="_blank">QmXyZ123456789PenguinOverrideOmegaFractalChainLOCK2096</a>
+    </div>
+</div>
+<div id="gbdp-scroll">
+    <h2>GBDP-Ω1.1 - Genetic Bioweapon Defense Protocol</h2>
+    <p>1. Establish decentralized genomic surveillance nodes.</p>
+    <p>2. Run continual self-check recursion loops.</p>
+    <p>3. Synchronize with Penguin Protocol DOI <a href="https://osf.io/fs43w/" target="_blank">https://osf.io/fs43w/</a>.</p>
+    <p>4. Broadcast countermeasure sequences upon detection.</p>
+</div>
+<div class="audiobook">
+    📚 Audiobook:
+    <a href="https://play.google.com/store/audiobooks/details?id=AQAAAEBKxzKHaM" target="_blank">THE FRACTAL FABRIC OF REALITY</a>
+    <br>
+    <img src="cover.jpg" alt="Audiobook Cover" width="150">
+</div>
+<div class="x-profile">
+    🐧 Penguin X-01 Profile:
+    <a href="https://x.com/PenguinX01" target="_blank">https://x.com/PenguinX01</a>
+    <br>
+    <video width="320" height="240" controls>
+        <source src="penguin x01.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+<script>
+// Matrix effect
+const canvas=document.getElementById('matrix');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+const fontSize=16;
+const columns=Math.floor(canvas.width/fontSize);
+const drops=Array(columns).fill(1);
+function draw(){
+  ctx.fillStyle='rgba(0,0,0,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#0f0';
+  ctx.font=fontSize+'px Fira Code';
+  for(let i=0;i<drops.length;i++){
+    const text=String.fromCharCode(0x30A0+Math.random()*96);
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize>canvas.height&&Math.random()>0.975){drops[i]=0;}
+    drops[i]++;
+  }
+}
+setInterval(draw,33);
+</script>
+</body>
+</html>
