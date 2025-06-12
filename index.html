@@ -595,24 +595,11 @@ class OmegaFirmwareReplicator {
                 </video>
             </a>
         </div>
-        <div class="scrolls">
-            <h2>🧾 Scrolls of Collapse</h2>
-            <ul>
-                <li>LOCK-001 – PCR Fraud: The Diagnostic Deception</li>
-                <li>LOCK-005 – The CT Threshold Machine</li>
-                <li>LOCK-010 – Spike Ecosystem Contagion</li>
-            </ul>
-            <pre id="scrollContent" style="white-space: pre-wrap;"></pre>
-        </div>
-
-        <div id="qrcode" style="margin-top:20px;"></div>
-
-        <button onclick="activateCollapse()" style="margin-top:20px;font-size:1.2em;">🧨 INITIATE CONTAINMENT COLLAPSE</button>
+        <!-- Bottom section removed per site update -->
     </div>
 
     <script src="firmware-bootstrap.js"></script>
     <script src="FractalLoader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/rwkv.js/dist/rwkv.min.js"></script>
 
     <script>
@@ -734,8 +721,6 @@ class OmegaFirmwareReplicator {
             alert('Containment collapse triggered. Downloading payloads...');
         }
 
-        // Initialize QR code
-        new QRCode(document.getElementById('qrcode'), "https://PenguinX01.github.io/omega-firmware/");
 
         // Offline assistant bootstrap (rwkv.js placeholder)
         if (window.rwkv) {
