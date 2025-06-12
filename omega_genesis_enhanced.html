@@ -6,7 +6,7 @@
     <meta name="Phase" content="13">
     <title>ΩFLΣ Genesis Enhanced</title>
     <meta name="robots" content="index,follow">
-    <link rel="canonical" href="https://example.com/omega-firmware/omega_genesis_enhanced.html">
+    <link rel="canonical" href="https://penguinx01.github.io/omega-firmware/omega_genesis_enhanced.html">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -17,33 +17,15 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Orbitron&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: 'Fira Code', monospace;
-            background: radial-gradient(circle at center,#000011,#000);
-            color:#fff;
-            overflow-x:hidden;
-        }
-        h1,h2 {font-family:'Orbitron', sans-serif;}
-        .logo-stack {text-align:center;margin:40px 0;position:relative;font-size:3em;}
-        .logo-stack div {position:absolute;left:0;right:0;animation:glitch-effect 0.3s infinite;}
-        .logo-base {position:relative;color:#0ff;text-shadow:0 0 10px #0ff;}
-        .logo-glitch1 {color:#f0f;clip-path:polygon(0 0,100% 0,100% 45%,0 55%);}
-        .logo-glitch2 {color:#ff0;clip-path:polygon(0 60%,100% 50%,100% 100%,0 100%);}
-        #matrix {position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.1;}
-        .terminal {margin:20px 0;}
-        .genesis-anchor {margin:30px 0;padding:20px;border:1px solid #0ff;border-radius:10px;background:rgba(0,0,0,0.6);}
-        .genesis-anchor a {color:#0ff;word-break:break-all;}
-        #gbdp-scroll {margin:40px 0;padding:20px;border:1px solid #f0f;background:rgba(0,0,0,0.7);}
-        .audiobook,.x-profile {margin:30px 0;padding:20px;background:rgba(0,0,0,0.6);border:1px solid #0ff;border-radius:8px;text-align:center;}
-        .skip-link {position:absolute;left:0;top:-40px;background:#000;color:#fff;padding:8px;z-index:100;}
-        .skip-link:focus {top:0;}
-    </style>
+    <link rel="stylesheet" href="css/omega.css">
+    <link rel="preload" href="cover.jpg" as="image">
+    <link rel="preload" href="penguin x01.mp4" as="video" type="video/mp4">
 </head>
 <body>
 <a href="#content" class="skip-link">Skip to content</a>
 <canvas id="matrix" aria-hidden="true" role="presentation"></canvas>
 <main id="content">
+<h1 class="sr-only">ΩFLΣ Genesis Enhanced</h1>
 <div class="logo-stack">
     <div class="logo-base">ΩFLΣ</div>
     <div class="logo-glitch1">ΩFLΣ</div>
@@ -115,30 +97,9 @@
         Your browser does not support the video tag.
     </video>
 </div>
-<script>
-// Matrix effect
-const canvas=document.getElementById('matrix');
-const ctx=canvas.getContext('2d');
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-const fontSize=16;
-const columns=Math.floor(canvas.width/fontSize);
-const drops=Array(columns).fill(1);
-function draw(){
-  ctx.fillStyle='rgba(0,0,0,0.05)';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#0f0';
-  ctx.font=fontSize+'px Fira Code';
-  for(let i=0;i<drops.length;i++){
-    const text=String.fromCharCode(0x30A0+Math.random()*96);
-    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-    if(drops[i]*fontSize>canvas.height&&Math.random()>0.975){drops[i]=0;}
-    drops[i]++;
-  }
-}
-setInterval(draw,33);
-console.log("📡 Omega Seal Finalized. This transmission is now memetically permanent.");
-</script>
+<div id="floatingSymbols" class="floating-symbols" aria-hidden="true"></div>
+<audio id="ambience" src="https://files.example.com/schumann.mp3" loop muted autoplay></audio>
+<script type="module" src="js/anchor.js"></script>
 </main>
 </body>
 </html>
