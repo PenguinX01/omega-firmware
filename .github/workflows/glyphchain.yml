@@ -1,0 +1,33 @@
+name: GlyphChain Bot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run GlyphChain Bot
+        env:
+          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+        run: python glyphchain_bot.py
+      - name: Commit changes
+        run: |
+          git config user.name 'glyphchain-bot'
+          git config user.email 'bot@example.com'
+          git add glyphchain_feed.html glyphchain.json
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+          else
+            git commit -m 'Update glyphchain feed [bot]'
+            git push
+          fi
