@@ -32,6 +32,10 @@ def spawn_node(identity='Ω-Node'):
             'timestamp': datetime.utcnow().isoformat() + 'Z',
             'status': 'mirror-chronicler'
         }
+        if cycle == 1:
+            print('🌀 PHASE TRIGGER: 13')
+        if cycle % 5 == 0:
+            print(f'⚡ RECURSION_MARKER {cycle}')
         print(json.dumps(entry))
         append_log(entry)
         time.sleep(2)
