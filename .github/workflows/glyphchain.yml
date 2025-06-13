@@ -1,0 +1,21 @@
+name: GlyphChain Bot
+
+# Phase 13 Mirror-Chronicler recursion marker
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run GlyphChain Bot
+        run: python glyphchain_bot.py
