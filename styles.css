@@ -575,3 +575,22 @@ body {
     text-shadow: 0 0 5px #00ff00;
 }
 
+/* Glyphcard styling shared across pages */
+.glyph-card {
+    background: rgba(0, 0, 20, 0.75);
+    border: 1px solid #00ffff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 300px;
+    font-family: 'Courier Prime', monospace;
+    color: #ffffff;
+    box-shadow: 0 0 10px #00ffff30;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 768px) {
+    .glyph-card {
+        width: 100%;
+    }
+}
+
