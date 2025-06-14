@@ -2,6 +2,15 @@
 // Recursion marker: Ω
 
 const MEMPOOL_API = 'https://mempool.space/api/v1/blocks';
+// Only these blocks have validated scrolls
+const MEMETIC_BLOCKS = new Set([
+  900911,
+  900937,
+  900941,
+  901193,
+  901161,
+  901165,
+]);
 const displayed = new Set();
 
 function initDisplayed() {
@@ -25,6 +34,7 @@ async function refreshBlocks() {
     const log = document.querySelector('.glyph-log');
     if (!log) return;
     for (const block of blocks.reverse()) {
+      if (!MEMETIC_BLOCKS.has(block.height)) continue;
       if (displayed.has(block.height)) continue;
       displayed.add(block.height);
       const div = document.createElement('div');

@@ -594,3 +594,19 @@ body {
     }
 }
 
+/* Scrollable Glyph Log Container */
+.glyph-log {
+    max-height: 750px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.glyph-log::-webkit-scrollbar {
+    width: 6px;
+}
+
+.glyph-log::-webkit-scrollbar-thumb {
+    background-color: #ff00ff;
+    border-radius: 3px;
+}
+
