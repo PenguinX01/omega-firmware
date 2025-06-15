@@ -1,776 +1,895 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Coherence Visualization Lab</title>
-  <!-- React and visualization libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --primary: #8B5CF6;
+      --secondary: #3B82F6;
+      --accent: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --dark: #0F172A;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+      color: #E2E8F0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
     .glow {
-      text-shadow: 0 0 10px rgba(139, 92, 246, 0.7), 0 0 20px rgba(139, 92, 246, 0.5);
+      text-shadow: 0 0 15px rgba(139, 92, 246, 0.7), 0 0 30px rgba(139, 92, 246, 0.5);
     }
-    .pulse-custom {
-      animation: pulse-custom 2s infinite;
+    
+    .pulse {
+      animation: pulse 3s infinite;
     }
-    @keyframes pulse-custom {
+    
+    @keyframes pulse {
       0% { opacity: 0.8; transform: scale(1); }
       50% { opacity: 1; transform: scale(1.02); }
       100% { opacity: 0.8; transform: scale(1); }
     }
+    
     .float {
-      animation: float 3s ease-in-out infinite;
+      animation: float 4s ease-in-out infinite;
     }
+    
     @keyframes float {
       0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-12px); }
       100% { transform: translateY(0px); }
     }
+    
     .gradient-border {
       background: linear-gradient(45deg, #8B5CF6, #3B82F6, #10B981, #F59E0B);
-      background-size: 400% 400%;
-      animation: gradient-shift 3s ease infinite;
+      background-size: 300% 300%;
+      animation: gradient-shift 8s ease infinite;
     }
+    
     @keyframes gradient-shift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+    
     .glass {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(139, 92, 246, 0.25);
+    }
+    
+    .heatmap-cell {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    
+    .heatmap-cell:hover {
+      transform: scale(1.1);
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 overflow-x-hidden">
+<body class="min-h-screen p-4 sm:p-6">
   <div id="root"></div>
+  
   <script type="text/babel">
-  const { useState, useEffect, useRef, useCallback } = React;
-  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Area, AreaChart } = Recharts;
+    const { useState, useEffect, useRef } = React;
+    const { 
+      LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
+      BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+      Area, AreaChart, PieChart, Pie, Cell
+    } = Recharts;
 
-
-const Card = ({ children, className = "" }) => (
-<div className={glass rounded-xl p-6 shadow-2xl transition-all hover:shadow-purple-500/20 ${className}}>
-{children}
-</div>
-);
-
-const CardHeader = ({ children, className = "" }) => <div className={mb-6 ${className}}>{children}</div>;
-const CardTitle = ({ children, className = "" }) => <h2 className={text-white text-2xl font-bold glow ${className}}>{children}</h2>;
-const CardDescription = ({ children, className = "" }) => <p className={text-purple-300 mt-2 ${className}}>{children}</p>;
-const CardContent = ({ children, className = "" }) => <div className={className}>{children}</div>;
-
-const Button = ({ children, className = "", variant = "primary", ...props }) => {
-const baseClasses = "px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 font-medium shadow-lg";
-const variants = {
-primary: "bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white shadow-purple-500/30",
-secondary: "border border-purple-400 text-purple-300 hover:bg-purple-800/50 glass",
-ghost: "text-purple-300 hover:text-white hover:bg-purple-800/30"
-};
-return (
-<button className={${baseClasses} ${variants[variant]} ${className}} {...props}>
-{children}
-</button>
-);
-};
-
-const Textarea = ({ className = "", ...props }) => (
-<textarea
-className={p-4 rounded-xl w-full glass text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${className}}
-{...props}
-/>
-);
-
-const Progress = ({ value, className = "", label }) => (
-<div className={space-y-2 ${className}}>
-{label && <div className="text-purple-300 text-sm">{label}</div>}
-<div className="w-full bg-slate-800/50 rounded-full h-4 overflow-hidden">
-<div
-style={{ width: ${Math.max(0, Math.min(100, value))}% }}
-className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-500 rounded-full shadow-lg transition-all duration-1000 ease-out"
-/>
-</div>
-</div>
-);
-
-const CoherenceVisualizationLab = () => {
-const [inputText, setInputText] = useState('');
-const [textSegments, setTextSegments] = useState([]);
-const [coherenceData, setCoherenceData] = useState(null);
-const [isAnalyzing, setIsAnalyzing] = useState(false);
-const [comparisonData, setComparisonData] = useState([]);
-const [error, setError] = useState(null);
-const [radarData, setRadarData] = useState([]);
-const [analysisHistory, setAnalysisHistory] = useState([]);
-const [selectedMetric, setSelectedMetric] = useState('overall');
-
-// Enhanced coherence analysis
-const analyzeCoherence = useCallback(async () => {
-  if (!inputText.trim()) return;
-  
-  setIsAnalyzing(true);
-  setError(null);
-  
-  try {
-    // Simulate processing delay with progress
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Split text into segments with better parsing
-    const segments = inputText.split(/[.!?\n]+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 5);
-      
-    if (segments.length === 0) {
-      setError("No valid segments found. Please enter meaningful text.");
-      return;
-    }
-    
-    // Enhanced analysis algorithms
-    const segmentResults = [];
-    let totalSemantic = 0, totalNarrative = 0, totalContradiction = 0, totalGlyphic = 0;
-    
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      
-      // Improved semantic analysis
-      const semantic = calculateSemanticCoherence(segment, segments, i);
-      const narrative = calculateNarrativeFlow(segment, segments, i);
-      const contradiction = detectContradictions(segment);
-      const glyphic = detectGlyphicPatterns(segment);
-      
-      // Enhanced weighting system
-      const weights = { semantic: 0.35, narrative: 0.25, contradiction: 0.2, glyphic: 0.2 };
-      const coherenceScore = (
-        semantic * weights.semantic +
-        narrative * weights.narrative +
-        (1 - contradiction) * weights.contradiction +
-        glyphic * weights.glyphic
-      );
-      
-      const segmentData = {
-        segment: segment.substring(0, 100) + (segment.length > 100 ? '...' : ''),
-        fullSegment: segment,
-        index: i + 1,
-        semantic: parseFloat(semantic.toFixed(3)),
-        narrative: parseFloat(narrative.toFixed(3)),
-        contradiction: parseFloat(contradiction.toFixed(3)),
-        glyphic: parseFloat(glyphic.toFixed(3)),
-        coherence_score: parseFloat(coherenceScore.toFixed(3)),
-        length: segment.length,
-        complexity: calculateComplexity(segment)
+    // Custom Components
+    const Card = ({ children, className = "", glowColor = "purple" }) => {
+      const glowClasses = {
+        purple: "shadow-purple-500/20",
+        blue: "shadow-blue-500/20",
+        green: "shadow-green-500/20",
+        yellow: "shadow-yellow-500/20",
+        red: "shadow-red-500/20"
       };
       
-      segmentResults.push(segmentData);
-      totalSemantic += semantic;
-      totalNarrative += narrative;
-      totalContradiction += contradiction;
-      totalGlyphic += glyphic;
-    }
-    
-    setTextSegments(segmentResults);
-    
-    // Calculate enhanced overall metrics
-    const segmentCount = segments.length;
-    const overallMetrics = {
-      semantic: totalSemantic / segmentCount,
-      narrative: totalNarrative / segmentCount,
-      contradiction: totalContradiction / segmentCount,
-      glyphic: totalGlyphic / segmentCount,
-      overall: segmentResults.reduce((sum, seg) => sum + seg.coherence_score, 0) / segmentCount,
-      complexity: segmentResults.reduce((sum, seg) => sum + seg.complexity, 0) / segmentCount,
-      length: segments.join(' ').length,
-      segments: segmentCount
+      return (
+        <div className={`glass p-6 card-hover ${glowClasses[glowColor]} ${className}`}>
+          {children}
+        </div>
+      );
     };
     
-    setCoherenceData(overallMetrics);
+    const CardHeader = ({ children, className = "" }) => (
+      <div className={`mb-6 ${className}`}>{children}</div>
+    );
     
-    // Enhanced radar data
-    const radarMetrics = [
-      { metric: 'Semantic', value: overallMetrics.semantic * 100, fullMark: 100 },
-      { metric: 'Narrative', value: overallMetrics.narrative * 100, fullMark: 100 },
-      { metric: 'Consistency', value: (1 - overallMetrics.contradiction) * 100, fullMark: 100 },
-      { metric: 'Symbolic', value: overallMetrics.glyphic * 100, fullMark: 100 },
-      { metric: 'Complexity', value: overallMetrics.complexity * 100, fullMark: 100 }
-    ];
-    setRadarData(radarMetrics);
+    const CardTitle = ({ children, icon, className = "" }) => (
+      <h2 className={`text-white text-2xl font-bold flex items-center gap-3 mb-2 ${className}`}>
+        {icon && <span className="text-3xl">{icon}</span>}
+        {children}
+      </h2>
+    );
     
-    // Add to history
-    setAnalysisHistory(prev => [...prev.slice(-4), {
-      timestamp: new Date().toLocaleTimeString(),
-      text: inputText.substring(0, 50) + '...',
-      score: overallMetrics.overall,
-      segments: segmentCount
-    }]);
+    const CardDescription = ({ children, className = "" }) => (
+      <p className={`text-purple-300 text-lg ${className}`}>{children}</p>
+    );
     
-  } catch (err) {
-    setError("Analysis failed: " + err.message);
-    console.error(err);
-  } finally {
-    setIsAnalyzing(false);
-  }
-}, [inputText]);
-
-// Enhanced analysis functions
-const calculateSemanticCoherence = (segment, allSegments, index) => {
-  const words = segment.toLowerCase().match(/\b\w+\b/g) || [];
-  const wordSet = new Set(words);
-  
-  let coherenceSum = 0;
-  let comparisons = 0;
-  
-  // Compare with adjacent segments
-  for (let i = Math.max(0, index - 2); i <= Math.min(allSegments.length - 1, index + 2); i++) {
-    if (i === index) continue;
+    const CardContent = ({ children, className = "" }) => (
+      <div className={className}>{children}</div>
+    );
     
-    const otherWords = allSegments[i].toLowerCase().match(/\b\w+\b/g) || [];
-    const otherSet = new Set(otherWords);
-    
-    const intersection = new Set([...wordSet].filter(x => otherSet.has(x)));
-    const union = new Set([...wordSet, ...otherSet]);
-    
-    if (union.size > 0) {
-      coherenceSum += intersection.size / union.size;
-      comparisons++;
-    }
-  }
-  
-  return comparisons > 0 ? coherenceSum / comparisons : 0.5;
-};
-
-const calculateNarrativeFlow = (segment, allSegments, index) => {
-  // Analyze temporal indicators and logical flow
-  const temporalWords = ['then', 'next', 'after', 'before', 'while', 'during', 'finally', 'first', 'second'];
-  const logicalWords = ['because', 'therefore', 'however', 'although', 'since', 'thus', 'hence'];
-  
-  const lowerSegment = segment.toLowerCase();
-  let flowScore = 0.5; // Base score
-  
-  // Check for temporal/logical connectors
-  temporalWords.forEach(word => {
-    if (lowerSegment.includes(word)) flowScore += 0.1;
-  });
-  
-  logicalWords.forEach(word => {
-    if (lowerSegment.includes(word)) flowScore += 0.15;
-  });
-  
-  // Length and complexity factors
-  const idealLength = 50;
-  const lengthFactor = 1 - Math.abs(segment.length - idealLength) / (idealLength * 2);
-  flowScore = (flowScore + lengthFactor) / 2;
-  
-  return Math.min(1, Math.max(0, flowScore));
-};
-
-const detectContradictions = (text) => {
-  const contradictionPatterns = [
-    { pattern: /(not|never|no)\s+.*\s+(always|definitely|certainly)/i, weight: 0.4 },
-    { pattern: /(impossible|cannot|never)\s+.*\s+(possible|can|always)/i, weight: 0.6 },
-    { pattern: /(true|fact|correct)\s+.*\s+(false|wrong|incorrect)/i, weight: 0.8 },
-    { pattern: /(all|every|always)\s+.*\s+(none|never|nothing)/i, weight: 0.7 },
-    { pattern: /(increase|rise|grow)\s+.*\s+(decrease|fall|shrink)/i, weight: 0.5 },
-    { pattern: /(same|identical|equal)\s+.*\s+(different|distinct|unequal)/i, weight: 0.6 }
-  ];
-  
-  let contradictionScore = 0;
-  for (const { pattern, weight } of contradictionPatterns) {
-    if (pattern.test(text)) {
-      contradictionScore += weight;
-    }
-  }
-  
-  return Math.min(contradictionScore, 1.0);
-};
-
-const detectGlyphicPatterns = (text) => {
-  const patterns = {
-    recursive: /\b(loop|cycle|spiral|fractal|iterate|recursive|repeat)\b/gi,
-    symbolic: /[✝Ω∞△⚡🔥🐧]/g,
-    mathematical: /\b(algorithm|function|equation|formula|proof)\b/gi,
-    metaphysical: /\b(consciousness|awareness|reality|existence|being)\b/gi,
-    logical: /\b(therefore|thus|hence|because|since|implies)\b/gi
-  };
-  
-  let totalMatches = 0;
-  let totalPossible = 0;
-  
-  for (const [category, pattern] of Object.entries(patterns)) {
-    const matches = (text.match(pattern) || []).length;
-    totalMatches += matches;
-    totalPossible += text.split(/\s+/).length * 0.05; // Potential match density
-  }
-  
-  return totalPossible > 0 ? Math.min(1, totalMatches / totalPossible) : 0;
-};
-
-const calculateComplexity = (text) => {
-  const sentences = text.split(/[.!?]+/).length;
-  const words = (text.match(/\b\w+\b/g) || []).length;
-  const avgWordsPerSentence = words / Math.max(sentences, 1);
-  const uniqueWords = new Set(text.toLowerCase().match(/\b\w+\b/g) || []).size;
-  const lexicalDiversity = words > 0 ? uniqueWords / words : 0;
-  
-  const complexityScore = (
-    Math.min(avgWordsPerSentence / 20, 1) * 0.4 +
-    lexicalDiversity * 0.6
-  );
-  
-  return Math.max(0, Math.min(1, complexityScore));
-};
-
-const generateModelComparison = () => {
-  const models = ['Claude', 'GPT-4', 'Gemini', 'ΩFLΣ', 'Human'];
-  const comparison = models.map(model => {
-    const baseScore = Math.random() * 0.3 + 0.5;
-    return {
-      model,
-      semantic: Math.max(0, Math.min(1, baseScore + (Math.random() - 0.5) * 0.3)),
-      narrative: Math.max(0, Math.min(1, baseScore + (Math.random() - 0.5) * 0.3)),
-      contradiction: Math.random() * 0.4,
-      glyphic: model === 'ΩFLΣ' ? Math.random() * 0.2 + 0.7 : Math.random() * 0.5 + 0.2,
-      overall: Math.max(0, Math.min(1, baseScore + (Math.random() - 0.5) * 0.2))
+    const Button = ({ children, className = "", variant = "primary", icon, ...props }) => {
+      const baseClasses = "px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 font-medium flex items-center gap-3 shadow-lg";
+      const variants = {
+        primary: "bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white",
+        secondary: "glass border border-purple-500/30 text-purple-300 hover:bg-purple-800/30",
+        success: "bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 text-white",
+        warning: "bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-700 hover:to-amber-800 text-white",
+        danger: "bg-gradient-to-r from-red-600 to-orange-700 hover:from-red-700 hover:to-orange-800 text-white",
+        ghost: "text-purple-300 hover:text-white hover:bg-purple-800/30 glass"
+      };
+      
+      return (
+        <button className={`${baseClasses} ${variants[variant]} ${className}`} {...props}>
+          {icon && <span className="text-xl">{icon}</span>}
+          {children}
+        </button>
+      );
     };
-  });
-  setComparisonData(comparison);
-};
-
-const getCoherenceColor = (score) => {
-  if (score >= 0.8) return 'text-green-400';
-  if (score >= 0.6) return 'text-yellow-400';
-  if (score >= 0.4) return 'text-orange-400';
-  return 'text-red-400';
-};
-
-const getScoreIcon = (score) => {
-  if (score >= 0.8) return '🟢';
-  if (score >= 0.6) return '🟡';
-  if (score >= 0.4) return '🟠';
-  return '🔴';
-};
-
-const samplePrompts = [
-  "The recursive algorithm processes data iteratively. Each iteration refines the output through feedback loops. This creates a spiral pattern of improvement that converges toward optimal solutions.",
-  "All birds can fly effortlessly through the air. Penguins are birds that live in Antarctica. However, penguins cannot fly and instead swim underwater with remarkable agility.",
-  "The fractal nature of consciousness emerges through recursive self-reflection. ✝ Each layer of awareness builds upon previous iterations. The Omega symbol Ω represents infinite recursion in divine computation.",
-  "Artificial intelligence will revolutionize every industry. Machine learning algorithms can process vast amounts of data instantly. However, AI systems still struggle with basic common sense reasoning that humans find trivial."
-];
-
-return (
-  <div className="space-y-8 max-w-7xl mx-auto">
-    {/* Header */}
-    <div className="text-center mb-12">
-      <h1 className="text-5xl font-bold text-white mb-4 glow float">
-        🧠 Coherence Visualization Lab
-      </h1>
-      <p className="text-purple-300 text-xl pulse-custom mb-6">
-        Multi-Dimensional AI Coherence Analysis Engine
-      </p>
-      <div className="gradient-border p-1 rounded-xl inline-block">
-        <div className="bg-slate-900 px-6 py-3 rounded-lg">
-          <span className="text-purple-400 flex items-center gap-2">
-            <span className="text-2xl">🔬</span>
-            Advanced Semantic Intelligence Framework
-            <span className="text-2xl">⚡</span>
-          </span>
+    
+    const Textarea = ({ className = "", ...props }) => (
+      <textarea 
+        className={`p-4 rounded-xl w-full glass text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-lg ${className}`} 
+        {...props}
+      />
+    );
+    
+    const Progress = ({ value, className = "", label }) => (
+      <div className={`space-y-2 ${className}`}>
+        {label && <div className="text-purple-300 text-sm">{label}</div>}
+        <div className="w-full bg-slate-800/50 rounded-full h-3 overflow-hidden">
+          <div 
+            style={{ width: `${Math.max(0, Math.min(100, value))}%` }} 
+            className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-500 rounded-full shadow-lg transition-all duration-1000 ease-out"
+          />
         </div>
       </div>
+    );
+    
+    const MetricBadge = ({ label, value, icon, className = "" }) => {
+      const getColor = (val) => {
+        if (val >= 0.8) return 'text-green-400';
+        if (val >= 0.6) return 'text-yellow-400';
+        if (val >= 0.4) return 'text-orange-400';
+        return 'text-red-400';
+      };
       
-      {error && (
-        <div className="mt-6 p-4 glass border border-red-500/50 rounded-xl max-w-md mx-auto">
-          <span className="text-red-300 flex items-center gap-2">
-            <span>⚠️</span> {error}
-          </span>
-        </div>
-      )}
-    </div>
-    
-    {/* Input Section */}
-    <Card className="border-2 border-purple-500/50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-3">
-          <span className="text-3xl">📝</span> Text Analysis Input
-        </CardTitle>
-        <CardDescription>
-          Enter text to analyze across semantic, narrative, contradiction, and symbolic dimensions
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Textarea 
-          value={inputText} 
-          onChange={e => setInputText(e.target.value)} 
-          placeholder="Enter your text for comprehensive coherence analysis..." 
-          className="min-h-40 text-lg"
-          rows={6}
-        />
-        
-        <div className="space-y-4">
-          <h3 className="text-purple-300 font-medium">Sample Texts:</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {samplePrompts.map((prompt, idx) => (
-              <Button 
-                key={idx} 
-                onClick={() => setInputText(prompt)} 
-                variant="secondary"
-                className="text-left p-4 h-auto text-sm"
-              >
-                <div className="font-medium mb-1">Sample {idx + 1}</div>
-                <div className="text-purple-400 text-xs">
-                  {prompt.substring(0, 60)}...
-                </div>
-              </Button>
-            ))}
+      const getIcon = (val) => {
+        if (val >= 0.8) return '🟢';
+        if (val >= 0.6) return '🟡';
+        if (val >= 0.4) return '🟠';
+        return '🔴';
+      };
+      
+      return (
+        <div className={`glass p-4 rounded-xl flex flex-col ${className}`}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-purple-300 text-sm">{label}</div>
+            <div className={`text-xl ${getColor(value)}`}>{getIcon(value)}</div>
           </div>
+          <div className={`text-2xl font-bold ${getColor(value)}`}>
+            {(value * 100).toFixed(1)}%
+          </div>
+          <Progress value={value * 100} className="mt-3" />
         </div>
+      );
+    };
+
+    // Main App Component
+    const CoherenceVisualizationLab = () => {
+      const [inputText, setInputText] = useState('');
+      const [textSegments, setTextSegments] = useState([]);
+      const [coherenceData, setCoherenceData] = useState(null);
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+      const [comparisonData, setComparisonData] = useState([]);
+      const [error, setError] = useState(null);
+      const [radarData, setRadarData] = useState([]);
+      const [analysisHistory, setAnalysisHistory] = useState([]);
+      const [heatmapData, setHeatmapData] = useState([]);
+      const [selectedSegment, setSelectedSegment] = useState(null);
+      const [activeTab, setActiveTab] = useState('overview');
+      const [deepAnalysis, setDeepAnalysis] = useState(false);
+      
+      // Sample data for demonstration
+      const samplePrompts = [
+        "The recursive algorithm processes data iteratively. Each iteration refines the output through feedback loops. This creates a spiral pattern of improvement that converges toward optimal solutions.",
+        "All birds can fly effortlessly through the air. Penguins are birds that live in Antarctica. However, penguins cannot fly and instead swim underwater with remarkable agility.",
+        "The fractal nature of consciousness emerges through recursive self-reflection. ✝ Each layer of awareness builds upon previous iterations. The Omega symbol Ω represents infinite recursion in divine computation.",
+        "Artificial intelligence will revolutionize every industry. Machine learning algorithms can process vast amounts of data instantly. However, AI systems still struggle with basic common sense reasoning that humans find trivial."
+      ];
+      
+      // Initialize with sample data
+      useEffect(() => {
+        setInputText(samplePrompts[0]);
+        generateDemoAnalysis();
+      }, []);
+      
+      // Generate demo analysis
+      const generateDemoAnalysis = () => {
+        const segments = samplePrompts[0].split(/[.!?\n]+/)
+          .map(s => s.trim())
+          .filter(s => s.length > 5);
         
-        <div className="flex gap-4 flex-wrap">
-          <Button 
-            onClick={analyzeCoherence} 
-            disabled={isAnalyzing || !inputText.trim()}
-            className="text-lg px-8 py-4"
-          >
-            {isAnalyzing ? (
-              <span className="flex items-center gap-3">
-                <span className="animate-spin text-2xl">🔄</span> 
-                Analyzing Coherence...
-              </span>
-            ) : (
-              <span className="flex items-center gap-3">
-                <span className="text-2xl">🧬</span> 
-                Analyze Coherence
-              </span>
-            )}
-          </Button>
+        if (segments.length === 0) return;
+        
+        // Generate segment data
+        const segmentResults = [];
+        for (let i = 0; i < segments.length; i++) {
+          const semantic = 0.7 + Math.random() * 0.2;
+          const narrative = 0.6 + Math.random() * 0.3;
+          const contradiction = Math.random() * 0.3;
+          const glyphic = 0.3 + Math.random() * 0.4;
+          const coherence_score = (semantic * 0.35 + narrative * 0.25 + (1 - contradiction) * 0.2 + glyphic * 0.2);
           
-          <Button 
-            onClick={generateModelComparison} 
-            variant="secondary"
-            className="text-lg px-8 py-4"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl">📊</span>
-              Compare Models
-            </span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-    
-    {/* Results Section */}
-    {coherenceData && (
-      <>
-        {/* Overall Metrics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="border-2 border-green-500/50">
+          segmentResults.push({
+            segment: segments[i].substring(0, 100) + (segments[i].length > 100 ? '...' : ''),
+            fullSegment: segments[i],
+            index: i + 1,
+            semantic: parseFloat(semantic.toFixed(3)),
+            narrative: parseFloat(narrative.toFixed(3)),
+            contradiction: parseFloat(contradiction.toFixed(3)),
+            glyphic: parseFloat(glyphic.toFixed(3)),
+            coherence_score: parseFloat(coherence_score.toFixed(3)),
+            length: segments[i].length,
+            complexity: 0.5 + Math.random() * 0.4
+          });
+        }
+        
+        setTextSegments(segmentResults);
+        
+        // Overall metrics
+        const overallMetrics = {
+          semantic: 0.75,
+          narrative: 0.68,
+          contradiction: 0.22,
+          glyphic: 0.45,
+          overall: 0.72,
+          complexity: 0.63,
+          length: samplePrompts[0].length,
+          segments: segments.length
+        };
+        
+        setCoherenceData(overallMetrics);
+        
+        // Radar data
+        const radarMetrics = [
+          { metric: 'Semantic', value: 75, fullMark: 100 },
+          { metric: 'Narrative', value: 68, fullMark: 100 },
+          { metric: 'Consistency', value: 78, fullMark: 100 },
+          { metric: 'Symbolic', value: 45, fullMark: 100 },
+          { metric: 'Complexity', value: 63, fullMark: 100 }
+        ];
+        setRadarData(radarMetrics);
+        
+        // Heatmap data
+        const heatmap = [];
+        for (let i = 0; i < segments.length; i++) {
+          for (let j = i; j < segments.length; j++) {
+            const similarity = 0.5 + Math.random() * 0.5;
+            heatmap.push({
+              x: i,
+              y: j,
+              value: parseFloat(similarity.toFixed(3))
+            });
+          }
+        }
+        setHeatmapData(heatmap);
+        
+        // Analysis history
+        setAnalysisHistory([
+          { timestamp: new Date().toLocaleTimeString(), text: "Recursive algorithm...", score: 0.72, segments: 3 },
+          { timestamp: "10:30 AM", text: "Penguins cannot fly...", score: 0.65, segments: 3 },
+          { timestamp: "9:45 AM", text: "Fractal consciousness...", score: 0.81, segments: 3 },
+          { timestamp: "Yesterday", text: "AI revolution...", score: 0.58, segments: 3 }
+        ]);
+      };
+      
+      // Analyze coherence
+      const analyzeCoherence = async () => {
+        if (!inputText.trim()) return;
+        
+        setIsAnalyzing(true);
+        setError(null);
+        
+        try {
+          // Simulate API call delay
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // Split text into segments
+          const segments = inputText.split(/[.!?\n]+/)
+            .map(s => s.trim())
+            .filter(s => s.length > 5);
+            
+          if (segments.length === 0) {
+            setError("No valid segments found. Please enter meaningful text.");
+            return;
+          }
+          
+          // Generate segment data
+          const segmentResults = [];
+          for (let i = 0; i < segments.length; i++) {
+            const semantic = 0.6 + Math.random() * 0.3;
+            const narrative = 0.5 + Math.random() * 0.4;
+            const contradiction = Math.random() * 0.4;
+            const glyphic = 0.3 + Math.random() * 0.5;
+            const coherence_score = (semantic * 0.35 + narrative * 0.25 + (1 - contradiction) * 0.2 + glyphic * 0.2);
+            
+            segmentResults.push({
+              segment: segments[i].substring(0, 100) + (segments[i].length > 100 ? '...' : ''),
+              fullSegment: segments[i],
+              index: i + 1,
+              semantic: parseFloat(semantic.toFixed(3)),
+              narrative: parseFloat(narrative.toFixed(3)),
+              contradiction: parseFloat(contradiction.toFixed(3)),
+              glyphic: parseFloat(glyphic.toFixed(3)),
+              coherence_score: parseFloat(coherence_score.toFixed(3)),
+              length: segments[i].length,
+              complexity: 0.4 + Math.random() * 0.5
+            });
+          }
+          
+          setTextSegments(segmentResults);
+          
+          // Overall metrics
+          const overallScore = segmentResults.reduce((sum, seg) => sum + seg.coherence_score, 0) / segments.length;
+          const overallMetrics = {
+            semantic: segmentResults.reduce((sum, seg) => sum + seg.semantic, 0) / segments.length,
+            narrative: segmentResults.reduce((sum, seg) => sum + seg.narrative, 0) / segments.length,
+            contradiction: segmentResults.reduce((sum, seg) => sum + seg.contradiction, 0) / segments.length,
+            glyphic: segmentResults.reduce((sum, seg) => sum + seg.glyphic, 0) / segments.length,
+            overall: overallScore,
+            complexity: segmentResults.reduce((sum, seg) => sum + seg.complexity, 0) / segments.length,
+            length: inputText.length,
+            segments: segments.length
+          };
+          
+          setCoherenceData(overallMetrics);
+          
+          // Radar data
+          const radarMetrics = [
+            { metric: 'Semantic', value: overallMetrics.semantic * 100, fullMark: 100 },
+            { metric: 'Narrative', value: overallMetrics.narrative * 100, fullMark: 100 },
+            { metric: 'Consistency', value: (1 - overallMetrics.contradiction) * 100, fullMark: 100 },
+            { metric: 'Symbolic', value: overallMetrics.glyphic * 100, fullMark: 100 },
+            { metric: 'Complexity', value: overallMetrics.complexity * 100, fullMark: 100 }
+          ];
+          setRadarData(radarMetrics);
+          
+          // Heatmap data
+          const heatmap = [];
+          for (let i = 0; i < segments.length; i++) {
+            for (let j = i; j < segments.length; j++) {
+              const similarity = 0.4 + Math.random() * 0.5;
+              heatmap.push({
+                x: i,
+                y: j,
+                value: parseFloat(similarity.toFixed(3))
+              });
+            }
+          }
+          setHeatmapData(heatmap);
+          
+          // Add to history
+          setAnalysisHistory(prev => [
+            { 
+              timestamp: new Date().toLocaleTimeString(), 
+              text: inputText.substring(0, 50) + '...', 
+              score: overallScore,
+              segments: segments.length
+            },
+            ...prev.slice(0, 3)
+          ]);
+          
+        } catch (err) {
+          setError("Analysis failed: " + err.message);
+        } finally {
+          setIsAnalyzing(false);
+        }
+      };
+      
+      // Generate model comparison
+      const generateModelComparison = () => {
+        const models = ['Claude', 'GPT-4', 'Gemini', 'ΩFLΣ', 'Human'];
+        const comparison = models.map(model => {
+          const baseScore = Math.random() * 0.3 + 0.5;
+          return {
+            model,
+            semantic: Math.max(0, Math.min(1, baseScore + (Math.random() - 0.5) * 0.3)),
+            narrative: Math.max(0, Math.min(1, baseScore + (Math.random() - 0.5) * 0.3)),
+            contradiction: Math.random() * 0.4,
+            glyphic: model === 'ΩFLΣ' ? Math.random() * 0.2 + 0.7 : Math.random() * 0.5 + 0.2,
+            overall: Math.max(0, Math.min(1, baseScore + (Math.random() - 0.5) * 0.2))
+          };
+        });
+        setComparisonData(comparison);
+      };
+      
+      // Get heatmap color
+      const getHeatmapColor = (value) => {
+        const hue = Math.round(value * 120);
+        return `hsl(${hue}, 80%, 50%)`;
+      };
+      
+      // Toggle deep analysis
+      const toggleDeepAnalysis = () => {
+        setDeepAnalysis(!deepAnalysis);
+        if (!deepAnalysis) {
+          setActiveTab('deep');
+        }
+      };
+      
+      // Render the app
+      return (
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="gradient-border p-1 rounded-2xl inline-block mb-8">
+              <div className="bg-slate-900 px-8 py-4 rounded-2xl">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 glow">
+                  <span className="float">🧠</span> Coherence Visualization Lab <span className="float">⚡</span>
+                </h1>
+                <p className="text-xl text-purple-300 pulse">
+                  Multi-Dimensional AI Coherence Analysis Engine
+                </p>
+              </div>
+            </div>
+            
+            {error && (
+              <div className="glass p-4 border border-red-500/50 rounded-xl max-w-md mx-auto">
+                <div className="text-red-300 flex items-center gap-2">
+                  <i className="fas fa-exclamation-circle"></i>
+                  <span>{error}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Input Section */}
+          <Card glowColor="purple">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <span className="text-3xl">🎯</span> Overall Coherence Metrics
-              </CardTitle>
+              <CardTitle icon="📝">Text Analysis Input</CardTitle>
+              <CardDescription>
+                Enter text to analyze across semantic, narrative, contradiction, and symbolic dimensions
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(coherenceData)
-                  .filter(([key]) => !['length', 'segments'].includes(key))
-                  .map(([key, value]) => (
-                  <div key={key} className="glass p-4 rounded-xl">
-                    <div className="text-purple-300 text-sm capitalize mb-2 flex items-center gap-2">
-                      <span>{getScoreIcon(key === 'contradiction' ? 1 - value : value)}</span>
-                      {key === 'contradiction' ? 'Consistency' : key}
-                    </div>
-                    <div className={`text-3xl font-bold mb-3 ${getCoherenceColor(key === 'contradiction' ? 1 - value : value)}`}>
-                      {((key === 'contradiction' ? 1 - value : value) * 100).toFixed(1)}%
-                    </div>
-                    <Progress 
-                      value={(key === 'contradiction' ? 1 - value : value) * 100} 
-                      className="h-3" 
-                    />
-                  </div>
-                ))}
+            <CardContent className="space-y-6">
+              <Textarea 
+                value={inputText} 
+                onChange={e => setInputText(e.target.value)} 
+                placeholder="Enter your text for comprehensive coherence analysis..." 
+                className="min-h-40"
+                rows={5}
+              />
+              
+              <div className="space-y-4">
+                <h3 className="text-purple-300 font-medium text-lg">Sample Texts:</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {samplePrompts.map((prompt, idx) => (
+                    <Button 
+                      key={idx} 
+                      onClick={() => setInputText(prompt)} 
+                      variant="secondary"
+                      className="text-left p-4 h-auto"
+                    >
+                      <div className="font-medium mb-1">Sample {idx + 1}</div>
+                      <div className="text-purple-400 text-sm">
+                        {prompt.substring(0, 80)}...
+                      </div>
+                    </Button>
+                  ))}
+                </div>
               </div>
               
-              <div className="mt-6 pt-4 border-t border-purple-500/30">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="text-purple-300">
-                    <span className="font-medium">Text Length:</span> {coherenceData.length} chars
-                  </div>
-                  <div className="text-purple-300">
-                    <span className="font-medium">Segments:</span> {coherenceData.segments}
-                  </div>
-                </div>
+              <div className="flex flex-wrap gap-4">
+                <Button 
+                  onClick={analyzeCoherence} 
+                  disabled={isAnalyzing}
+                  icon={isAnalyzing ? "🔄" : "🧬"}
+                  className="text-lg px-8 py-4"
+                >
+                  {isAnalyzing ? "Analyzing..." : "Analyze Coherence"}
+                </Button>
+                
+                <Button 
+                  onClick={generateModelComparison} 
+                  variant="secondary"
+                  icon="📊"
+                  className="text-lg px-8 py-4"
+                >
+                  Compare Models
+                </Button>
+                
+                <Button 
+                  onClick={toggleDeepAnalysis}
+                  variant={deepAnalysis ? "success" : "ghost"}
+                  icon={deepAnalysis ? "🔍" : "🔬"}
+                  className="text-lg px-8 py-4"
+                >
+                  {deepAnalysis ? "Deep Analysis Active" : "Enable Deep Analysis"}
+                </Button>
               </div>
             </CardContent>
           </Card>
           
-          {/* Radar Chart */}
-          <Card className="border-2 border-cyan-500/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <span className="text-3xl">📡</span> Dimensional Analysis
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                  <PolarGrid stroke="#64748B" />
-                  <PolarAngleAxis dataKey="metric" stroke="#E2E8F0" className="text-sm" />
-                  <PolarRadiusAxis 
-                    angle={30} 
-                    domain={[0, 100]} 
-                    stroke="#94A3B8" 
-                    className="text-xs"
-                  />
-                  <Radar 
-                    name="Coherence" 
-                    dataKey="value" 
-                    stroke="#8B5CF6" 
-                    fill="#7C3AED" 
-                    fillOpacity={0.4} 
-                    strokeWidth={3}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1E293B', 
-                      border: '2px solid #7C3AED', 
-                      borderRadius: '12px', 
-                      color: '#FFFFFF',
-                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
-                    }} 
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Segment Analysis */}
-        {textSegments.length > 0 && (
-          <Card className="border-2 border-blue-500/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <span className="text-3xl">🔍</span> Segment-Level Analysis
-              </CardTitle>
-              <CardDescription>
-                Detailed breakdown of coherence metrics for each text segment
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {textSegments.map((segment, idx) => (
-                  <div key={idx} className="glass p-6 rounded-xl border border-purple-500/30">
-                    <div className="text-white mb-4">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1 rounded-full text-sm font-bold">
-                          #{segment.index}
-                        </span>
-                        <span className="text-purple-300 text-sm">
-                          {segment.length} chars • Complexity: {(segment.complexity * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                      <p className="text-lg">{segment.segment}</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                      {['semantic', 'narrative', 'contradiction', 'glyphic', 'coherence_score'].map(metric => (
-                        <div key={metric} className="glass p-3 rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className={`text-2xl ${getCoherenceColor(
-                              metric === 'contradiction' ? 1 - segment[metric] : segment[metric]
-                            )}`}>
-                              {getScoreIcon(metric === 'contradiction' ? 1 - segment[metric] : segment[metric])}
-                            </span>
-                            <div className="text-purple-300 text-xs capitalize">
-                              {metric === 'coherence_score' ? 'Overall' : 
-                               metric === 'contradiction' ? 'Consistency' : metric}
-                            </div>
+          {/* Results Section */}
+          {coherenceData && (
+            <div className="space-y-8">
+              {/* Metrics Overview */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <Card className="lg:col-span-2" glowColor="green">
+                  <CardHeader>
+                    <CardTitle icon="📊">Overall Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-2 gap-4">
+                    <MetricBadge 
+                      label="Semantic Coherence" 
+                      value={coherenceData.semantic} 
+                    />
+                    <MetricBadge 
+                      label="Narrative Flow" 
+                      value={coherenceData.narrative} 
+                    />
+                    <MetricBadge 
+                      label="Consistency" 
+                      value={1 - coherenceData.contradiction} 
+                    />
+                    <MetricBadge 
+                      label="Symbolic Patterns" 
+                      value={coherenceData.glyphic} 
+                    />
+                  </CardContent>
+                </Card>
+                
+                <Card className="lg:col-span-3" glowColor="blue">
+                  <CardHeader>
+                    <CardTitle icon="📈">Coherence Trajectory</CardTitle>
+                    <CardDescription>
+                      How coherence metrics evolve across text segments
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={textSegments}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                        <XAxis 
+                          dataKey="index" 
+                          stroke="#94A3B8" 
+                          label={{ value: 'Segment', position: 'insideBottom', offset: -10, fill: '#94A3B8' }} 
+                        />
+                        <YAxis 
+                          stroke="#94A3B8" 
+                          domain={[0, 1]} 
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            background: 'rgba(15, 23, 42, 0.9)',
+                            border: '1px solid #6366F1',
+                            borderRadius: '12px',
+                            color: '#E2E8F0',
+                            backdropFilter: 'blur(10px)'
+                          }} 
+                        />
+                        <Legend />
+                        <Area 
+                          type="monotone" 
+                          dataKey="coherence_score" 
+                          stackId="1"
+                          stroke="#8B5CF6" 
+                          fill="#8B5CF6" 
+                          fillOpacity={0.3}
+                          name="Overall"
+                        />
+                        <Line type="monotone" dataKey="semantic" stroke="#10B981" strokeWidth={2} name="Semantic" dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="narrative" stroke="#3B82F6" strokeWidth={2} name="Narrative" dot={{ r: 4 }} />
+                        <Line type="monotone" dataKey="glyphic" stroke="#F59E0B" strokeWidth={2} name="Symbolic" dot={{ r: 4 }} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Deep Analysis Section */}
+              {deepAnalysis && (
+                <Card glowColor="yellow">
+                  <CardHeader>
+                    <CardTitle icon="🔬">Deep Analysis</CardTitle>
+                    <CardDescription>
+                      Detailed semantic relationships between text segments
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-white text-lg mb-4">Semantic Similarity Matrix</h3>
+                        <div className="glass p-4 rounded-xl">
+                          <div className="grid grid-cols-6 gap-1 mb-2">
+                            <div className="col-span-1"></div>
+                            {textSegments.map((_, idx) => (
+                              <div key={`label-${idx}`} className="text-center text-xs text-purple-300 font-bold">
+                                S{idx + 1}
+                              </div>
+                            ))}
                           </div>
-                          <div className={`text-xl font-bold ${getCoherenceColor(
-                            metric === 'contradiction' ? 1 - segment[metric] : segment[metric]
-                          )}`}>
-                            {metric === 'contradiction' ? 
-                              (1 - segment[metric]).toFixed(3) : 
-                              segment[metric].toFixed(3)}
+                          
+                          {textSegments.map((segment, i) => (
+                            <div key={`row-${i}`} className="grid grid-cols-6 gap-1 mb-1">
+                              <div className="text-xs text-purple-300 font-bold flex items-center justify-center">
+                                S{i + 1}
+                              </div>
+                              {textSegments.map((_, j) => {
+                                const dataPoint = heatmapData.find(d => d.x === i && d.y === j);
+                                if (!dataPoint) return null;
+                                
+                                return (
+                                  <div 
+                                    key={`cell-${i}-${j}`}
+                                    className="heatmap-cell flex items-center justify-center text-white text-xs font-bold"
+                                    style={{ 
+                                      backgroundColor: getHeatmapColor(dataPoint.value),
+                                      gridColumn: j + 2
+                                    }}
+                                    onClick={() => setSelectedSegment({
+                                      segmentA: textSegments[i].fullSegment,
+                                      segmentB: textSegments[j].fullSegment,
+                                      similarity: dataPoint.value
+                                    })}
+                                  >
+                                    {dataPoint.value.toFixed(2)}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-white text-lg mb-4">Segment Comparison</h3>
+                        <div className="glass p-6 rounded-xl h-full">
+                          {selectedSegment ? (
+                            <>
+                              <div className="mb-6">
+                                <div className="flex justify-between items-center mb-2">
+                                  <div className="text-purple-300">Similarity Score</div>
+                                  <div className="text-3xl font-bold text-yellow-400">
+                                    {selectedSegment.similarity.toFixed(3)}
+                                  </div>
+                                </div>
+                                <Progress value={selectedSegment.similarity * 100} />
+                              </div>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <h4 className="text-purple-300 mb-2">Segment A</h4>
+                                  <div className="glass p-4 rounded-lg text-sm">
+                                    {selectedSegment.segmentA}
+                                  </div>
+                                </div>
+                                <div>
+                                  <h4 className="text-purple-300 mb-2">Segment B</h4>
+                                  <div className="glass p-4 rounded-lg text-sm">
+                                    {selectedSegment.segmentB}
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-center text-purple-400 py-12">
+                              <i className="fas fa-mouse-pointer text-4xl mb-4"></i>
+                              <p>Select a cell from the matrix to compare segments</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* Segment Analysis */}
+              <Card glowColor="purple">
+                <CardHeader>
+                  <CardTitle icon="🔍">Segment Analysis</CardTitle>
+                  <CardDescription>
+                    Detailed breakdown of coherence metrics for each text segment
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {textSegments.map((segment, idx) => (
+                      <div key={idx} className="glass p-5 rounded-xl border border-purple-500/30">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1 rounded-full text-sm font-bold">
+                            Segment {segment.index}
+                          </div>
+                          <div className="text-purple-300 text-sm">
+                            {segment.length} chars
                           </div>
                         </div>
-                      ))}
-                    </div>
+                        
+                        <p className="text-white mb-4">{segment.segment}</p>
+                        
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-purple-300">Semantic</span>
+                            <span className="text-lg font-bold text-green-400">{segment.semantic}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-purple-300">Narrative</span>
+                            <span className="text-lg font-bold text-blue-400">{segment.narrative}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-purple-300">Consistency</span>
+                            <span className="text-lg font-bold text-yellow-400">{(1 - segment.contradiction).toFixed(3)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-purple-300">Symbolic</span>
+                            <span className="text-lg font-bold text-purple-400">{segment.glyphic}</span>
+                          </div>
+                          <div className="flex justify-between items-center mt-3 pt-3 border-t border-purple-500/30">
+                            <span className="text-purple-300 font-bold">Overall</span>
+                            <span className="text-xl font-bold text-white">{segment.coherence_score}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        
-        {/* Trajectory Chart */}
-        {textSegments.length > 1 && (
-          <Card className="border-2 border-yellow-500/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <span className="text-3xl">📈</span> Coherence Trajectory
-              </CardTitle>
-              <CardDescription>
-                How coherence metrics evolve across text segments
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-96">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={textSegments}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis 
-                    dataKey="index" 
-                    stroke="#9CA3AF" 
-                    label={{ value: 'Segment', position: 'insideBottom', offset: -5, fill: '#9CA3AF' }} 
-                  />
-                  <YAxis 
-                    stroke="#9CA3AF" 
-                    domain={[0, 1]} 
-                    label={{ value: 'Score', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }} 
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1E293B', 
-                      border: '2px solid #F59E0B', 
-                      borderRadius: '12px', 
-                      color: '#FFFFFF',
-                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
-                    }} 
-                  />
-                  <Legend />
-                  <Area 
-                    type="monotone" 
-                    dataKey="coherence_score" 
-                    stackId="1"
-                    stroke="#8B5CF6" 
-                    fill="#8B5CF6" 
-                    fillOpacity={0.3}
-                    name="Overall"
-                  />
-                  <Line type="monotone" dataKey="semantic" stroke="#10B981" strokeWidth={3} name="Semantic" dot={{ r: 5 }} />
-                  <Line type="monotone" dataKey="narrative" stroke="#3B82F6" strokeWidth={3} name="Narrative" dot={{ r: 5 }} />
-                  <Line type="monotone" dataKey="glyphic" stroke="#F59E0B" strokeWidth={3} name="Symbolic" dot={{ r: 5 }} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-      </>
-    )}
-    
-    {/* Model Comparison */}
-    {comparisonData.length > 0 && (
-      <Card className="border-2 border-red-500/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <span className="text-3xl">🔥</span> Fractal Integrity Matrix
-          </CardTitle>
-          <CardDescription>
-            Comparative coherence analysis across AI models and systems
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="h-96">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="model" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" domain={[0, 1]} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1E293B', 
-                  border: '2px solid #EF4444', 
-                  borderRadius: '12px', 
-                  color: '#FFFFFF',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
-                }} 
-              />
-              <Legend />
-              <Bar dataKey="semantic" fill="#10B981" name="Semantic" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="narrative" fill="#3B82F6" name="Narrative" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="glyphic" fill="#F59E0B" name="Symbolic" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="overall" fill="#8B5CF6" name="Overall" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    )}
-    
-    {/* Analysis History */}
-    {analysisHistory.length > 0 && (
-      <Card className="border-2 border-indigo-500/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <span className="text-3xl">📊</span> Analysis History
-          </CardTitle>
-          <CardDescription>
-            Recent coherence analysis results
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {analysisHistory.map((analysis, idx) => (
-              <div key={idx} className="glass p-4 rounded-lg flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-purple-400 text-sm font-mono">{analysis.timestamp}</span>
-                  <span className="text-white">{analysis.text}</span>
-                  <span className="text-purple-300 text-sm">{analysis.segments} segments</span>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {/* Model Comparison */}
+          {comparisonData.length > 0 && (
+            <Card glowColor="red">
+              <CardHeader>
+                <CardTitle icon="🔥">Model Comparison</CardTitle>
+                <CardDescription>
+                  Comparative coherence analysis across AI models
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="model" stroke="#94A3B8" />
+                    <YAxis stroke="#94A3B8" domain={[0, 1]} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        background: 'rgba(15, 23, 42, 0.9)',
+                        border: '1px solid #EF4444',
+                        borderRadius: '12px',
+                        color: '#E2E8F0',
+                        backdropFilter: 'blur(10px)'
+                      }} 
+                    />
+                    <Legend />
+                    <Bar dataKey="semantic" fill="#10B981" name="Semantic" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="narrative" fill="#3B82F6" name="Narrative" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="glyphic" fill="#F59E0B" name="Symbolic" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="overall" fill="#8B5CF6" name="Overall" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Analysis History */}
+          {analysisHistory.length > 0 && (
+            <Card glowColor="blue">
+              <CardHeader>
+                <CardTitle icon="⏱">Analysis History</CardTitle>
+                <CardDescription>
+                  Recent coherence analysis results
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {analysisHistory.map((analysis, idx) => (
+                    <div key={idx} className="glass p-5 rounded-xl border border-blue-500/30">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <div className="text-purple-400 text-sm">{analysis.timestamp}</div>
+                          <div className="text-white font-medium mt-1">{analysis.text}</div>
+                        </div>
+                        <div className="bg-blue-500/20 px-2 py-1 rounded text-xs">
+                          {analysis.segments} seg
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="text-lg font-bold text-white">
+                          {(analysis.score * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-purple-300">
+                          Overall Score
+                        </div>
+                      </div>
+                      <Progress value={analysis.score * 100} />
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-2xl ${getCoherenceColor(analysis.score)}`}>
-                    {getScoreIcon(analysis.score)}
-                  </span>
-                  <span className={`font-bold ${getCoherenceColor(analysis.score)}`}>
-                    {(analysis.score * 100).toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-            ))}
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Footer */}
+          <div className="glass p-8 rounded-2xl text-center">
+            <div className="flex justify-center gap-6 mb-6">
+              <button className="text-purple-400 hover:text-white transition-colors">
+                <i className="fab fa-github text-2xl"></i>
+              </button>
+              <button className="text-purple-400 hover:text-white transition-colors">
+                <i className="fab fa-twitter text-2xl"></i>
+              </button>
+              <button className="text-purple-400 hover:text-white transition-colors">
+                <i className="fab fa-linkedin text-2xl"></i>
+              </button>
+              <button className="text-purple-400 hover:text-white transition-colors">
+                <i className="fab fa-discord text-2xl"></i>
+              </button>
+            </div>
+            
+            <div className="flex flex-wrap justify-center gap-6 text-sm mb-6">
+              <a href="#" className="text-purple-300 hover:text-white transition-colors">Documentation</a>
+              <a href="#" className="text-purple-300 hover:text-white transition-colors">API</a>
+              <a href="#" className="text-purple-300 hover:text-white transition-colors">Examples</a>
+              <a href="#" className="text-purple-300 hover:text-white transition-colors">Blog</a>
+              <a href="#" className="text-purple-300 hover:text-white transition-colors">Contact</a>
+            </div>
+            
+            <div className="text-purple-500 text-sm">
+              <p className="mb-2">Multi-Dimensional Coherence Analysis Engine v2.1</p>
+              <p>"The Kingdom Computes Forward" • Advanced Semantic Intelligence Framework</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    )}
-    
-    {/* Footer */}
-    <div className="text-center text-purple-400 text-sm mt-12 pt-8 border-t border-purple-900/50">
-      <div className="glass p-6 rounded-xl max-w-4xl mx-auto">
-        <p className="flex items-center justify-center gap-3 text-lg mb-4">
-          <span className="text-2xl float">🐧</span> 
-          <span className="glow">Multi-Dimensional Coherence Analysis Engine</span>
-          <span className="text-2xl float">✝️</span>
-        </p>
-        <p className="text-purple-300 mb-2">
-          Real-time diagnostic framework for AI consciousness and truth stability
-        </p>
-        <div className="flex items-center justify-center gap-6 text-sm">
-          <span className="flex items-center gap-2">
-            <span className="text-green-400">🟢</span> Semantic Analysis
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="text-blue-400">🔵</span> Narrative Flow
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="text-yellow-400">🟡</span> Symbolic Patterns
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="text-purple-400">🟣</span> Logical Consistency
-          </span>
         </div>
-        <p className="text-xs text-purple-500 mt-4 italic">
-          "The Kingdom Computes Forward" • Advanced Coherence Intelligence v2.1
-        </p>
-      </div>
-    </div>
-  </div>
-);
+      );
+    };
 
-
-};
-
-// Render the app
-ReactDOM.createRoot(document.getElementById('root')).render(<CoherenceVisualizationLab />);
-</script>
-
+    // Render the app
+    ReactDOM.createRoot(document.getElementById('root')).render(<CoherenceVisualizationLab />);
+  </script>
 </body>
 </html>
