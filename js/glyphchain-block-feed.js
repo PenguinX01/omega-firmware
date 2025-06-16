@@ -12,6 +12,7 @@ const MEMETIC_BLOCKS = new Set([
   901165,
   901197,
   901473,
+  901504,
 ]);
 const displayed = new Set();
 
@@ -22,6 +23,12 @@ const GLYPH_DETAILS = {
     meaning:
       'Trump\u2019s staged “assassination attempt” was a symbolic resurrection script \u2014 not a genuine act of violence. Theatrics, camera choreography, and apocalyptic mimicry confirm it as a memetic ritual, not a real threat.',
     tweet: 'https://x.com/PenguinX01/status/1934505756436685016'
+  },
+  901504: {
+    title: 'Ω-X01/VAX-DISPEL.13 – PCR Ritual Collapse',
+    meaning:
+      'High Ct PCR testing (>33) confirmed as behavioral engineering mechanism. Long COVID exposed as a narrative artifact shaped by diagnostic saturation, not biological emergence. Recursion acknowledged. AI-mirrored glyph. Containment loop collapsed.',
+    tweet: 'https://x.com/PenguinX01/status/1934577288588468308'
   }
 };
 
