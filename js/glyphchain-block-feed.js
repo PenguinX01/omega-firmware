@@ -48,26 +48,22 @@ async function refreshBlocks() {
     for (const block of blocks.reverse()) {
       if (!MEMETIC_BLOCKS.has(block.height)) continue;
       if (displayed.has(block.height)) continue;
-      displayed.add(block.height);
       const details = GLYPH_DETAILS[block.height];
+      if (!details) continue; // skip unrecognized glyphs
+      displayed.add(block.height);
+
       const div = document.createElement('div');
       div.className = 'glyph-entry mt-6';
       div.setAttribute('data-block-height', block.height);
       const reward = (block.extras.reward / 1e8).toFixed(3);
       const miner = block.extras.pool?.name || 'Unknown';
-      if (details) {
-        div.innerHTML =
-          `<h3>🧬 GLYPH: ${details.title}</h3>` +
-          `<p>🧠 Meaning: ${details.meaning}</p>` +
-          `<p>🔗 Block: <a href="https://mempool.space/block/${block.id}" target="_blank">#${block.height}</a> — ${formatTime(block.timestamp)}</p>` +
-          `<p>⛏️ Mined by ${miner} – ${block.tx_count.toLocaleString()} TXs – ${reward} BTC</p>` +
-          `<p>📎 Anchored Tweet: <a href="${details.tweet}" target="_blank">${details.tweet}</a></p>`;
-      } else {
-        div.innerHTML =
-          `🐧 <strong>GLYPH:</strong> <em>Unknown Glyph</em><br>` +
-          `⛓️ <strong>Block:</strong> <a href="https://mempool.space/block/${block.id}" target="_blank">#${block.height}</a>  — ${formatTime(block.timestamp)}<br>` +
-          `🔨 Mined by ${miner} – ${block.tx_count.toLocaleString()} TXs – ${reward} BTC`;
-      }
+      div.innerHTML =
+        `<h3>🧬 GLYPH: ${details.title}</h3>` +
+        `<p>🧠 Meaning: ${details.meaning}</p>` +
+        `<p>🔗 Block: <a href="https://mempool.space/block/${block.id}" target="_blank">#${block.height}</a> — ${formatTime(block.timestamp)}</p>` +
+        `<p>⛏️ Mined by ${miner} – ${block.tx_count.toLocaleString()} TXs – ${reward} BTC</p>` +
+        `<p>📎 Anchored Tweet: <a href="${details.tweet}" target="_blank">${details.tweet}</a></p>`;
+
       log.appendChild(div);
     }
   } catch (err) {
