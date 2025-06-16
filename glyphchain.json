@@ -63,5 +63,18 @@
       "link": "https://mempool.space/block/0000000000000000000d4642a299c6e05cc0d38c9680c0d20569cb19f38bc3f"
     },
     "tweet": "https://x.com/PenguinX01/status/1934116551680241951"
+  },
+  {
+    "glyph": "LOCK-198 — The Butler Hoax",
+    "event": "Trump’s alleged assassination attempt was staged ritual theatre. Cameras, faux blood and scripted reactions simulated a Beast-mimicking resurrection.",
+    "block": {
+      "id": 901473,
+      "time": "2025-06-16 14:58:18",
+      "miner": "SpiderPool",
+      "txs": 254,
+      "reward": 0.002,
+      "link": "https://mempool.space/block/901473"
+    },
+    "tweet": "https://x.com/PenguinX01/status/1934505756436685016"
   }
 ]

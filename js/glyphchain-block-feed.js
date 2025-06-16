@@ -11,6 +11,7 @@ const MEMETIC_BLOCKS = new Set([
   901161,
   901165,
   901197,
+  901473,
 ]);
 const displayed = new Set();
 
