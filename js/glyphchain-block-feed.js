@@ -11,8 +11,19 @@ const MEMETIC_BLOCKS = new Set([
   901161,
   901165,
   901197,
+  901473,
 ]);
 const displayed = new Set();
+
+// Metadata for special glyphs keyed by block height
+const GLYPH_DETAILS = {
+  901473: {
+    title: 'LOCK-198 — Butler Hoax: Ritual of the Faux Wound',
+    meaning:
+      'Trump\u2019s staged “assassination attempt” was a symbolic resurrection script \u2014 not a genuine act of violence. Theatrics, camera choreography, and apocalyptic mimicry confirm it as a memetic ritual, not a real threat.',
+    tweet: 'https://x.com/PenguinX01/status/1934505756436685016'
+  }
+};
 
 function initDisplayed() {
   document.querySelectorAll('.glyph-log [data-block-height]')
@@ -38,15 +49,26 @@ async function refreshBlocks() {
       if (!MEMETIC_BLOCKS.has(block.height)) continue;
       if (displayed.has(block.height)) continue;
       displayed.add(block.height);
+      const details = GLYPH_DETAILS[block.height];
       const div = document.createElement('div');
-      div.className = 'glyph-card';
+      div.className = 'glyph-entry mt-6';
       div.setAttribute('data-block-height', block.height);
       const reward = (block.extras.reward / 1e8).toFixed(3);
       const miner = block.extras.pool?.name || 'Unknown';
-      div.innerHTML = `🐧 <strong>GLYPH:</strong> <em>Live Block Glyph</em><br>` +
-        `⛓️ <strong>Block:</strong> <a href="https://mempool.space/block/${block.id}" target="_blank">#${block.height}</a>  — ${formatTime(block.timestamp)}<br>` +
-        `🔨 Mined by ${miner} – ${block.tx_count.toLocaleString()} TXs – ${reward} BTC`;
-      log.prepend(div);
+      if (details) {
+        div.innerHTML =
+          `<h3>🧬 GLYPH: ${details.title}</h3>` +
+          `<p>🧠 Meaning: ${details.meaning}</p>` +
+          `<p>🔗 Block: <a href="https://mempool.space/block/${block.id}" target="_blank">#${block.height}</a> — ${formatTime(block.timestamp)}</p>` +
+          `<p>⛏️ Mined by ${miner} – ${block.tx_count.toLocaleString()} TXs – ${reward} BTC</p>` +
+          `<p>📎 Anchored Tweet: <a href="${details.tweet}" target="_blank">${details.tweet}</a></p>`;
+      } else {
+        div.innerHTML =
+          `🐧 <strong>GLYPH:</strong> <em>Unknown Glyph</em><br>` +
+          `⛓️ <strong>Block:</strong> <a href="https://mempool.space/block/${block.id}" target="_blank">#${block.height}</a>  — ${formatTime(block.timestamp)}<br>` +
+          `🔨 Mined by ${miner} – ${block.tx_count.toLocaleString()} TXs – ${reward} BTC`;
+      }
+      log.appendChild(div);
     }
   } catch (err) {
     console.error('[Ω13] Error fetching blocks', err);
