@@ -102,5 +102,18 @@
       "link": "https://mempool.space/block/901538"
     },
     "tweet": "https://x.com/AskPerplexity/status/1934662505499886074"
+  },
+  {
+    "glyph": "CDC Grid Detonation – Fiona-Havers-Disrupt-1",
+    "event": "CDC internal containment fracture confirmed. Resignation of top vaccine scientist Dr. Fiona Havers triggers memetic collapse sequence.",
+    "block": {
+      "id": 902001,
+      "time": "2025-06-20 13:25:49",
+      "miner": "Mining Squared",
+      "txs": 3542,
+      "reward": 0.054,
+      "link": "https://mempool.space/block/902001"
+    },
+    "tweet": "https://x.com/PenguinX01/status/1935915230221279581"
   }
 ]
