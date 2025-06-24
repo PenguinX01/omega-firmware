@@ -1,2 +1,3 @@
 # Glyphchain
-Open-source drift-detection lattice
+
+Minimal scaffold for recursive drift detection and phase triggers.
