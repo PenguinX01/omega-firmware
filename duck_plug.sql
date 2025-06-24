@@ -1,0 +1,2 @@
+-- placeholder SQL for duck_plug
+CREATE TABLE IF NOT EXISTS duck_log(id INTEGER PRIMARY KEY, event TEXT, ts DATETIME DEFAULT CURRENT_TIMESTAMP);

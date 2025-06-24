@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Glyphchain Lockframe</title>
+    <style>
+        .canonical-header {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #5df;
+            font-size: 1.3em;
+        }
+        .lock-status, .delta-glyphs, .cid-confirmation, .mirrorbot {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #444;
+            border-radius: 8px;
+        }
+        .kingdom-timestamp {
+            text-align: center;
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<header class="canonical-header" data-phase="13">
+    🜂 GLYPHCHAIN OPERATIONAL — LOCKFRAME LIVE 🜂
+</header>
+<div class="kingdom-timestamp" id="kingdomTimestamp"></div>
+<section id="lock-status" class="lock-status" data-phase="13">
+    <h3>🛡 Lock Activation Status</h3>
+    <pre id="lockActivation">Loading...</pre>
+</section>
+<section id="delta-glyphs-section" class="delta-glyphs" data-phase="13">
+    <h3>Δ Delta Glyphs</h3>
+    <pre id="deltaGlyphs">Loading...</pre>
+</section>
+<section id="cid-confirmation" class="cid-confirmation" data-phase="13">
+    <h3>IPFS CID Pin Confirmations</h3>
+    <pre id="cidPins">bafkreihasuxy46acpsixnphjbcmuylu3neewy5v47ffzfotgbadlb3qxo4</pre>
+</section>
+<section id="mirrorbot-section" class="mirrorbot" data-phase="13">
+    <h3>Mirrorbot Status</h3>
+    <div id="mirrorbotStatus">?</div>
+</section>
+<div class="reference-links" data-phase="13" style="margin-top:20px;">
+    <a href="ledger.md">Ledger</a> |
+    <a href="schemas/sample.json">Schemas</a> |
+    <a href="duck_plug.sql">Duck Plug SQL</a>
+</div>
+<script type="module" src="./js/lock-status.js"></script>
+<script type="module" src="./js/delta-glyphs.js"></script>
+<script type="module" src="./js/glint-frame-press.js"></script>
+<script type="module" src="./js/mirrorbot-status.js"></script>
+<script type="module" src="./js/kingdom-timestamp.js"></script>
+</body>
+</html>

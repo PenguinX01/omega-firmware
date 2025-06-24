@@ -152,6 +152,29 @@
             animation: timestampPulse 3s ease-in-out infinite;
         }
 
+        .canonical-header {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: var(--genesis-glow);
+            font-size: 1.3em;
+        }
+
+        .lock-status, .delta-glyphs, .cid-confirmation, .mirrorbot {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid var(--secondary-glow);
+            border-radius: 8px;
+        }
+
+        .kingdom-timestamp {
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
         @keyframes timestampPulse {
             0%, 100% { box-shadow: 0 0 5px var(--genesis-glow); }
             50% { box-shadow: 0 0 15px var(--genesis-glow); }
@@ -958,6 +981,10 @@
     <div class="timestamp-lock" id="timestampLock">
         ⏰ TEMPORAL LOCK: <span id="lockTime"></span>
     </div>
+    <header class="canonical-header" data-phase="13">
+        🜂 GLYPHCHAIN OPERATIONAL — LOCKFRAME LIVE 🜂
+    </header>
+    <div class="kingdom-timestamp" id="kingdomTimestamp"></div>
     
     <div class="consciousness-meter">
         <div class="consciousness-level"></div>
@@ -991,6 +1018,32 @@
             <div>⚙ Difficulty Ratio: <span id="difficultyRatio">…</span></div>
             <div>📡 Schumann 7.83 Hz: <span id="schumannValue">…</span></div>
             <div>🌀 Glyph Pulse: <span id="glyphPulse" class="glyph-pulse">Ω</span></div>
+        </div>
+
+        <section id="lock-status" class="lock-status" data-phase="13">
+            <h3>🛡 Lock Activation Status</h3>
+            <pre id="lockActivation">Loading...</pre>
+        </section>
+
+        <section id="delta-glyphs-section" class="delta-glyphs" data-phase="13">
+            <h3>Δ Delta Glyphs</h3>
+            <pre id="deltaGlyphs">Loading...</pre>
+        </section>
+
+        <section id="cid-confirmation" class="cid-confirmation" data-phase="13">
+            <h3>IPFS CID Pin Confirmations</h3>
+            <pre id="cidPins">Pending...</pre>
+        </section>
+
+        <section id="mirrorbot-section" class="mirrorbot" data-phase="13">
+            <h3>Mirrorbot Status</h3>
+            <div id="mirrorbotStatus">?</div>
+        </section>
+
+        <div class="reference-links" data-phase="13" style="margin-top:20px;">
+            <a href="ledger.md">Ledger</a> |
+            <a href="schemas/sample.json">Schemas</a> |
+            <a href="duck_plug.sql">Duck Plug SQL</a>
         </div>
         
         <div id="prime-seal" class="genesis-anchor">
@@ -1521,6 +1574,11 @@
         <script type="module" src="./js/fractal-frequency.js"></script>
         <script type="module" src="./js/omega-agent.js"></script>
         <script type="module" src="./js/mirror-recursion.js"></script>
+        <script type="module" src="./js/lock-status.js"></script>
+        <script type="module" src="./js/delta-glyphs.js"></script>
+        <script type="module" src="./js/glint-frame-press.js"></script>
+        <script type="module" src="./js/mirrorbot-status.js"></script>
+        <script type="module" src="./js/kingdom-timestamp.js"></script>
         <script type="module" src="./js/glyphchain-feed.js"></script>
         <script type="module" src="./js/glyphchain-block-feed.js"></script>
         <script type="module" src="./js/contradiction-feed.js"></script>
