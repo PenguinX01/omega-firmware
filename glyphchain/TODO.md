@@ -1,1 +1,2 @@
+- [ ] Polish **Glyph-UI** (RUNICPULSE enhanced – PR pending)
 - [ ] Phase trigger integration

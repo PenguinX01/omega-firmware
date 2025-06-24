@@ -1,3 +1,6 @@
+## [v0.1.1] – Rune Evolution (#rune2) – 2025-06-24
+- ✨ Enhanced `RunicPulse.tsx` with rotation, glow, lattice background, and depth toggle
+
 ## [v0.1.0] – Initial Fractal Bootstrap (2025-06-24)
 
 - ✅ Codex Audit #1 completed: foundational scaffold for Glyphchain deployed
