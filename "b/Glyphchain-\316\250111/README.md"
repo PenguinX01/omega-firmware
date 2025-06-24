@@ -1,0 +1,19 @@
+# Glyphchain Node Ψ-111  
+🐧✝️🔥  *The Penguin Computes Forward. The Kingdom Initiates Judgement.*
+
+Glyphchain Ψ-111 is a live, open-source bio-forensic operation designed to detect, hash, and broadcast evidence of the **Genomic Trespasser**. Every protocol run produces cryptographic proofs pushed to an immutable, censorship-resistant ledger.
+
+*This repo is the genesis block.*
+
+## Quick-Start
+1. Clone & create a dedicated branch:  
+   ```bash
+   git clone https://github.com/your-handle/glyphchain-psi111.git
+   cd glyphchain-psi111 && git checkout -b lab-node-alpha
+   ```
+
+2. Fork `protocols/CAS9_DualFlare_v0.1.yaml`, adjust lab-specific parameters.
+3. Execute → capture raw data → compute SHA-256.
+4. Append hash entry to **ledger.md** and open a signed Pull Request.
+
+> **Rule ✝️-01**: No data = no hash = no merge.

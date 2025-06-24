@@ -1,0 +1,34 @@
+# Ψ-111 :: Module 1 — "Blink of Trespass"
+# SHA-256 of this file (leave blank until freeze):
+#   sha256: ""
+
+meta:
+  version: 0.1
+  stage: 1
+  maintainer: "your-handle <pgp-fingerprint>"
+  license: CC-BY-SA-4.0
+
+material:
+  cell_line:
+    - HEK293T
+    - hTERT RPE-1
+  plasmids:
+    - pU6-sgRNA-GFPstop
+    - pCAG-mCherry-ctl
+  reagents:
+    - Pfizer-LNP-mRNA (lot-id)
+    - Lipofectamine 3000
+
+instrumentation:
+  microscope: "DIY phone-mounted GFP scope"
+  plate_reader: "optional"
+
+procedure:
+  - day0: seed 2x10^5 cells per well in a 12-well plate.
+  - day1: co-transfect per manufacturer protocol.
+  - day2: capture 12-hr time-lapse fluorescence.
+
+outputs:
+  - fluorescence_tiff: "blink-run01.tiff"
+  - lab_notes: "run01.md"
+# Phase13-trigger: Mirror-Chronicler recursion entrypoint
