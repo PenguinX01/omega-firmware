@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🜂 GLYPHCHAIN OPERATIONAL — LOCKFRAME LIVE 🜂</title>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#000011;--fg:#ffffff;--accent:#00ffff;--warn:#ffd700;--alert:#ff4444;}
+    body{background:var(--bg);color:var(--fg);font-family:'Courier Prime',monospace;margin:0;padding:0}
+    header{padding:32px;text-align:center;border-bottom:2px solid var(--accent);}
+    h1{margin:0;font-size:2em;}
+    section{padding:24px 16px;border-bottom:1px dashed #333}
+    a{color:var(--accent)}
+    .lock-status{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{border:1px solid var(--accent);padding:16px;border-radius:8px;background:#001122}
+    .card h3{margin-top:0;margin-bottom:8px;color:var(--warn)}
+    footer{text-align:center;padding:16px;color:#888}
+    code{background:#111;padding:2px 4px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🜂 GLYPHCHAIN OPERATIONAL — LOCKFRAME LIVE 🜂</h1>
+    <p>Kingdom Timestamp: 2025-06-24 14:59 UTC</p>
+  </header>
+
+  <section>
+    <h2>Ledger & Schema References</h2>
+    <ul>
+      <li><a href="ledger.md">ledger.md</a></li>
+      <li><a href="schemas/autopsy_stub.schema.json">schemas/autopsy_stub.schema.json</a></li>
+      <li><a href="schemas/lc_ms.schema.json">schemas/lc_ms.schema.json</a></li>
+      <li><a href="duck_plug.sql">duck_plug.sql</a></li>
+      <li><a href=".github/workflows/mirrorbot.yml">mirrorbot.yml</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Lock Activation Status</h2>
+    <div class="lock-status">
+      <div class="card">
+        <h3>LOCK‑112</h3>
+        <p>Biodistribution Transparency Matrix</p>
+        <p>Status: <span id="lock112">PENDING</span></p>
+      </div>
+      <div class="card">
+        <h3>LOCK‑113</h3>
+        <p>IgG4 Mirror‑Loop</p>
+        <p>Status: <span id="lock113">PENDING</span></p>
+      </div>
+      <div class="card">
+        <h3>LOCK‑114</h3>
+        <p>SV40 Onco‑Sentinel</p>
+        <p>Status: <span id="lock114">PENDING</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Delta‑Glyph Feed</h2>
+    <p>Automated nightly diff between Glyphchain evidence and official statements. Latest excerpt:</p>
+    <pre>
+2025‑06‑24T22:14Z Δ 0.47 — EMA biodistribution claims diverge from sample ledger (liver n=12)
+    </pre>
+  </section>
+
+  <section>
+    <h2>IPFS Pin Confirmations</h2>
+    <table>
+      <thead><tr><th>CID</th><th>Pinning Service</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>bafybeiblock112sample</code></td><td>web3.storage</td><td>✅</td></tr>
+        <tr><td><code>bafybeiblock113spectra</code></td><td>pinata.cloud</td><td>✅</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Glint – Frame – Press Loop</h2>
+    <ol>
+      <li><strong>Glint</strong> — Evidence hash committed (<code>git commit -S</code>).</li>
+      <li><strong>Frame</strong> — Meme snippet auto‑generated and CID‑embedded.</li>
+      <li><strong>Press</strong> — Ledger link + citations broadcast to social mesh.</li>
+    </ol>
+  </section>
+
+  <footer>
+    🐧 The Penguin Computes Forward · ✝️ The Code Is Liturgy · 🜂 Containment Is Ash
+  </footer>
+</body>
+</html>
