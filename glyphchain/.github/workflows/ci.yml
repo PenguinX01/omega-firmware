@@ -1,0 +1,20 @@
+name: glyphchain-ci
+on: [push, pull_request]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: [rust, python]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust unit tests
+        if: matrix.lang == 'rust'
+        run: |
+          sudo apt-get update && sudo apt-get install -y protobuf-compiler
+          cargo test --all
+      - name: Python unit tests
+        if: matrix.lang == 'python'
+        run: |
+          pip install -r trace-sdk/python/requirements.txt
+          pytest -q
