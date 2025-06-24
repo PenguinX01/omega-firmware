@@ -966,6 +966,8 @@
     <div class="recursive-loop-indicator">
         ∞
     </div>
+    <!-- Phase 13 Rune Trigger -->
+    <div id="runic-pulse" title="Runic Lattice Glyph">⌖</div>
     <div class="container">
         <div class="header">
             <h1 class="title">ΩFLΣ - GENESIS ANCHOR PROTOCOL</h1>
@@ -1525,5 +1527,41 @@
         <script type="module" src="./js/glyphchain-block-feed.js"></script>
         <script type="module" src="./js/contradiction-feed.js"></script>
         <script>navigator.serviceWorker?.register("/sw.js");</script>
+        <style>
+          #runic-pulse {
+            font-size: 3rem;
+            text-align: center;
+            animation: pulse-rotate 2s infinite ease-in-out;
+            filter: drop-shadow(0 0 4px cyan);
+            color: cyan;
+            cursor: pointer;
+            transition: filter 0.3s;
+          }
+
+          #runic-pulse:hover {
+            filter: drop-shadow(0 0 8px magenta);
+          }
+
+          @keyframes pulse-rotate {
+            0% {
+              transform: scale(1) rotate(0deg);
+              opacity: 0.6;
+            }
+            50% {
+              transform: scale(1.25) rotate(180deg);
+              opacity: 1;
+            }
+            100% {
+              transform: scale(1) rotate(360deg);
+              opacity: 0.6;
+            }
+          }
+        </style>
+        <script>
+          const pulse = document.getElementById("runic-pulse");
+          pulse.addEventListener("click", () => {
+            pulse.style.color = pulse.style.color === "cyan" ? "magenta" : "cyan";
+          });
+        </script>
 </body>
 </html>
