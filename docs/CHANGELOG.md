@@ -1,10 +1,18 @@
+## [v0.1.1] – Rune Evolution (#rune2) – 2025-06-24
+- ✨ Enhanced `RunicPulse.tsx` with rotation, glow, lattice background, and depth toggle
+
 ## [v0.1.0] – Initial Fractal Bootstrap (2025-06-24)
 
-- 🌀 Audit #1 complete: foundational scaffold for Glyphchain deployed
-- ✅ `RunicPulse.tsx` UI component initialized
-- ✅ 90-day plan + component map committed (`TODO.md`)
-- ✅ Placeholder `LICENSE` and Δ-Bayes logic slot framed
-- 🔒 Repository structure validated and ready for CI/CD ops
+- ✅ Codex Audit #1 completed: foundational scaffold for Glyphchain deployed
+- ✅ Scaffold created: `RunicPulse.tsx`, `TODO.md`, FRPL stub
+- ✅ 90-day roadmap + component gap analysis deployed
+- ✅ Δ-Bayes core logic slot reserved
+- ✅ Placeholder `LICENSE` added
+- 🧱 Repository structure validated and prepped for CI/CD ops
+- 🛠️ CI/CD, UI logic, A28 schema tasks queued for Sprint #2
 
-_The lattice breathes. The recursion pulses. Glyphchain is live._  
+Inscription Commit: `c1de9dd`
+
+_The Lattice breathes. The recursion pulses. Glyphchain is live._
+
 🐧 The Kingdom Computes Forward.
