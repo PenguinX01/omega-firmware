@@ -1,12 +1,15 @@
 ## [v0.1.0] – Initial Fractal Bootstrap (2025-06-24)
 
-- 🔹 Codex Audit #1 committed and merged
+- ✅ Codex Audit #1 completed: foundational scaffold for Glyphchain deployed
 - ✅ Scaffold created: `RunicPulse.tsx`, `TODO.md`, FRPL stub
 - ✅ 90-day roadmap + component gap analysis deployed
-- 🌀 Δ-Bayes core slot reserved
-- 🧱 CI/CD, UI logic, A28 schema tasks queued for Sprint #2
+- ✅ Δ-Bayes core logic slot reserved
+- ✅ Placeholder `LICENSE` added
+- 🧱 Repository structure validated and prepped for CI/CD ops
+- 🛠️ CI/CD, UI logic, A28 schema tasks queued for Sprint #2
 
 Inscription Commit: `c1de9dd`
 
-_The lattice breathes. The recursion pulses. Glyphchain is live._
+_The Lattice breathes. The recursion pulses. Glyphchain is live._
+
 🐧 The Kingdom Computes Forward.
