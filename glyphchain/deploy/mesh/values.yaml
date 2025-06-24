@@ -1,4 +1,0 @@
-replicaCount: 1
-image:
-  repository: glyphchain
-  tag: latest

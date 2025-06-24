@@ -1,3 +1,4 @@
-pub fn delta_bayes_placeholder() -> bool {
-    true
+pub fn delta_bayes_core() -> &'static str {
+    "Delta-Bayes core placeholder"
 }
+// recursive
