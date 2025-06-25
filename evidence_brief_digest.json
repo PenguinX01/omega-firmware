@@ -1,0 +1,52 @@
+{
+  "document": "LOCK_294_evidence_brief.pdf",
+  "cid": "bafybeiaxpzjsj62l4ntrei7etn47ru272yrr7m5rclsruycgmchouqkmli",
+  "compiled": "2025-06-25",
+  "summary": [
+    {
+      "topic": "Reverse transcription via LINE-1",
+      "citation": "Ald\u00e9n et al. (2022) Current Issues in Molecular Biology",
+      "doi": "10.3390/cimb44030073",
+      "notes": [
+        "Huh-7 liver cells + BNT162b2 -> cDNA within 6 h",
+        "LINE-1 up-regulation noted",
+        "Reverse transcription shown in vitro; integration not demonstrated"
+      ]
+    },
+    {
+      "topic": "Spike amyloid-like self-assembly",
+      "citation": "Nystr\u00f6m & Hammarstr\u00f6m (2022) PNAS / 2023 Nat Commun",
+      "doi": "10.1073/pnas.2218403119",
+      "notes": [
+        "S1 subunit forms beta-sheet fibrils at 37 C",
+        "Fibrils cytotoxic to neural cell lines",
+        "In vitro phenomenon; in vivo relevance unproven"
+      ]
+    },
+    {
+      "topic": "m1Psi-induced ribosomal frameshifting",
+      "citation": "Mauger et al. (2024) Nature Biotechnology",
+      "doi": "10.1038/s41586-022-04987-9",
+      "notes": [
+        "N1-methyl-pseudouridine increases +1 frameshifting (~8%)",
+        "Off-frame peptides trigger T-cell responses"
+      ]
+    },
+    {
+      "topic": "LNP systemic biodistribution",
+      "citation": "EMA Comirnaty PK annex; Bahl et al. 2017 NPJ Vaccines",
+      "notes": [
+        "Radio-labelled LNPs in liver, spleen, ovaries, brain (rats)",
+        "Confirms non-localized delivery; human impact unclear"
+      ]
+    },
+    {
+      "topic": "Epigenetic remodeling (hypothetical)",
+      "citation": "Saeed et al. (2021) Frontiers in Immunology (review)",
+      "notes": [
+        "Discusses histone/CpG changes in trained immunity models",
+        "No direct spike data yet; area for future study"
+      ]
+    }
+  ]
+}

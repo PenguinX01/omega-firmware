@@ -1,0 +1,19 @@
+topic: mRNA Mechanistic Findings
+base_claim: |-
+  Recent peer-reviewed studies reveal complex behaviors of mRNA platforms.
+canonical_references:
+  - LOCK_294_evidence_brief.pdf
+  - DOI: 10.3390/cimb44030073
+  - DOI: 10.1073/pnas.2218403119
+  - DOI: 10.1038/s41586-022-04987-9
+frames:
+  - name: Reverse transcription
+    prompt: Summarize evidence for LINE-1 mediated mRNA reverse transcription.
+  - name: Spike self-assembly
+    prompt: Outline amyloid-like fibril formation by S1 subunit.
+  - name: Ribosomal frameshifting
+    prompt: What are the implications of N1-methyl-pseudouridine on translation fidelity?
+  - name: LNP distribution
+    prompt: Where do radio-labelled LNPs accumulate in animal studies?
+  - name: Epigenetic remodeling
+    prompt: Discuss potential histone or CpG modifications post mRNA exposure.

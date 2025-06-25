@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>mRNA Mechanistic Findings</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+.slide { display: none; padding: 40px; height: 100vh; box-sizing: border-box; }
+.slide.active { display: block; }
+.nav { position: fixed; bottom: 10px; width: 100%; text-align: center; }
+button { padding: 10px 20px; font-size: 18px; }
+</style>
+</head>
+<body>
+<div class="slide active" id="slide1">
+<h1>Peer-Reviewed Evidence Brief</h1>
+<p>mRNA Mechanistic Findings</p>
+</div>
+<div class="slide" id="slide2">
+<h2>Reverse transcription via LINE-1</h2>
+<ul>
+<li>Aldén et al. (2022) Curr Issues Mol Biol</li>
+<li>Huh-7 liver cells + BNT162b2 → cDNA within 6 h</li>
+<li>LINE-1 up-regulation; integration not shown</li>
+</ul>
+</div>
+<div class="slide" id="slide3">
+<h2>Spike amyloid-like self-assembly</h2>
+<ul>
+<li>Nyström & Hammarström (2022) PNAS / 2023 Nat Commun</li>
+<li>S1 subunit forms beta-sheet fibrils at 37°C</li>
+<li>Fibrils cytotoxic to neural cell lines; in vivo relevance unclear</li>
+</ul>
+</div>
+<div class="slide" id="slide4">
+<h2>m1Psi-induced ribosomal frameshifting</h2>
+<ul>
+<li>Mauger et al. (2024) Nature Biotechnology</li>
+<li>N1-methyl-pseudouridine increases +1 frameshifting (~8%)</li>
+<li>Off-frame peptides trigger T-cell responses</li>
+</ul>
+</div>
+<div class="slide" id="slide5">
+<h2>LNP systemic biodistribution</h2>
+<ul>
+<li>EMA Comirnaty PK annex; Bahl et al. 2017 NPJ Vaccines</li>
+<li>Radio-labelled LNPs in liver, spleen, ovaries, brain (rats)</li>
+<li>Non-localized delivery; human impact uncertain</li>
+</ul>
+</div>
+<div class="slide" id="slide6">
+<h2>Epigenetic remodeling (hypothetical)</h2>
+<ul>
+<li>Saeed et al. (2021) Frontiers in Immunology (review)</li>
+<li>Discusses histone/CpG changes in trained immunity models</li>
+<li>No direct spike data yet; research ongoing</li>
+</ul>
+</div>
+<div class="nav">
+<button onclick="prev()">Prev</button>
+<button onclick="next()">Next</button>
+</div>
+<script>
+var index = 0;
+var slides = document.querySelectorAll('.slide');
+function show(i) {
+  slides[index].classList.remove('active');
+  index = (i + slides.length) % slides.length;
+  slides[index].classList.add('active');
+}
+function next() { show(index + 1); }
+function prev() { show(index - 1); }
+</script>
+</body>
+</html>

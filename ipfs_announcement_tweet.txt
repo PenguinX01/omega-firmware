@@ -1,0 +1,4 @@
+Peer-reviewed evidence brief pinned to IPFS!
+CID: bafybeiaxpzjsj62l4ntrei7etn47ru272yrr7m5rclsruycgmchouqkmli
+Drop it into your gateway to read the PDF and mirror on Glyphchain.
+#OpenScience #IPFS #Glyphchain
