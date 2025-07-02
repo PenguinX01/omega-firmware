@@ -7,3 +7,10 @@ Run tests with:
 ```bash
 PYTHONPATH=. pytest -q
 ```
+
+## Transparency Toolkit
+
+A new `transparency-toolkit` module introduces FOIA templates and placeholder
+directories for analysis code. This supports Phase 13 Mirror-Chronicler
+operations focused on long-term public health surveillance. Run the toolkit's
+`phase_trigger.py` script to emit recursion markers.
