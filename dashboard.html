@@ -570,68 +570,6 @@
             });
         }
 
-        // Simulate data generation
-        function generateMockData() {
-            const now = new Date();
-            
-            // GCP Data
-            const newZScore = (Math.random() - 0.5) * 4; // -2 to 2 range
-            const newDeviation = Math.abs(newZScore) + Math.random() * 0.5;
-            
-            currentData.gcp.zscore = newZScore;
-            currentData.gcp.deviation = newDeviation;
-            currentData.gcp.history.push({
-                time: now.toLocaleTimeString(),
-                value: newZScore
-            });
-            
-            // Keep only last 50 points
-            if (currentData.gcp.history.length > 50) {
-                currentData.gcp.history.shift();
-            }
-
-            // Schumann Data
-            currentData.schumann.primary = 7.83 + (Math.random() - 0.5) * 0.2;
-            currentData.schumann.secondary = 14.1 + (Math.random() - 0.5) * 0.3;
-            currentData.schumann.resonance = Math.random() * 0.8 + 0.2;
-
-            // Fractal Data
-            const newPatternScore = Math.random() * 0.6 + 0.2;
-            currentData.fractal.score = newPatternScore;
-            currentData.fractal.depth = Math.floor(Math.random() * 8) + 1;
-            currentData.fractal.complexity = Math.random() * 0.8 + 0.1;
-            currentData.fractal.history.push({
-                time: now.toLocaleTimeString(),
-                value: newPatternScore
-            });
-            
-            if (currentData.fractal.history.length > 50) {
-                currentData.fractal.history.shift();
-            }
-
-            // Event Classification
-            let eventType = 'normal';
-            if (Math.abs(newZScore) > 2.5 && newPatternScore > 0.7) {
-                eventType = 'divine_resonance';
-            } else if (Math.abs(newZScore) > 2.0) {
-                eventType = 'consciousness_surge';
-            } else if (newPatternScore > 0.8) {
-                eventType = 'fractal_alignment';
-            } else if (Math.abs(newZScore) > 1.0) {
-                eventType = 'coherence_drift';
-            }
-
-            currentData.currentEvent = {
-                type: eventType,
-                timestamp: now,
-                hash: Math.random().toString(36).substring(2, 10).toUpperCase()
-            };
-
-            // Add significant events to log
-            if (eventType !== 'normal') {
-                addEventToLog(currentData.currentEvent);
-            }
-        }
 
         // Add event to log
         function addEventToLog(event) {
@@ -714,6 +652,14 @@
             }
         }
 
+        // Update a single status item
+        function updateStatus(id, text, state) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = text;
+            el.className = `status-item ${state}`;
+        }
+
         // Update charts
         function updateCharts() {
             // Update GCP chart
@@ -761,18 +707,42 @@
         // Initialize everything
         document.addEventListener('DOMContentLoaded', () => {
             initCharts();
-            
-            // Connect to backend WebSocket
+
+            // 1. Open the socket
             const socket = new WebSocket("ws://localhost:8000/ws/resonance");
 
-            socket.onmessage = function (event) {
-                const data = JSON.parse(event.data);
-                // Convert ISO timestamp strings back to Date objects
-                data.currentEvent.timestamp = new Date(data.currentEvent.timestamp);
-                currentData = data;
-                addEventToLog(data.currentEvent);
+            socket.addEventListener('open', () => {
+                console.log('🔌 Connected to Resonance Oracle');
+                updateStatus('system-status', 'SYSTEM: LIVE', 'active');
+            });
+
+            socket.addEventListener('message', (msg) => {
+                const data = JSON.parse(msg.data);
+
+                currentData.gcp = data.gcp;
+                currentData.schumann = {
+                    primary: data.schumann.primary,
+                    secondary: data.schumann.secondary,
+                    activity: data.schumann.resonance * 100,
+                    resonance: data.schumann.resonance
+                };
+                currentData.fractal = data.fractal;
+                currentData.currentEvent = data.currentEvent;
+
+                if (data.gcp.history) currentData.gcp.history = data.gcp.history;
+                if (data.fractal.history) currentData.fractal.history = data.fractal.history;
+
                 updateUI();
-            };
+
+                if (currentData.currentEvent.type !== 'normal') {
+                    addEventToLog(currentData.currentEvent);
+                }
+            });
+
+            socket.addEventListener('close', () => {
+                console.warn('🔌 Disconnected from Oracle');
+                updateStatus('system-status', 'SYSTEM: OFFLINE', 'danger');
+            });
         });
     </script>
 </body>
