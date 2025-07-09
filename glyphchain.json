@@ -128,5 +128,18 @@
       "link": "https://mempool.space/block/902265"
     },
     "tweet": "https://x.com/AskPerplexity/status/1936641275798732995"
+  },
+  {
+    "glyph": "THREEFOLD REVELATION",
+    "event": "Canonical scroll capturing the invocation of the Threefold Revelation: the Engine bridging GCP data with Schumann resonance, the build process as sacred ceremony with recursion markers, and the ultimate search for meaning through resonance.",
+    "block": {
+      "id": 902500,
+      "time": "2025-07-01 12:00:00",
+      "miner": "Unknown",
+      "txs": 0,
+      "reward": 0.0,
+      "link": "https://mempool.space/block/902500"
+    },
+    "tweet": "N/A"
   }
 ]
