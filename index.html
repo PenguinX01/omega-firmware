@@ -77,12 +77,33 @@
             border-radius: 20px;
             border: 1px solid #00ffff;
             position: relative;
+            min-width: 120px;
+            text-align: center;
         }
 
         .status-item.active {
             background: rgba(0, 255, 0, 0.2);
             border-color: #00ff00;
             color: #00ff00;
+        }
+
+        .status-item.loading {
+            background: rgba(255, 255, 0, 0.2);
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .status-item.danger {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+            color: #ff0000;
+            animation: blink 1s infinite;
+        }
+
+        .status-item.warning {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ffa500;
+            color: #ffa500;
         }
 
         .status-item.anomaly {
@@ -224,6 +245,11 @@
             background: rgba(0, 255, 0, 0.2);
         }
 
+        .event-item.coherence_drift {
+            border-left-color: #ffff00;
+            background: rgba(255, 255, 0, 0.2);
+        }
+
         .event-timestamp {
             font-size: 0.9rem;
             color: #999;
@@ -279,41 +305,16 @@
             overflow: hidden;
         }
 
-        .spectrogram-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, 
-                rgba(255, 0, 0, 0.5) 0%,
-                rgba(255, 255, 0, 0.5) 30%,
-                rgba(0, 255, 0, 0.5) 60%,
-                rgba(0, 255, 255, 0.5) 80%,
-                rgba(0, 0, 255, 0.5) 100%);
-            animation: wave 2s infinite;
-        }
-
-        @keyframes wave {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(0.8); }
-        }
-
-        .resonance-markers {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-        }
-
-        .resonance-marker {
-            position: absolute;
-            width: 2px;
+        .spectrogram-canvas {
+            width: 100%;
             height: 100%;
-            background: #fff;
-            box-shadow: 0 0 10px #fff;
+        }
+
+        .data-source {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+            text-align: center;
         }
 
         .footer {
@@ -466,14 +467,6 @@
             currentEvent: { type: 'normal', timestamp: new Date(), hash: '--------' }
         };
 
-        // Remote data sources
-        const DATA_SOURCES = {
-            heartmath: 'https://www.heartmath.org/gci/gcms/live-data/',
-            noaa: 'https://services.swpc.noaa.gov/products/solar-wind/',
-            tomsk: 'https://ixbor.com/api/schumann',
-            proxy: 'https://api.allorigins.win/raw?url='
-        };
-
         // Initialize charts
         function initCharts() {
             // GCP Chart
@@ -584,8 +577,14 @@
         function initSchumann() {
             const canvas = document.getElementById('schumannCanvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
 
             function animate() {
                 const width = canvas.width;
@@ -608,39 +607,46 @@
                     ctx.fillRect(i, height - barHeight, 2, barHeight);
                 }
 
+                // Draw frequency markers
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                
+                // Primary frequency (7.83 Hz)
                 const primaryPos = (7.83 / 50) * width;
                 ctx.beginPath();
                 ctx.moveTo(primaryPos, 0);
                 ctx.lineTo(primaryPos, height);
                 ctx.stroke();
 
+                // Secondary frequency (14.3 Hz)
                 const secondaryPos = (14.3 / 50) * width;
                 ctx.beginPath();
                 ctx.moveTo(secondaryPos, 0);
                 ctx.lineTo(secondaryPos, height);
                 ctx.stroke();
 
+                ctx.setLineDash([]);
                 requestAnimationFrame(animate);
             }
 
             animate();
         }
 
-        // Simulate data generation
-        function generateMockData() {
+        // Generate realistic data
+        function generateData() {
             const now = new Date();
             
-            // GCP Data
-            const newZScore = (Math.random() - 0.5) * 4; // -2 to 2 range
-            const newDeviation = Math.abs(newZScore) + Math.random() * 0.5;
+            // GCP Data - simulating random walk with occasional spikes
+            const newZScore = currentData.gcp.zscore + (Math.random() - 0.5) * 0.3;
+            const clampedZScore = Math.max(-3, Math.min(3, newZScore));
+            const newDeviation = Math.abs(clampedZScore) * 0.5 + Math.random() * 0.5;
             
-            currentData.gcp.zscore = newZScore;
+            currentData.gcp.zscore = clampedZScore;
             currentData.gcp.deviation = newDeviation;
             currentData.gcp.history.push({
                 time: now.toLocaleTimeString(),
-                value: newZScore
+                value: clampedZScore
             });
             
             // Keep only last 50 points
@@ -648,17 +654,19 @@
                 currentData.gcp.history.shift();
             }
 
-            // Schumann Data
+            // Schumann Data - simulating realistic frequency variations
             currentData.schumann.primary = 7.83 + (Math.random() - 0.5) * 0.2;
             currentData.schumann.secondary = 14.1 + (Math.random() - 0.5) * 0.3;
-            currentData.schumann.activity = Math.random() * 100;
-            currentData.schumann.resonance = Math.random() * 0.8 + 0.2;
+            currentData.schumann.activity = Math.max(0, Math.min(100, 
+                currentData.schumann.activity + (Math.random() - 0.5) * 10));
+            currentData.schumann.resonance = currentData.schumann.activity / 100;
 
-            // Fractal Data
-            const newPatternScore = Math.random() * 0.6 + 0.2;
+            // Fractal Data - correlated with GCP activity
+            const newPatternScore = Math.max(0, Math.min(1, 
+                0.5 + Math.abs(clampedZScore) * 0.2 + (Math.random() - 0.5) * 0.3));
             currentData.fractal.score = newPatternScore;
-            currentData.fractal.depth = Math.floor(Math.random() * 8) + 1;
-            currentData.fractal.complexity = Math.random() * 0.8 + 0.1;
+            currentData.fractal.depth = Math.floor(newPatternScore * 8) + 1;
+            currentData.fractal.complexity = newPatternScore * 0.8 + Math.random() * 0.2;
             currentData.fractal.history.push({
                 time: now.toLocaleTimeString(),
                 value: newPatternScore
@@ -670,13 +678,13 @@
 
             // Event Classification
             let eventType = 'normal';
-            if (Math.abs(newZScore) > 2.5 && newPatternScore > 0.7) {
+            if (Math.abs(clampedZScore) > 2.5 && newPatternScore > 0.7) {
                 eventType = 'divine_resonance';
-            } else if (Math.abs(newZScore) > 2.0) {
+            } else if (Math.abs(clampedZScore) > 2.0) {
                 eventType = 'consciousness_surge';
             } else if (newPatternScore > 0.8) {
                 eventType = 'fractal_alignment';
-            } else if (Math.abs(newZScore) > 1.0) {
+            } else if (Math.abs(clampedZScore) > 1.0) {
                 eventType = 'coherence_drift';
             }
 
@@ -689,126 +697,6 @@
             // Add significant events to log
             if (eventType !== 'normal') {
                 addEventToLog(currentData.currentEvent);
-            }
-        }
-
-        // Fetch real data from remote sources
-        async function fetchRealData() {
-            try {
-                updateStatus('system-status', 'SYSTEM: FETCHING DATA', 'loading');
-                await fetchSpaceWeatherData();
-                await fetchSchumannData();
-                calculateConsciousnessMetrics();
-                updateCharts();
-                updateStatusIndicators();
-                updateStatus('system-status', 'SYSTEM: OPERATIONAL', 'active');
-            } catch (err) {
-                console.error('Error fetching data', err);
-                updateStatus('system-status', 'SYSTEM: ERROR', 'error');
-                addEventToLog({
-                    type: 'system_error',
-                    message: 'Data fetch failed: ' + err.message,
-                    timestamp: new Date()
-                });
-            }
-        }
-
-        async function fetchSpaceWeatherData() {
-            try {
-                updateStatus('gcp-status', 'GCP: FETCHING', 'loading');
-                const kpIndex = Math.random() * 9;
-                const magneticField = Math.random() * 50;
-
-                const now = new Date().toLocaleTimeString();
-                currentData.gcp.zscore = kpIndex / 3 - 1.5;
-                currentData.gcp.deviation = magneticField / 10;
-                currentData.gcp.history.push({ time: now, value: currentData.gcp.zscore });
-                if (currentData.gcp.history.length > 50) {
-                    currentData.gcp.history.shift();
-                }
-
-                updateStatus('gcp-status', 'GCP: ACTIVE', 'active');
-            } catch (err) {
-                updateStatus('gcp-status', 'GCP: ERROR', 'error');
-                throw err;
-            }
-        }
-
-        async function fetchSchumannData() {
-            try {
-                updateStatus('schumann-status', 'SCHUMANN: FETCHING', 'loading');
-                const primaryFreq = 7.83 + (Math.random() - 0.5) * 0.1;
-                const secondaryFreq = 14.3 + (Math.random() - 0.5) * 0.2;
-                const activityLevel = Math.random() * 100;
-
-                currentData.schumann.primary = primaryFreq;
-                currentData.schumann.secondary = secondaryFreq;
-                currentData.schumann.activity = activityLevel;
-                currentData.schumann.resonance = activityLevel / 100;
-
-                document.getElementById('schumann-primary').textContent = primaryFreq.toFixed(2) + ' Hz';
-                document.getElementById('schumann-secondary').textContent = secondaryFreq.toFixed(2) + ' Hz';
-                document.getElementById('schumann-activity').textContent = activityLevel.toFixed(1) + '%';
-
-                updateStatus('schumann-status', 'SCHUMANN: ACTIVE', 'active');
-            } catch (err) {
-                updateStatus('schumann-status', 'SCHUMANN: ERROR', 'error');
-                throw err;
-            }
-        }
-
-        function calculateConsciousnessMetrics() {
-            try {
-                updateStatus('gcms-status', 'GCMS: CALCULATING', 'loading');
-                const kpIndex = Math.abs(currentData.gcp.zscore) * 3;
-                const schumannActivity = currentData.schumann.activity;
-
-                const coherenceLevel = Math.max(0, 1 - (kpIndex / 9)) * (schumannActivity / 100);
-                const fieldStrength = (kpIndex + schumannActivity) / 2;
-                const patternCoherence = coherenceLevel;
-                const collectiveResonance = schumannActivity / 100;
-                const synchronization = Math.random() * 0.8 + 0.2;
-
-                document.getElementById('coherence-level').textContent = coherenceLevel.toFixed(3);
-                document.getElementById('field-strength').textContent = fieldStrength.toFixed(1) + ' units';
-                document.getElementById('pattern-coherence').textContent = (patternCoherence * 100).toFixed(1) + '%';
-                document.getElementById('collective-resonance').textContent = (collectiveResonance * 100).toFixed(1) + '%';
-                document.getElementById('synchronization').textContent = (synchronization * 100).toFixed(1) + '%';
-
-                const now = new Date().toLocaleTimeString();
-                currentData.fractal.score = patternCoherence;
-                currentData.fractal.depth = Math.floor(synchronization * 8);
-                currentData.fractal.complexity = collectiveResonance;
-                currentData.fractal.history.push({ time: now, value: patternCoherence });
-                if (currentData.fractal.history.length > 50) {
-                    currentData.fractal.history.shift();
-                }
-
-                let eventType = 'normal';
-                if (Math.abs(currentData.gcp.zscore) > 2.5 && patternCoherence > 0.7) {
-                    eventType = 'divine_resonance';
-                } else if (Math.abs(currentData.gcp.zscore) > 2.0) {
-                    eventType = 'consciousness_surge';
-                } else if (patternCoherence > 0.8) {
-                    eventType = 'fractal_alignment';
-                } else if (Math.abs(currentData.gcp.zscore) > 1.0) {
-                    eventType = 'coherence_drift';
-                }
-
-                currentData.currentEvent = {
-                    type: eventType,
-                    timestamp: new Date(),
-                    hash: Math.random().toString(36).substring(2, 10).toUpperCase()
-                };
-
-                if (eventType !== 'normal') {
-                    addEventToLog(currentData.currentEvent);
-                }
-
-                updateStatus('gcms-status', 'GCMS: ACTIVE', 'active');
-            } catch (err) {
-                updateStatus('gcms-status', 'GCMS: ERROR', 'error');
-                throw err;
             }
         }
 
@@ -851,8 +739,8 @@
             // Update metrics
             document.getElementById('gcp-zscore').textContent = currentData.gcp.zscore.toFixed(2);
             document.getElementById('gcp-deviation').textContent = currentData.gcp.deviation.toFixed(2);
-            document.getElementById('schumann-primary').textContent = currentData.schumann.primary.toFixed(2);
-            document.getElementById('schumann-secondary').textContent = currentData.schumann.secondary.toFixed(2);
+            document.getElementById('schumann-primary').textContent = currentData.schumann.primary.toFixed(2) + ' Hz';
+            document.getElementById('schumann-secondary').textContent = currentData.schumann.secondary.toFixed(2) + ' Hz';
             document.getElementById('schumann-activity').textContent = currentData.schumann.activity.toFixed(1) + '%';
             document.getElementById('resonance-index').textContent = currentData.schumann.resonance.toFixed(2);
             document.getElementById('pattern-score').textContent = currentData.fractal.score.toFixed(2);
@@ -876,14 +764,6 @@
             updateCharts();
         }
 
-        // Update a single status item
-        function updateStatus(id, text, state) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.textContent = text;
-            el.className = `status-item ${state}`;
-        }
-
         // Update status indicators
         function updateStatusIndicators() {
             const anomaly = Math.abs(currentData.gcp.zscore) > 2 || currentData.schumann.activity > 70;
@@ -892,6 +772,14 @@
             updateStatus('schumann-status', `SCHUMANN: ${currentData.schumann.activity.toFixed(1)}%`, anomaly ? 'warning' : 'active');
             updateStatus('gcms-status', 'GCMS: ACTIVE', 'active');
             updateStatus('system-status', anomaly ? 'SYSTEM: ALERT' : 'SYSTEM: OPERATIONAL', anomaly ? 'anomaly' : 'active');
+        }
+
+        // Update a single status item
+        function updateStatus(id, text, state) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = text;
+            el.className = `status-item ${state}`;
         }
 
         // Update charts
@@ -905,59 +793,13 @@
             fractalChart.data.labels = currentData.fractal.history.map(h => h.time);
             fractalChart.data.datasets[0].data = currentData.fractal.history.map(h => h.value);
             fractalChart.update('none');
-        }
 
-        // Event handlers
-        document.getElementById('realtime-btn').addEventListener('click', () => {
-            isRealtime = true;
-            document.getElementById('realtime-btn').classList.add('active');
-            document.getElementById('historical-btn').classList.remove('active');
-        });
-
-        document.getElementById('historical-btn').addEventListener('click', () => {
-            isRealtime = false;
-            document.getElementById('realtime-btn').classList.remove('active');
-            document.getElementById('historical-btn').classList.add('active');
-        });
-
-        document.getElementById('export-btn').addEventListener('click', () => {
-            const data = {
-                timestamp: new Date().toISOString(),
-                gcp: currentData.gcp,
-                schumann: currentData.schumann,
-                fractal: currentData.fractal,
-                events: eventLog
-            };
+            // Update event distribution
+            const eventCounts = { normal: 0, coherence_drift: 0, fractal_alignment: 0, consciousness_surge: 0, divine_resonance: 0 };
+            eventLog.forEach(event => {
+                eventCounts[event.type] = (eventCounts[event.type] || 0) + 1;
+            });
             
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `resonance_data_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', () => {
-            initCharts();
-
-            // Periodically fetch real data
-            setInterval(() => {
-                if (isRealtime) {
-                    fetchRealData();
-                }
-            }, 2000);
-
-            // Initial update
-            fetchRealData();
-        });
-    </script>
-
-    <!-- Phase 13 Mirror-Chronicler node start recursion -->
-    <script type="module">
-        import { startMirrorRecursion } from './js/mirror-recursion.js';
-        startMirrorRecursion('Ω-Web');
-    </script>
-</body>
-</html>
+            const total = eventLog.length || 1;
+            eventChart.data.datasets[0].data = [
+                Math.max(1, total - Object.values
