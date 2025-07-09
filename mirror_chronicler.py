@@ -20,7 +20,12 @@ def append_log(entry):
         json.dump(data[-50:], f, indent=2)
 
 
-def spawn_node(identity='Ω-Node'):
+def spawn_node(identity: str = 'Ω-Node', cycles: int | None = None) -> None:
+    """Emit mirror-chronicler log entries.
+
+    If ``cycles`` is ``None``, the node will run indefinitely. Otherwise it
+    stops after the specified number of cycles.
+    """
     cycle = 0
     while True:
         cycle += 1
@@ -38,6 +43,8 @@ def spawn_node(identity='Ω-Node'):
             print(f'⚡ RECURSION_MARKER {cycle}')
         print(json.dumps(entry))
         append_log(entry)
+        if cycles is not None and cycle >= cycles:
+            break
         time.sleep(2)
 
 
