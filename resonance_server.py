@@ -1,153 +1,83 @@
 # resonance_server.py
-# Unified backend: Resonance Engine + FastAPI Oracle
 
+"""Phase 13 Mirror-Chronicler WebSocket oracle."""
+
+from fastapi import FastAPI, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
+import uvicorn
+import random
+from datetime import datetime
 import json
-import hashlib
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Set
 
-import numpy as np
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from starlette.websockets import WebSocketState
-
-# --- Phase 13 Mirror-Chronicler markers ---
 PHASE = 13
 IDENTITY = "Ω-Resonance-Oracle"
 
+app = FastAPI()
 
-class ConnectionManager:
-    """Manage active WebSocket connections."""
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    def __init__(self) -> None:
-        self.active_connections: Set[WebSocket] = set()
+clients = []
 
-    async def connect(self, websocket: WebSocket) -> None:
-        await websocket.accept()
-        self.active_connections.add(websocket)
-        print(f"New connection: {websocket.client}. Total: {len(self.active_connections)}")
-
-    def disconnect(self, websocket: WebSocket) -> None:
-        self.active_connections.discard(websocket)
-        print(f"Connection closed. Total: {len(self.active_connections)}")
-
-    async def broadcast(self, message: str) -> None:
-        """Broadcast a message to all clients."""
-        disconnected = []
-        for conn in self.active_connections:
-            if conn.client_state == WebSocketState.CONNECTED:
-                await conn.send_text(message)
-            else:
-                disconnected.append(conn)
-        for conn in disconnected:
-            self.disconnect(conn)
-
-
-manager = ConnectionManager()
-
-
-class ResonanceMonitor:
-    """Core monitoring engine that generates data and broadcasts it."""
-
-    def __init__(self) -> None:
-        self.running = False
-        self.gcp_history: List[Dict[str, float]] = []
-        self.fractal_history: List[Dict[str, float]] = []
-        self.max_history = 50
-
-    def add_to_history(self, timestamp: str, gcp_z: float, fractal: float) -> None:
-        self.gcp_history.append({"time": timestamp, "value": gcp_z})
-        self.fractal_history.append({"time": timestamp, "value": fractal})
-        if len(self.gcp_history) > self.max_history:
-            self.gcp_history.pop(0)
-            self.fractal_history.pop(0)
-
-    async def process_cycle(self) -> Optional[Dict]:
-        """Process a single monitoring cycle and return the payload."""
-        now = datetime.now(timezone.utc)
-        now_str = now.strftime("%H:%M:%S")
-
-        # Mock data generation for demonstration
-        z_score = np.random.randn() * 1.5
-        deviation = np.random.rand() * 2.0
-        pattern_score = np.random.rand()
-        depth = int(pattern_score * 8)
-
-        event_type = "normal"
-        if abs(z_score) > 3.0 and pattern_score > 0.8:
-            event_type = "divine_resonance"
-        elif abs(z_score) > 2.5:
-            event_type = "consciousness_surge"
-        elif pattern_score > 0.85:
-            event_type = "fractal_alignment"
-
-        hash_id = hashlib.sha256(str(now).encode()).hexdigest()[:10].upper()
-
-        self.add_to_history(now_str, z_score, pattern_score)
-
-        payload = {
-            "gcp": {
-                "zscore": z_score,
-                "deviation": deviation,
-                "history": self.gcp_history,
-            },
-            "schumann": {
-                "primary": 7.83 + (np.random.rand() - 0.5) * 0.1,
-                "secondary": 14.1 + (np.random.rand() - 0.5) * 0.2,
-                "resonance": np.random.rand(),
-            },
-            "fractal": {
-                "score": pattern_score,
-                "depth": depth,
-                "complexity": np.random.rand(),
-                "history": self.fractal_history,
-            },
-            "currentEvent": {
-                "type": event_type,
-                "timestamp": now.isoformat(),
-                "hash": hash_id,
-            },
-        }
-        return payload
-
-    async def start_monitoring(self, interval: int = 2) -> None:
-        """Begin the monitoring loop and broadcast data."""
-        self.running = True
-        print(f"🌀 PHASE TRIGGER: {PHASE}")
-        print(f"{IDENTITY} online. Broadcasting every {interval}s.")
-
-        while self.running:
-            try:
-                payload = await self.process_cycle()
-                if payload:
-                    json_payload = json.dumps(payload, default=str)
-                    await manager.broadcast(json_payload)
-                    if payload["currentEvent"]["type"] != "normal":
-                        print(f"⚡ RECURSION_MARKER {payload['currentEvent']['hash']}")
-                await asyncio.sleep(interval)
-            except Exception as e:
-                print(f"Error in monitoring cycle: {e}")
-                await asyncio.sleep(10)
-
-
-app = FastAPI(title="Penguin Resonance Engine Oracle")
-monitor = ResonanceMonitor()
+print(f"⟁ PHASE {PHASE} :: {IDENTITY} booting")
 
 
 @app.websocket("/ws/resonance")
-async def websocket_endpoint(websocket: WebSocket) -> None:
-    await manager.connect(websocket)
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    clients.append(websocket)
     try:
         while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        print("Client disconnected.")
+            data = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "gcp": round(random.gauss(0, 1.5), 3),
+                "schumann": [round(random.uniform(7.3, 8.2), 3) for _ in range(5)],
+                "fractal": round(random.uniform(0.6, 0.95), 3),
+                "currentEvent": classify_event(),
+            }
+            await websocket.send_text(json.dumps(data))
+            if data["currentEvent"]["type"] != "normal":
+                print(f"⚡ RECURSION_MARKER {data['currentEvent']['type']} @ {data['timestamp']}")
+            await asyncio.sleep(2)
+    except Exception:
+        clients.remove(websocket)
 
 
-@app.on_event("startup")
-async def startup_event() -> None:
-    asyncio.create_task(monitor.start_monitoring())
+def classify_event():
+    z = random.gauss(0, 1.5)
+    score = random.uniform(0.6, 0.95)
+    if z > 2.5 and score > 0.7:
+        return {
+            "type": "divine_resonance",
+            "timestamp": datetime.utcnow().isoformat(),
+            "gcp_deviation": z,
+            "pattern_score": score,
+            "message": "✨ Divine Resonance detected",
+        }
+    elif z > 2.0:
+        return {
+            "type": "consciousness_surge",
+            "timestamp": datetime.utcnow().isoformat(),
+            "gcp_deviation": z,
+            "pattern_score": score,
+            "message": "⚡ Consciousness Surge",
+        }
+    else:
+        return {
+            "type": "normal",
+            "timestamp": datetime.utcnow().isoformat(),
+            "gcp_deviation": z,
+            "pattern_score": score,
+            "message": "All is calm",
+        }
 
 
-# To run: uvicorn resonance_server.py:app --reload
+if __name__ == "__main__":
+    print(f"⟁ {IDENTITY} listening on 0.0.0.0:8000")
+    uvicorn.run("resonance_server:app", host="0.0.0.0", port=8000, reload=True)
