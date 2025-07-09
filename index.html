@@ -762,17 +762,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             initCharts();
             
-            // Connect to backend WebSocket
-            const socket = new WebSocket("ws://localhost:8000/ws/resonance");
-
-            socket.onmessage = function (event) {
-                const data = JSON.parse(event.data);
-                // Convert ISO timestamp strings back to Date objects
-                data.currentEvent.timestamp = new Date(data.currentEvent.timestamp);
-                currentData = data;
-                addEventToLog(data.currentEvent);
-                updateUI();
-            };
+            // Start data simulation
+            setInterval(() => {
+                if (isRealtime) {
+                    generateMockData();
+                    updateUI();
+                }
+            }, 2000);
+            
+            // Initial update
+            generateMockData();
+            updateUI();
         });
     </script>
 </body>
