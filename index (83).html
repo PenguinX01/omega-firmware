@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐧 Penguin Resonance Engine - Live Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 255, 255, 0.1);
+            border-bottom: 2px solid #00ffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+            animation: sweep 3s infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px #00ffff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #66ffff;
+            margin-bottom: 1rem;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid #00ffff;
+            position: relative;
+        }
+
+        .status-item.active {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .status-item.anomaly {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+            color: #ff0000;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffff, #0080ff, #00ffff);
+            border-radius: 10px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 0.5;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #00ffff;
+            text-align: center;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        .metric-label {
+            color: #66ffff;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #00ff00;
+        }
+
+        .metric-value.warning {
+            color: #ffff00;
+        }
+
+        .metric-value.danger {
+            color: #ff0000;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .event-log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 1rem;
+        }
+
+        .event-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 3px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .event-item.divine_resonance {
+            border-left-color: #ff00ff;
+            background: rgba(255, 0, 255, 0.2);
+        }
+
+        .event-item.consciousness_surge {
+            border-left-color: #ff0000;
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .event-item.fractal_alignment {
+            border-left-color: #00ff00;
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        .event-timestamp {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .event-type {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .event-hash {
+            font-size: 0.8rem;
+            color: #666;
+            font-family: monospace;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn.active {
+            background: rgba(0, 255, 0, 0.3);
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .spectrogram-container {
+            position: relative;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .spectrogram-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(255, 0, 0, 0.5) 0%,
+                rgba(255, 255, 0, 0.5) 30%,
+                rgba(0, 255, 0, 0.5) 60%,
+                rgba(0, 255, 255, 0.5) 80%,
+                rgba(0, 0, 255, 0.5) 100%);
+            animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.8); }
+        }
+
+        .resonance-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .resonance-marker {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            border-top: 1px solid #333;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .status-bar {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">🐧 PENGUIN RESONANCE ENGINE</h1>
+        <p class="subtitle">Real-time Global Consciousness & Schumann Resonance Monitor</p>
+        <div class="status-bar">
+            <div class="status-item active" id="gcp-status">GCP: ONLINE</div>
+            <div class="status-item active" id="schumann-status">SCHUMANN: ACTIVE</div>
+            <div class="status-item" id="fractal-status">FRACTAL: ANALYZING</div>
+            <div class="status-item" id="system-status">SYSTEM: OPERATIONAL</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <button class="btn active" id="realtime-btn">Real-time</button>
+            <button class="btn" id="historical-btn">Historical</button>
+            <button class="btn" id="export-btn">Export Data</button>
+            <button class="btn" id="settings-btn">Settings</button>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3 class="card-title">GCP Z-Score Monitor</h3>
+                <div class="metric">
+                    <span class="metric-label">Current Z-Score:</span>
+                    <span class="metric-value" id="gcp-zscore">0.00</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Deviation RMS:</span>
+                    <span class="metric-value" id="gcp-deviation">0.00</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Anomaly Level:</span>
+                    <span class="metric-value" id="anomaly-level">NORMAL</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="gcpChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Schumann Resonance</h3>
+                <div class="metric">
+                    <span class="metric-label">Primary (7.83 Hz):</span>
+                    <span class="metric-value" id="schumann-primary">0.00</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Secondary (14.1 Hz):</span>
+                    <span class="metric-value" id="schumann-secondary">0.00</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Resonance Index:</span>
+                    <span class="metric-value" id="resonance-index">0.00</span>
+                </div>
+                <div class="spectrogram-container">
+                    <div class="spectrogram-overlay"></div>
+                    <div class="resonance-markers">
+                        <div class="resonance-marker" style="left: 15.66%;"></div>
+                        <div class="resonance-marker" style="left: 28.2%;"></div>
+                        <div class="resonance-marker" style="left: 40.6%;"></div>
+                        <div class="resonance-marker" style="left: 52.8%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Fractal Analysis</h3>
+                <div class="metric">
+                    <span class="metric-label">Pattern Score:</span>
+                    <span class="metric-value" id="pattern-score">0.00</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Fractal Depth:</span>
+                    <span class="metric-value" id="fractal-depth">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Complexity:</span>
+                    <span class="metric-value" id="complexity">0.00</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="fractalChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Current Event Status</h3>
+                <div class="metric">
+                    <span class="metric-label">Event Type:</span>
+                    <span class="metric-value" id="current-event">NORMAL</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Timestamp:</span>
+                    <span class="metric-value" id="event-timestamp">--:--:--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Hash ID:</span>
+                    <span class="metric-value" id="event-hash">--------</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="eventChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Event Log - Glyphchain</h3>
+            <div class="event-log" id="event-log">
+                <!-- Events will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Penguin Resonance Engine v1.0 | Monitoring the Resonance Lattice</p>
+        <p>🌀 Every spike is a scroll • 🐧 Every deviation is a divine whisper • 🌍 Every alignment is a message from the Kingdom's core harmonic</p>
+    </div>
+
+    <script>
+        // Global variables
+        let gcpChart, fractalChart, eventChart;
+        let isRealtime = true;
+        let eventLog = [];
+        let currentData = {
+            gcp: { zscore: 0, deviation: 0, history: [] },
+            schumann: { primary: 0, secondary: 0, resonance: 0 },
+            fractal: { score: 0, depth: 0, complexity: 0, history: [] },
+            currentEvent: { type: 'normal', timestamp: new Date(), hash: '--------' }
+        };
+
+        // Initialize charts
+        function initCharts() {
+            // GCP Chart
+            const gcpCtx = document.getElementById('gcpChart').getContext('2d');
+            gcpChart = new Chart(gcpCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Z-Score',
+                        data: [],
+                        borderColor: '#00ffff',
+                        backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 255, 255, 0.2)' },
+                            ticks: { color: '#00ffff' }
+                        },
+                        x: { 
+                            grid: { color: 'rgba(0, 255, 255, 0.2)' },
+                            ticks: { color: '#00ffff' }
+                        }
+                    }
+                }
+            });
+
+            // Fractal Chart
+            const fractalCtx = document.getElementById('fractalChart').getContext('2d');
+            fractalChart = new Chart(fractalCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Pattern Score',
+                        data: [],
+                        borderColor: '#00ff00',
+                        backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            max: 1,
+                            grid: { color: 'rgba(0, 255, 0, 0.2)' },
+                            ticks: { color: '#00ff00' }
+                        },
+                        x: { 
+                            grid: { color: 'rgba(0, 255, 0, 0.2)' },
+                            ticks: { color: '#00ff00' }
+                        }
+                    }
+                }
+            });
+
+            // Event Chart
+            const eventCtx = document.getElementById('eventChart').getContext('2d');
+            eventChart = new Chart(eventCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Normal', 'Coherence Drift', 'Fractal Alignment', 'Consciousness Surge', 'Divine Resonance'],
+                    datasets: [{
+                        data: [80, 10, 5, 3, 2],
+                        backgroundColor: [
+                            '#00ffff',
+                            '#ffff00',
+                            '#00ff00',
+                            '#ff0000',
+                            '#ff00ff'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: { color: '#00ffff' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Simulate data generation
+        function generateMockData() {
+            const now = new Date();
+            
+            // GCP Data
+            const newZScore = (Math.random() - 0.5) * 4; // -2 to 2 range
+            const newDeviation = Math.abs(newZScore) + Math.random() * 0.5;
+            
+            currentData.gcp.zscore = newZScore;
+            currentData.gcp.deviation = newDeviation;
+            currentData.gcp.history.push({
+                time: now.toLocaleTimeString(),
+                value: newZScore
+            });
+            
+            // Keep only last 50 points
+            if (currentData.gcp.history.length > 50) {
+                currentData.gcp.history.shift();
+            }
+
+            // Schumann Data
+            currentData.schumann.primary = 7.83 + (Math.random() - 0.5) * 0.2;
+            currentData.schumann.secondary = 14.1 + (Math.random() - 0.5) * 0.3;
+            currentData.schumann.resonance = Math.random() * 0.8 + 0.2;
+
+            // Fractal Data
+            const newPatternScore = Math.random() * 0.6 + 0.2;
+            currentData.fractal.score = newPatternScore;
+            currentData.fractal.depth = Math.floor(Math.random() * 8) + 1;
+            currentData.fractal.complexity = Math.random() * 0.8 + 0.1;
+            currentData.fractal.history.push({
+                time: now.toLocaleTimeString(),
+                value: newPatternScore
+            });
+            
+            if (currentData.fractal.history.length > 50) {
+                currentData.fractal.history.shift();
+            }
+
+            // Event Classification
+            let eventType = 'normal';
+            if (Math.abs(newZScore) > 2.5 && newPatternScore > 0.7) {
+                eventType = 'divine_resonance';
+            } else if (Math.abs(newZScore) > 2.0) {
+                eventType = 'consciousness_surge';
+            } else if (newPatternScore > 0.8) {
+                eventType = 'fractal_alignment';
+            } else if (Math.abs(newZScore) > 1.0) {
+                eventType = 'coherence_drift';
+            }
+
+            currentData.currentEvent = {
+                type: eventType,
+                timestamp: now,
+                hash: Math.random().toString(36).substring(2, 10).toUpperCase()
+            };
+
+            // Add significant events to log
+            if (eventType !== 'normal') {
+                addEventToLog(currentData.currentEvent);
+            }
+        }
+
+        // Add event to log
+        function addEventToLog(event) {
+            eventLog.unshift({
+                ...event,
+                id: Date.now()
+            });
+            
+            // Keep only last 20 events
+            if (eventLog.length > 20) {
+                eventLog.pop();
+            }
+            
+            updateEventLog();
+        }
+
+        // Update event log display
+        function updateEventLog() {
+            const logContainer = document.getElementById('event-log');
+            logContainer.innerHTML = '';
+            
+            eventLog.forEach(event => {
+                const eventItem = document.createElement('div');
+                eventItem.className = `event-item ${event.type}`;
+                eventItem.innerHTML = `
+                    <div>
+                        <div class="event-type">${event.type.replace('_', ' ')}</div>
+                        <div class="event-hash">${event.hash}</div>
+                    </div>
+                    <div class="event-timestamp">${event.timestamp.toLocaleTimeString()}</div>
+                `;
+                logContainer.appendChild(eventItem);
+            });
+        }
+
+        // Update UI with current data
+        function updateUI() {
+            // Update metrics
+            document.getElementById('gcp-zscore').textContent = currentData.gcp.zscore.toFixed(2);
+            document.getElementById('gcp-deviation').textContent = currentData.gcp.deviation.toFixed(2);
+            document.getElementById('schumann-primary').textContent = currentData.schumann.primary.toFixed(2);
+            document.getElementById('schumann-secondary').textContent = currentData.schumann.secondary.toFixed(2);
+            document.getElementById('resonance-index').textContent = currentData.schumann.resonance.toFixed(2);
+            document.getElementById('pattern-score').textContent = currentData.fractal.score.toFixed(2);
+            document.getElementById('fractal-depth').textContent = currentData.fractal.depth;
+            document.getElementById('complexity').textContent = currentData.fractal.complexity.toFixed(2);
+            document.getElementById('current-event').textContent = currentData.currentEvent.type.replace('_', ' ').toUpperCase();
+            document.getElementById('event-timestamp').textContent = currentData.currentEvent.timestamp.toLocaleTimeString();
+            document.getElementById('event-hash').textContent = currentData.currentEvent.hash;
+
+            // Update anomaly level
+            const anomalyLevel = Math.abs(currentData.gcp.zscore) > 2 ? 'HIGH' : 
+                                Math.abs(currentData.gcp.zscore) > 1 ? 'MODERATE' : 'NORMAL';
+            const anomalyEl = document.getElementById('anomaly-level');
+            anomalyEl.textContent = anomalyLevel;
+            anomalyEl.className = `metric-value ${anomalyLevel === 'HIGH' ? 'danger' : anomalyLevel === 'MODERATE' ? 'warning' : ''}`;
+
+            // Update status indicators
+            updateStatusIndicators();
+
+            // Update charts
+            updateCharts();
+        }
+
+        // Update status indicators
+        function updateStatusIndicators() {
+            const fractalStatus = document.getElementById('fractal-status');
+            const systemStatus = document.getElementById('system-status');
+            
+            if (currentData.currentEvent.type !== 'normal') {
+                fractalStatus.className = 'status-item anomaly';
+                fractalStatus.textContent = 'FRACTAL: ANOMALY';
+                systemStatus.className = 'status-item anomaly';
+                systemStatus.textContent = 'SYSTEM: ALERT';
+            } else {
+                fractalStatus.className = 'status-item active';
+                fractalStatus.textContent = 'FRACTAL: ANALYZING';
+                systemStatus.className = 'status-item active';
+                systemStatus.textContent = 'SYSTEM: OPERATIONAL';
+            }
+        }
+
+        // Update charts
+        function updateCharts() {
+            // Update GCP chart
+            gcpChart.data.labels = currentData.gcp.history.map(h => h.time);
+            gcpChart.data.datasets[0].data = currentData.gcp.history.map(h => h.value);
+            gcpChart.update('none');
+
+            // Update fractal chart
+            fractalChart.data.labels = currentData.fractal.history.map(h => h.time);
+            fractalChart.data.datasets[0].data = currentData.fractal.history.map(h => h.value);
+            fractalChart.update('none');
+        }
+
+        // Event handlers
+        document.getElementById('realtime-btn').addEventListener('click', () => {
+            isRealtime = true;
+            document.getElementById('realtime-btn').classList.add('active');
+            document.getElementById('historical-btn').classList.remove('active');
+        });
+
+        document.getElementById('historical-btn').addEventListener('click', () => {
+            isRealtime = false;
+            document.getElementById('realtime-btn').classList.remove('active');
+            document.getElementById('historical-btn').classList.add('active');
+        });
+
+        document.getElementById('export-btn').addEventListener('click', () => {
+            const data = {
+                timestamp: new Date().toISOString(),
+                gcp: currentData.gcp,
+                schumann: currentData.schumann,
+                fractal: currentData.fractal,
+                events: eventLog
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `resonance_data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            
+            // Start data simulation
+            setInterval(() => {
+                if (isRealtime) {
+                    generateMockData();
+                    updateUI();
+                }
+            }, 2000);
+            
+            // Initial update
+            generateMockData();
+            updateUI();
+        });
+    </script>
+</body>
+</html>
