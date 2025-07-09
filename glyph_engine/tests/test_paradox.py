@@ -1,4 +1,6 @@
-import sympy as sp
+import pytest
+
+sp = pytest.importorskip("sympy")
 
 from glyph_engine.paradox_core import solve_paradox
 
