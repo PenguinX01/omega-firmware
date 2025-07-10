@@ -14,7 +14,7 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
@@ -63,6 +63,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
+            width: 100%;
         }
         button:hover {
             transform: translateY(-2px);
@@ -93,28 +94,75 @@
             margin: 10px 0;
             border-radius: 8px;
             border-left: 4px solid #00ffff;
+            transition: all 0.3s;
+        }
+        .resonance-mode:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: translateX(5px);
         }
         .highlight {
             background: rgba(255, 215, 0, 0.2);
             border-left-color: #ffd700;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
         }
         canvas {
             width: 100%;
             height: 100%;
             border-radius: 5px;
         }
-        .frequency-bar {
-            height: 20px;
-            background: linear-gradient(90deg, #00ffff, #0080ff);
-            margin: 5px 0;
+        .info-panel {
+            background: rgba(0, 100, 100, 0.1);
+            padding: 20px;
             border-radius: 10px;
-            transition: width 0.3s;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            margin-bottom: 20px;
         }
-        .frequency-label {
+        .preset-buttons {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
             font-size: 12px;
+        }
+        .preset-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .mode-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .mode-type-count {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .frequency-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .range-value {
+            min-width: 60px;
+            text-align: center;
+            color: #00ffff;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -122,49 +170,74 @@
     <div class="container">
         <h1>🏛️ King's Chamber Acoustic Resonance Simulator</h1>
         
+        <div class="info-panel">
+            <h3>About the King's Chamber</h3>
+            <p>The King's Chamber in the Great Pyramid of Giza is renowned for its unique acoustic properties. Many researchers have reported a fundamental resonance around 117 Hz, which corresponds to the F# note. This simulator allows you to explore how different parameters affect the chamber's resonant frequencies.</p>
+        </div>
+
+        <div class="preset-buttons">
+            <button class="preset-btn" onclick="loadPreset('original')">Original Dimensions</button>
+            <button class="preset-btn" onclick="loadPreset('precise')">Precise Measurements</button>
+            <button class="preset-btn" onclick="loadPreset('theoretical')">Theoretical Golden</button>
+            <button class="preset-btn" onclick="loadPreset('modern')">Modern Analysis</button>
+        </div>
+        
         <div class="controls">
             <div class="control-group">
                 <h3>Chamber Dimensions (meters)</h3>
                 <label>Length:</label>
-                <input type="number" id="length" value="10.46" step="0.01">
+                <input type="number" id="length" value="10.46" step="0.01" min="1" max="20">
                 
                 <label>Width:</label>
-                <input type="number" id="width" value="5.23" step="0.01">
+                <input type="number" id="width" value="5.23" step="0.01" min="1" max="15">
                 
                 <label>Height:</label>
-                <input type="number" id="height" value="5.82" step="0.01">
+                <input type="number" id="height" value="5.82" step="0.01" min="1" max="15">
+                
+                <label>Volume: <span id="volume">318.2 m³</span></label>
             </div>
             
             <div class="control-group">
-                <h3>Acoustic Properties</h3>
+                <h3>Environmental Conditions</h3>
                 <label>Temperature (°C):</label>
-                <input type="number" id="temperature" value="20" step="0.1">
+                <input type="number" id="temperature" value="20" step="0.1" min="-10" max="50">
                 
                 <label>Humidity (%):</label>
-                <input type="number" id="humidity" value="65" step="1">
+                <input type="number" id="humidity" value="65" step="1" min="0" max="100">
+                
+                <label>Atmospheric Pressure (kPa):</label>
+                <input type="number" id="pressure" value="101.325" step="0.1" min="80" max="120">
                 
                 <label>Wall Material:</label>
                 <select id="material">
-                    <option value="granite">Granite</option>
-                    <option value="limestone">Limestone</option>
-                    <option value="sandstone">Sandstone</option>
+                    <option value="granite">Granite (High Density)</option>
+                    <option value="limestone">Limestone (Medium Density)</option>
+                    <option value="sandstone">Sandstone (Low Density)</option>
+                    <option value="quartzite">Quartzite (Very High Density)</option>
                 </select>
             </div>
             
             <div class="control-group">
                 <h3>Analysis Parameters</h3>
                 <label>Frequency Range (Hz):</label>
-                <input type="range" id="freqRange" min="20" max="500" value="200">
-                <span id="freqValue">200 Hz</span>
+                <div class="frequency-input">
+                    <input type="range" id="freqRange" min="20" max="1000" value="300">
+                    <span id="freqValue" class="range-value">300 Hz</span>
+                </div>
+                
+                <label>Target Frequency (Hz):</label>
+                <input type="number" id="targetFreq" value="117" step="0.1" min="20" max="1000">
                 
                 <label>Mode Analysis:</label>
                 <select id="modeType">
                     <option value="all">All Modes</option>
-                    <option value="fundamental">Fundamental Only</option>
-                    <option value="harmonic">Harmonic Series</option>
+                    <option value="axial">Axial Only</option>
+                    <option value="tangential">Tangential Only</option>
+                    <option value="oblique">Oblique Only</option>
+                    <option value="fundamental">Fundamental Modes</option>
                 </select>
                 
-                <button onclick="calculateResonance()">Calculate Resonance</button>
+                <button onclick="calculateResonance()">🔍 Calculate Resonance</button>
             </div>
         </div>
         
@@ -175,7 +248,7 @@
             </div>
             
             <div class="frequency-plot">
-                <h3>Frequency Response</h3>
+                <h3>Frequency Response Spectrum</h3>
                 <canvas id="frequencyPlot"></canvas>
             </div>
         </div>
@@ -183,16 +256,50 @@
         <div class="results">
             <h3>Resonance Analysis Results</h3>
             <div id="resonanceResults"></div>
+            
+            <div class="mode-types">
+                <div class="mode-type-count">
+                    <h4>Axial Modes</h4>
+                    <span id="axialCount">0</span>
+                </div>
+                <div class="mode-type-count">
+                    <h4>Tangential Modes</h4>
+                    <span id="tangentialCount">0</span>
+                </div>
+                <div class="mode-type-count">
+                    <h4>Oblique Modes</h4>
+                    <span id="obliqueCount">0</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Material properties
+        // Enhanced material properties
         const materials = {
-            granite: { density: 2750, velocity: 3000, absorption: 0.02 },
-            limestone: { density: 2600, velocity: 2800, absorption: 0.05 },
-            sandstone: { density: 2200, velocity: 2500, absorption: 0.08 }
+            granite: { density: 2750, velocity: 3100, absorption: 0.02, impedance: 8.5e6 },
+            limestone: { density: 2600, velocity: 2800, absorption: 0.05, impedance: 7.3e6 },
+            sandstone: { density: 2200, velocity: 2500, absorption: 0.08, impedance: 5.5e6 },
+            quartzite: { density: 2800, velocity: 3200, absorption: 0.015, impedance: 9.0e6 }
         };
+
+        // Preset configurations
+        const presets = {
+            original: { length: 10.46, width: 5.23, height: 5.82, temp: 20, humidity: 65 },
+            precise: { length: 10.479, width: 5.234, height: 5.819, temp: 20, humidity: 65 },
+            theoretical: { length: 10.472, width: 5.236, height: 5.816, temp: 20, humidity: 65 },
+            modern: { length: 10.477, width: 5.237, height: 5.821, temp: 22, humidity: 70 }
+        };
+
+        function loadPreset(type) {
+            const preset = presets[type];
+            document.getElementById('length').value = preset.length;
+            document.getElementById('width').value = preset.width;
+            document.getElementById('height').value = preset.height;
+            document.getElementById('temperature').value = preset.temp;
+            document.getElementById('humidity').value = preset.humidity;
+            calculateResonance();
+        }
 
         // Initialize 3D visualization
         function init3D() {
@@ -201,7 +308,6 @@
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
             
-            // Draw isometric chamber
             drawChamber(ctx);
         }
 
@@ -209,11 +315,10 @@
             const w = ctx.canvas.width;
             const h = ctx.canvas.height;
             
-            // Clear canvas
             ctx.clearRect(0, 0, w, h);
             
-            // Isometric projection
-            const scale = 20;
+            // Enhanced isometric projection
+            const scale = Math.min(w, h) / 25;
             const offsetX = w / 2;
             const offsetY = h / 2;
             
@@ -225,59 +330,84 @@
             function iso(x, y, z) {
                 return {
                     x: offsetX + (x - y) * Math.cos(Math.PI / 6) * scale,
-                    y: offsetY + (x + y) * Math.sin(Math.PI / 6) * scale - z * scale
+                    y: offsetY + (x + y) * Math.sin(Math.PI / 6) * scale - z * scale * 0.8
                 };
             }
             
-            // Draw chamber edges
+            // Chamber vertices
+            const vertices = [
+                iso(0, 0, 0), iso(length, 0, 0), iso(length, width, 0), iso(0, width, 0),
+                iso(0, 0, height), iso(length, 0, height), iso(length, width, height), iso(0, width, height)
+            ];
+            
+            // Draw faces with gradient
+            const gradient = ctx.createLinearGradient(0, 0, w, h);
+            gradient.addColorStop(0, 'rgba(0, 255, 255, 0.1)');
+            gradient.addColorStop(1, 'rgba(0, 255, 255, 0.3)');
+            
+            // Bottom face
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(vertices[0].x, vertices[0].y);
+            ctx.lineTo(vertices[1].x, vertices[1].y);
+            ctx.lineTo(vertices[2].x, vertices[2].y);
+            ctx.lineTo(vertices[3].x, vertices[3].y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Top face
+            ctx.beginPath();
+            ctx.moveTo(vertices[4].x, vertices[4].y);
+            ctx.lineTo(vertices[5].x, vertices[5].y);
+            ctx.lineTo(vertices[6].x, vertices[6].y);
+            ctx.lineTo(vertices[7].x, vertices[7].y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Side faces
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.15)';
+            ctx.beginPath();
+            ctx.moveTo(vertices[1].x, vertices[1].y);
+            ctx.lineTo(vertices[2].x, vertices[2].y);
+            ctx.lineTo(vertices[6].x, vertices[6].y);
+            ctx.lineTo(vertices[5].x, vertices[5].y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw edges
             ctx.strokeStyle = '#00ffff';
             ctx.lineWidth = 2;
             ctx.beginPath();
             
-            // Bottom face
-            const p1 = iso(0, 0, 0);
-            const p2 = iso(length, 0, 0);
-            const p3 = iso(length, width, 0);
-            const p4 = iso(0, width, 0);
+            // Bottom edges
+            ctx.moveTo(vertices[0].x, vertices[0].y);
+            ctx.lineTo(vertices[1].x, vertices[1].y);
+            ctx.lineTo(vertices[2].x, vertices[2].y);
+            ctx.lineTo(vertices[3].x, vertices[3].y);
+            ctx.lineTo(vertices[0].x, vertices[0].y);
             
-            // Top face
-            const p5 = iso(0, 0, height);
-            const p6 = iso(length, 0, height);
-            const p7 = iso(length, width, height);
-            const p8 = iso(0, width, height);
+            // Top edges
+            ctx.moveTo(vertices[4].x, vertices[4].y);
+            ctx.lineTo(vertices[5].x, vertices[5].y);
+            ctx.lineTo(vertices[6].x, vertices[6].y);
+            ctx.lineTo(vertices[7].x, vertices[7].y);
+            ctx.lineTo(vertices[4].x, vertices[4].y);
             
-            // Draw bottom face
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.lineTo(p3.x, p3.y);
-            ctx.lineTo(p4.x, p4.y);
-            ctx.lineTo(p1.x, p1.y);
-            
-            // Draw top face
-            ctx.moveTo(p5.x, p5.y);
-            ctx.lineTo(p6.x, p6.y);
-            ctx.lineTo(p7.x, p7.y);
-            ctx.lineTo(p8.x, p8.y);
-            ctx.lineTo(p5.x, p5.y);
-            
-            // Draw vertical edges
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p5.x, p5.y);
-            ctx.moveTo(p2.x, p2.y);
-            ctx.lineTo(p6.x, p6.y);
-            ctx.moveTo(p3.x, p3.y);
-            ctx.lineTo(p7.x, p7.y);
-            ctx.moveTo(p4.x, p4.y);
-            ctx.lineTo(p8.x, p8.y);
+            // Vertical edges
+            for (let i = 0; i < 4; i++) {
+                ctx.moveTo(vertices[i].x, vertices[i].y);
+                ctx.lineTo(vertices[i + 4].x, vertices[i + 4].y);
+            }
             
             ctx.stroke();
             
-            // Add dimensions
+            // Enhanced labels
             ctx.fillStyle = '#00ffff';
-            ctx.font = '12px Courier New';
-            ctx.fillText(`L: ${length}m`, 10, 30);
-            ctx.fillText(`W: ${width}m`, 10, 50);
-            ctx.fillText(`H: ${height}m`, 10, 70);
+            ctx.font = 'bold 14px Courier New';
+            ctx.fillText(`Length: ${length}m`, 10, 25);
+            ctx.fillText(`Width: ${width}m`, 10, 45);
+            ctx.fillText(`Height: ${height}m`, 10, 65);
+            ctx.fillText(`Volume: ${(length * width * height).toFixed(1)}m³`, 10, 85);
         }
 
         function calculateResonance() {
@@ -286,20 +416,24 @@
             const height = parseFloat(document.getElementById('height').value);
             const temp = parseFloat(document.getElementById('temperature').value);
             const humidity = parseFloat(document.getElementById('humidity').value);
+            const pressure = parseFloat(document.getElementById('pressure').value);
             const materialType = document.getElementById('material').value;
+            const targetFreq = parseFloat(document.getElementById('targetFreq').value);
             
-            // Calculate speed of sound with temperature and humidity correction
-            const speedOfSound = 331.3 * Math.sqrt(1 + temp / 273.15) * (1 + 0.0016 * humidity / 100);
+            // Update volume display
+            document.getElementById('volume').textContent = `${(length * width * height).toFixed(1)} m³`;
             
-            // Calculate resonant frequencies for rectangular room
+            // Enhanced speed of sound calculation
+            const speedOfSound = calculateSpeedOfSound(temp, humidity, pressure);
+            
+            // Calculate resonant frequencies
             const modes = [];
-            
-            // Generate modes up to specified frequency range
             const maxFreq = parseInt(document.getElementById('freqRange').value);
+            const modeFilter = document.getElementById('modeType').value;
             
-            for (let nx = 0; nx <= 5; nx++) {
-                for (let ny = 0; ny <= 5; ny++) {
-                    for (let nz = 0; nz <= 5; nz++) {
+            for (let nx = 0; nx <= 8; nx++) {
+                for (let ny = 0; ny <= 8; ny++) {
+                    for (let nz = 0; nz <= 8; nz++) {
                         if (nx === 0 && ny === 0 && nz === 0) continue;
                         
                         const frequency = (speedOfSound / 2) * Math.sqrt(
@@ -307,27 +441,39 @@
                         );
                         
                         if (frequency <= maxFreq) {
-                            modes.push({
+                            const modeType = getModeType(nx, ny, nz);
+                            const mode = {
                                 frequency: frequency,
                                 nx: nx,
                                 ny: ny,
                                 nz: nz,
-                                type: getModeType(nx, ny, nz)
-                            });
+                                type: modeType,
+                                Q: calculateQFactor(frequency, materialType)
+                            };
+                            
+                            if (shouldIncludeMode(mode, modeFilter)) {
+                                modes.push(mode);
+                            }
                         }
                     }
                 }
             }
             
-            // Sort by frequency
             modes.sort((a, b) => a.frequency - b.frequency);
             
-            // Display results
-            displayResults(modes, speedOfSound);
-            
-            // Update visualizations
-            drawFrequencyPlot(modes);
+            displayResults(modes, speedOfSound, targetFreq);
+            drawFrequencyPlot(modes, targetFreq);
             drawChamber(document.getElementById('chamber3d').getContext('2d'));
+            updateModeTypeCounts(modes);
+        }
+
+        function calculateSpeedOfSound(temp, humidity, pressure) {
+            // More accurate calculation including pressure
+            const tempK = temp + 273.15;
+            const pressureRatio = pressure / 101.325;
+            const humidityFactor = 1 + 0.0016 * (humidity / 100);
+            
+            return 331.3 * Math.sqrt(tempK / 273.15) * Math.sqrt(pressureRatio) * humidityFactor;
         }
 
         function getModeType(nx, ny, nz) {
@@ -337,34 +483,83 @@
             return 'Oblique';
         }
 
-        function displayResults(modes, speedOfSound) {
+        function shouldIncludeMode(mode, filter) {
+            if (filter === 'all') return true;
+            if (filter === 'axial') return mode.type === 'Axial';
+            if (filter === 'tangential') return mode.type === 'Tangential';
+            if (filter === 'oblique') return mode.type === 'Oblique';
+            if (filter === 'fundamental') return mode.nx <= 2 && mode.ny <= 2 && mode.nz <= 2;
+            return true;
+        }
+
+        function calculateQFactor(frequency, materialType) {
+            const material = materials[materialType];
+            return 1 / (2 * material.absorption);
+        }
+
+        function displayResults(modes, speedOfSound, targetFreq) {
             const resultsDiv = document.getElementById('resonanceResults');
-            let html = `<p><strong>Speed of Sound:</strong> ${speedOfSound.toFixed(2)} m/s</p>`;
+            let html = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <strong>Speed of Sound:</strong> ${speedOfSound.toFixed(2)} m/s<br>
+                        <strong>Total Modes Found:</strong> ${modes.length}<br>
+                        <strong>Target Frequency:</strong> ${targetFreq} Hz
+                    </div>
+                    <div>
+                        <strong>Material:</strong> ${document.getElementById('material').selectedOptions[0].text}<br>
+                        <strong>Temperature:</strong> ${document.getElementById('temperature').value}°C<br>
+                        <strong>Humidity:</strong> ${document.getElementById('humidity').value}%
+                    </div>
+                </div>
+            `;
             
             html += '<h4>Resonant Modes:</h4>';
             
             modes.forEach((mode, index) => {
-                const isTarget = Math.abs(mode.frequency - 117) < 2;
+                const deviation = Math.abs(mode.frequency - targetFreq);
+                const isTarget = deviation < 5;
                 const cssClass = isTarget ? 'resonance-mode highlight' : 'resonance-mode';
+                const note = frequencyToNote(mode.frequency);
                 
                 html += `
                     <div class="${cssClass}">
-                        <strong>${mode.frequency.toFixed(2)} Hz</strong> 
-                        (${mode.nx},${mode.ny},${mode.nz}) - ${mode.type}
-                        ${isTarget ? ' <span style="color: #ffd700;">⭐ TARGET FREQUENCY</span>' : ''}
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${mode.frequency.toFixed(2)} Hz</strong> 
+                                <span style="color: #888;">(${note})</span>
+                                <br>
+                                <small>Mode: (${mode.nx},${mode.ny},${mode.nz}) - ${mode.type}</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <small>Q: ${mode.Q.toFixed(1)}</small>
+                                ${isTarget ? '<br><span style="color: #ffd700;">⭐ TARGET</span>' : ''}
+                            </div>
+                        </div>
                     </div>
                 `;
             });
             
-            // Check for 117 Hz match
-            const match117 = modes.find(m => Math.abs(m.frequency - 117) < 5);
-            if (match117) {
+            const bestMatch = modes.reduce((best, mode) => 
+                Math.abs(mode.frequency - targetFreq) < Math.abs(best.frequency - targetFreq) ? mode : best
+            , modes[0]);
+            
+            if (bestMatch && Math.abs(bestMatch.frequency - targetFreq) < 10) {
                 html += `
-                    <div style="background: rgba(255, 215, 0, 0.2); padding: 20px; margin: 20px 0; border-radius: 10px;">
-                        <h4 style="color: #ffd700;">🎯 117 Hz RESONANCE DETECTED</h4>
-                        <p><strong>Frequency:</strong> ${match117.frequency.toFixed(2)} Hz</p>
-                        <p><strong>Mode:</strong> (${match117.nx},${match117.ny},${match117.nz}) - ${match117.type}</p>
-                        <p><strong>Deviation:</strong> ${Math.abs(match117.frequency - 117).toFixed(2)} Hz</p>
+                    <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2)); padding: 20px; margin: 20px 0; border-radius: 10px; border: 2px solid #ffd700;">
+                        <h4 style="color: #ffd700; margin-top: 0;">🎯 CLOSEST MATCH TO ${targetFreq} Hz</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <strong>Frequency:</strong> ${bestMatch.frequency.toFixed(2)} Hz<br>
+                                <strong>Musical Note:</strong> ${frequencyToNote(bestMatch.frequency)}<br>
+                                <strong>Mode Type:</strong> ${bestMatch.type}
+                            </div>
+                            <div>
+                                <strong>Mode Numbers:</strong> (${bestMatch.nx}, ${bestMatch.ny}, ${bestMatch.nz})<br>
+                                <strong>Deviation:</strong> ${Math.abs(bestMatch.frequency - targetFreq).toFixed(2)} Hz<br>
+                                <strong>Q Factor:</strong> ${bestMatch.Q.toFixed(1)}
+                            </div>
+                        </div>
                     </div>
                 `;
             }
@@ -372,7 +567,19 @@
             resultsDiv.innerHTML = html;
         }
 
-        function drawFrequencyPlot(modes) {
+        function frequencyToNote(freq) {
+            const A4 = 440;
+            const C0 = A4 * Math.pow(2, -4.75);
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            
+            const h = Math.round(12 * Math.log2(freq / C0));
+            const octave = Math.floor(h / 12);
+            const n = h % 12;
+            
+            return noteNames[n] + octave;
+        }
+
+        function drawFrequencyPlot(modes, targetFreq) {
             const canvas = document.getElementById('frequencyPlot');
             const ctx = canvas.getContext('2d');
             canvas.width = canvas.offsetWidth;
@@ -383,43 +590,83 @@
             if (modes.length === 0) return;
             
             const maxFreq = Math.max(...modes.map(m => m.frequency));
-            const barHeight = Math.min(canvas.height / modes.length, 25);
+            const padding = 40;
+            const plotWidth = canvas.width - padding * 2;
+            const plotHeight = canvas.height - padding * 2;
             
+            // Draw axes
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+            
+            // Draw target frequency line
+            const targetX = padding + (targetFreq / maxFreq) * plotWidth;
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(targetX, padding);
+            ctx.lineTo(targetX, canvas.height - padding);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw frequency bars
             modes.forEach((mode, index) => {
-                const y = index * barHeight;
-                const width = (mode.frequency / maxFreq) * (canvas.width - 100);
+                const x = padding + (mode.frequency / maxFreq) * plotWidth;
+                const barHeight = Math.min(mode.Q * 2, plotHeight * 0.8);
+                const y = canvas.height - padding - barHeight;
                 
-                // Color based on proximity to 117 Hz
-                const isTarget = Math.abs(mode.frequency - 117) < 2;
-                ctx.fillStyle = isTarget ? '#ffd700' : '#00ffff';
+                const deviation = Math.abs(mode.frequency - targetFreq);
+                const isTarget = deviation < 5;
                 
-                ctx.fillRect(0, y, width, barHeight - 2);
+                ctx.fillStyle = isTarget ? '#ffd700' : 
+                    mode.type === 'Axial' ? '#ff4444' :
+                    mode.type === 'Tangential' ? '#44ff44' : '#4444ff';
                 
-                // Frequency label
-                ctx.fillStyle = '#fff';
-                ctx.font = '10px Courier New';
-                ctx.fillText(`${mode.frequency.toFixed(1)} Hz`, width + 5, y + barHeight/2 + 3);
+                ctx.fillRect(x - 2, y, 4, barHeight);
             });
+            
+            // Labels
+            ctx.fillStyle = '#eee';
+            ctx.font = '12px Courier New';
+            ctx.fillText('0 Hz', padding - 10, canvas.height - padding + 15);
+            ctx.fillText(`${maxFreq.toFixed(0)} Hz`, canvas.width - padding - 30, canvas.height - padding + 15);
+            ctx.fillText(`${targetFreq} Hz`, targetX - 20, padding - 10);
+            
+            // Legend
+            ctx.fillStyle = '#ff4444';
+            ctx.fillRect(padding, padding + 10, 10, 10);
+            ctx.fillStyle = '#eee';
+            ctx.fillText('Axial', padding + 15, padding + 20);
+            
+            ctx.fillStyle = '#44ff44';
+            ctx.fillRect(padding + 80, padding + 10, 10, 10);
+            ctx.fillStyle = '#eee';
+            ctx.fillText('Tangential', padding + 95, padding + 20);
+            
+            ctx.fillStyle = '#4444ff';
+            ctx.fillRect(padding + 180, padding + 10, 10, 10);
+            ctx.fillStyle = '#eee';
+            ctx.fillText('Oblique', padding + 195, padding + 20);
         }
 
-        // Update frequency range display
+        function updateModeTypeCounts(modes) {
+            const counts = { Axial: 0, Tangential: 0, Oblique: 0 };
+            modes.forEach(mode => counts[mode.type]++);
+            
+            document.getElementById('axialCount').textContent = counts.Axial;
+            document.getElementById('tangentialCount').textContent = counts.Tangential;
+            document.getElementById('obliqueCount').textContent = counts.Oblique;
+        }
+
+        // Event listeners
         document.getElementById('freqRange').addEventListener('input', function() {
             document.getElementById('freqValue').textContent = this.value + ' Hz';
         });
 
-        // Initialize
-        window.addEventListener('load', function() {
-            init3D();
-            calculateResonance();
-        });
-
-        // Recalculate on window resize
-        window.addEventListener('resize', function() {
-            setTimeout(() => {
-                init3D();
-                calculateResonance();
-            }, 100);
-        });
-    </script>
-</body>
-</html>
+        // Auto-update on input changes
+        ['length
