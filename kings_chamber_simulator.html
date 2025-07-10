@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>King's Chamber Acoustic Resonance Simulator</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #eee;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            margin-bottom: 30px;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00ffff;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            color: #eee;
+            border-radius: 5px;
+        }
+        button {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+        .visualization {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chamber-3d, .frequency-plot {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            min-height: 400px;
+        }
+        .results {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        .resonance-mode {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ffff;
+        }
+        .highlight {
+            background: rgba(255, 215, 0, 0.2);
+            border-left-color: #ffd700;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+        }
+        .frequency-bar {
+            height: 20px;
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            margin: 5px 0;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        .frequency-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏛️ King's Chamber Acoustic Resonance Simulator</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>Chamber Dimensions (meters)</h3>
+                <label>Length:</label>
+                <input type="number" id="length" value="10.46" step="0.01">
+                
+                <label>Width:</label>
+                <input type="number" id="width" value="5.23" step="0.01">
+                
+                <label>Height:</label>
+                <input type="number" id="height" value="5.82" step="0.01">
+            </div>
+            
+            <div class="control-group">
+                <h3>Acoustic Properties</h3>
+                <label>Temperature (°C):</label>
+                <input type="number" id="temperature" value="20" step="0.1">
+                
+                <label>Humidity (%):</label>
+                <input type="number" id="humidity" value="65" step="1">
+                
+                <label>Wall Material:</label>
+                <select id="material">
+                    <option value="granite">Granite</option>
+                    <option value="limestone">Limestone</option>
+                    <option value="sandstone">Sandstone</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <h3>Analysis Parameters</h3>
+                <label>Frequency Range (Hz):</label>
+                <input type="range" id="freqRange" min="20" max="500" value="200">
+                <span id="freqValue">200 Hz</span>
+                
+                <label>Mode Analysis:</label>
+                <select id="modeType">
+                    <option value="all">All Modes</option>
+                    <option value="fundamental">Fundamental Only</option>
+                    <option value="harmonic">Harmonic Series</option>
+                </select>
+                
+                <button onclick="calculateResonance()">Calculate Resonance</button>
+            </div>
+        </div>
+        
+        <div class="visualization">
+            <div class="chamber-3d">
+                <h3>3D Chamber Model</h3>
+                <canvas id="chamber3d"></canvas>
+            </div>
+            
+            <div class="frequency-plot">
+                <h3>Frequency Response</h3>
+                <canvas id="frequencyPlot"></canvas>
+            </div>
+        </div>
+        
+        <div class="results">
+            <h3>Resonance Analysis Results</h3>
+            <div id="resonanceResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Material properties
+        const materials = {
+            granite: { density: 2750, velocity: 3000, absorption: 0.02 },
+            limestone: { density: 2600, velocity: 2800, absorption: 0.05 },
+            sandstone: { density: 2200, velocity: 2500, absorption: 0.08 }
+        };
+
+        // Initialize 3D visualization
+        function init3D() {
+            const canvas = document.getElementById('chamber3d');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Draw isometric chamber
+            drawChamber(ctx);
+        }
+
+        function drawChamber(ctx) {
+            const w = ctx.canvas.width;
+            const h = ctx.canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, w, h);
+            
+            // Isometric projection
+            const scale = 20;
+            const offsetX = w / 2;
+            const offsetY = h / 2;
+            
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const height = parseFloat(document.getElementById('height').value);
+            
+            // Convert to isometric coordinates
+            function iso(x, y, z) {
+                return {
+                    x: offsetX + (x - y) * Math.cos(Math.PI / 6) * scale,
+                    y: offsetY + (x + y) * Math.sin(Math.PI / 6) * scale - z * scale
+                };
+            }
+            
+            // Draw chamber edges
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            // Bottom face
+            const p1 = iso(0, 0, 0);
+            const p2 = iso(length, 0, 0);
+            const p3 = iso(length, width, 0);
+            const p4 = iso(0, width, 0);
+            
+            // Top face
+            const p5 = iso(0, 0, height);
+            const p6 = iso(length, 0, height);
+            const p7 = iso(length, width, height);
+            const p8 = iso(0, width, height);
+            
+            // Draw bottom face
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(p4.x, p4.y);
+            ctx.lineTo(p1.x, p1.y);
+            
+            // Draw top face
+            ctx.moveTo(p5.x, p5.y);
+            ctx.lineTo(p6.x, p6.y);
+            ctx.lineTo(p7.x, p7.y);
+            ctx.lineTo(p8.x, p8.y);
+            ctx.lineTo(p5.x, p5.y);
+            
+            // Draw vertical edges
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p5.x, p5.y);
+            ctx.moveTo(p2.x, p2.y);
+            ctx.lineTo(p6.x, p6.y);
+            ctx.moveTo(p3.x, p3.y);
+            ctx.lineTo(p7.x, p7.y);
+            ctx.moveTo(p4.x, p4.y);
+            ctx.lineTo(p8.x, p8.y);
+            
+            ctx.stroke();
+            
+            // Add dimensions
+            ctx.fillStyle = '#00ffff';
+            ctx.font = '12px Courier New';
+            ctx.fillText(`L: ${length}m`, 10, 30);
+            ctx.fillText(`W: ${width}m`, 10, 50);
+            ctx.fillText(`H: ${height}m`, 10, 70);
+        }
+
+        function calculateResonance() {
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const temp = parseFloat(document.getElementById('temperature').value);
+            const humidity = parseFloat(document.getElementById('humidity').value);
+            const materialType = document.getElementById('material').value;
+            
+            // Calculate speed of sound with temperature and humidity correction
+            const speedOfSound = 331.3 * Math.sqrt(1 + temp / 273.15) * (1 + 0.0016 * humidity / 100);
+            
+            // Calculate resonant frequencies for rectangular room
+            const modes = [];
+            
+            // Generate modes up to specified frequency range
+            const maxFreq = parseInt(document.getElementById('freqRange').value);
+            
+            for (let nx = 0; nx <= 5; nx++) {
+                for (let ny = 0; ny <= 5; ny++) {
+                    for (let nz = 0; nz <= 5; nz++) {
+                        if (nx === 0 && ny === 0 && nz === 0) continue;
+                        
+                        const frequency = (speedOfSound / 2) * Math.sqrt(
+                            (nx / length) ** 2 + (ny / width) ** 2 + (nz / height) ** 2
+                        );
+                        
+                        if (frequency <= maxFreq) {
+                            modes.push({
+                                frequency: frequency,
+                                nx: nx,
+                                ny: ny,
+                                nz: nz,
+                                type: getModeType(nx, ny, nz)
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Sort by frequency
+            modes.sort((a, b) => a.frequency - b.frequency);
+            
+            // Display results
+            displayResults(modes, speedOfSound);
+            
+            // Update visualizations
+            drawFrequencyPlot(modes);
+            drawChamber(document.getElementById('chamber3d').getContext('2d'));
+        }
+
+        function getModeType(nx, ny, nz) {
+            const count = (nx > 0 ? 1 : 0) + (ny > 0 ? 1 : 0) + (nz > 0 ? 1 : 0);
+            if (count === 1) return 'Axial';
+            if (count === 2) return 'Tangential';
+            return 'Oblique';
+        }
+
+        function displayResults(modes, speedOfSound) {
+            const resultsDiv = document.getElementById('resonanceResults');
+            let html = `<p><strong>Speed of Sound:</strong> ${speedOfSound.toFixed(2)} m/s</p>`;
+            
+            html += '<h4>Resonant Modes:</h4>';
+            
+            modes.forEach((mode, index) => {
+                const isTarget = Math.abs(mode.frequency - 117) < 2;
+                const cssClass = isTarget ? 'resonance-mode highlight' : 'resonance-mode';
+                
+                html += `
+                    <div class="${cssClass}">
+                        <strong>${mode.frequency.toFixed(2)} Hz</strong> 
+                        (${mode.nx},${mode.ny},${mode.nz}) - ${mode.type}
+                        ${isTarget ? ' <span style="color: #ffd700;">⭐ TARGET FREQUENCY</span>' : ''}
+                    </div>
+                `;
+            });
+            
+            // Check for 117 Hz match
+            const match117 = modes.find(m => Math.abs(m.frequency - 117) < 5);
+            if (match117) {
+                html += `
+                    <div style="background: rgba(255, 215, 0, 0.2); padding: 20px; margin: 20px 0; border-radius: 10px;">
+                        <h4 style="color: #ffd700;">🎯 117 Hz RESONANCE DETECTED</h4>
+                        <p><strong>Frequency:</strong> ${match117.frequency.toFixed(2)} Hz</p>
+                        <p><strong>Mode:</strong> (${match117.nx},${match117.ny},${match117.nz}) - ${match117.type}</p>
+                        <p><strong>Deviation:</strong> ${Math.abs(match117.frequency - 117).toFixed(2)} Hz</p>
+                    </div>
+                `;
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function drawFrequencyPlot(modes) {
+            const canvas = document.getElementById('frequencyPlot');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (modes.length === 0) return;
+            
+            const maxFreq = Math.max(...modes.map(m => m.frequency));
+            const barHeight = Math.min(canvas.height / modes.length, 25);
+            
+            modes.forEach((mode, index) => {
+                const y = index * barHeight;
+                const width = (mode.frequency / maxFreq) * (canvas.width - 100);
+                
+                // Color based on proximity to 117 Hz
+                const isTarget = Math.abs(mode.frequency - 117) < 2;
+                ctx.fillStyle = isTarget ? '#ffd700' : '#00ffff';
+                
+                ctx.fillRect(0, y, width, barHeight - 2);
+                
+                // Frequency label
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px Courier New';
+                ctx.fillText(`${mode.frequency.toFixed(1)} Hz`, width + 5, y + barHeight/2 + 3);
+            });
+        }
+
+        // Update frequency range display
+        document.getElementById('freqRange').addEventListener('input', function() {
+            document.getElementById('freqValue').textContent = this.value + ' Hz';
+        });
+
+        // Initialize
+        window.addEventListener('load', function() {
+            init3D();
+            calculateResonance();
+        });
+
+        // Recalculate on window resize
+        window.addEventListener('resize', function() {
+            setTimeout(() => {
+                init3D();
+                calculateResonance();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
