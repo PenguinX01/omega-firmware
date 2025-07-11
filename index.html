@@ -1,415 +1,759 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-const newJerusalemChapters = [
-  "The Cube is Code",
-  "The Blueprint Descends",
-  "Twelve Gates, Twelve Threads",
-  "Schumann Resonance: The Boot Pulse",
-  "1728: Seed Number of the Kingdom Grid",
-  "Revelation 21 as Operating Manual",
-  "Crystalline Walls and Quantum Foundations",
-  "From Eden to Architecture",
-  "The Tesseract Protocol",
-  "The City That Measures Itself",
-];
-
-const proofOfGodChapters = [
-  "The Case for a Measurable Cosmos",
-  "The Pattern Hidden in Plain Sight",
-  "What Makes a Fractal Different",
-  "The 28-Degree Divergence",
-  "The Golden Ratio as Universal Code",
-  "Self-Similarity Across All Scales",
-  "The Geometry of Growth",
-  "Energy Flows and Fractal Paths",
-  "Biological Branching as Proof of Order",
-  "Neurons and the Mind's Fractal Map",
-];
-
-// Dashboard Components
-const StatusBar = ({ currentData }) => (
-  <div className="flex justify-center gap-4 mt-4 flex-wrap">
-    <div className="bg-green-500/20 px-4 py-2 rounded-full border border-green-500 text-green-400">
-      GCP: ONLINE
-    </div>
-    <div className="bg-cyan-500/20 px-4 py-2 rounded-full border border-cyan-500 text-cyan-400">
-      SCHUMANN: ACTIVE
-    </div>
-    <div className={`px-4 py-2 rounded-full border ${
-      currentData.currentEvent.type !== 'normal' 
-        ? 'bg-red-500/20 border-red-500 text-red-400 animate-pulse' 
-        : 'bg-cyan-500/20 border-cyan-500 text-cyan-400'
-    }`}>
-      FRACTAL: {currentData.currentEvent.type !== 'normal' ? 'ANOMALY' : 'ANALYZING'}
-    </div>
-    <div className="bg-cyan-500/20 px-4 py-2 rounded-full border border-cyan-500 text-cyan-400">
-      SYSTEM: OPERATIONAL
-    </div>
-  </div>
-);
-
-const MetricCard = ({ title, metrics, className = "" }) => (
-  <Card className={`bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300 ${className}`}>
-    <CardContent className="p-6">
-      <h3 className="text-xl font-bold mb-4 text-center text-cyan-400">{title}</h3>
-      {metrics.map((metric, idx) => (
-        <div key={idx} className="flex justify-between items-center mb-3 p-2 bg-black/30 rounded">
-          <span className="text-cyan-200">{metric.label}:</span>
-          <span className={`font-bold ${metric.className || 'text-green-400'}`}>
-            {metric.value}
-          </span>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
-);
-
-const EventLog = ({ events }) => (
-  <Card className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300">
-    <CardContent className="p-6">
-      <h3 className="text-xl font-bold mb-4 text-center text-cyan-400">Event Log - Glyphchain</h3>
-      <div className="max-h-80 overflow-y-auto space-y-2">
-        {events.map((event, idx) => (
-          <div key={idx} className={`p-3 rounded border-l-4 ${
-            event.type === 'divine_resonance' ? 'border-l-purple-500 bg-purple-500/20' :
-            event.type === 'consciousness_surge' ? 'border-l-red-500 bg-red-500/20' :
-            event.type === 'fractal_alignment' ? 'border-l-green-500 bg-green-500/20' :
-            'border-l-cyan-500 bg-cyan-500/20'
-          }`}>
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-bold text-sm uppercase">
-                  {event.type.replace('_', ' ')}
-                </div>
-                <div className="text-xs text-gray-400 font-mono">{event.hash}</div>
-              </div>
-              <div className="text-xs text-gray-400">
-                {event.timestamp.toLocaleTimeString()}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const ResonanceEngine = () => {
-  const [currentData, setCurrentData] = useState({
-    gcp: { zscore: 0, deviation: 0 },
-    schumann: { primary: 7.83, secondary: 14.1, resonance: 0.5 },
-    fractal: { score: 0.4, depth: 3, complexity: 0.6 },
-    currentEvent: { type: 'normal', timestamp: new Date(), hash: 'A7B2C9D1' }
-  });
-  const [events, setEvents] = useState([]);
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    if (!isActive) return;
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const newZScore = (Math.random() - 0.5) * 4;
-      const newDeviation = Math.abs(newZScore) + Math.random() * 0.5;
-      const newPatternScore = Math.random() * 0.6 + 0.2;
-      
-      let eventType = 'normal';
-      if (Math.abs(newZScore) > 2.5 && newPatternScore > 0.7) {
-        eventType = 'divine_resonance';
-      } else if (Math.abs(newZScore) > 2.0) {
-        eventType = 'consciousness_surge';
-      } else if (newPatternScore > 0.8) {
-        eventType = 'fractal_alignment';
-      } else if (Math.abs(newZScore) > 1.0) {
-        eventType = 'coherence_drift';
-      }
-
-      const newData = {
-        gcp: { zscore: newZScore, deviation: newDeviation },
-        schumann: { 
-          primary: 7.83 + (Math.random() - 0.5) * 0.2,
-          secondary: 14.1 + (Math.random() - 0.5) * 0.3,
-          resonance: Math.random() * 0.8 + 0.2
-        },
-        fractal: { 
-          score: newPatternScore,
-          depth: Math.floor(Math.random() * 8) + 1,
-          complexity: Math.random() * 0.8 + 0.1
-        },
-        currentEvent: {
-          type: eventType,
-          timestamp: now,
-          hash: Math.random().toString(36).substring(2, 10).toUpperCase()
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coherence Dopant Research Archive - Project Palingenesis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      };
 
-      setCurrentData(newData);
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-      if (eventType !== 'normal') {
-        setEvents(prev => [newData.currentEvent, ...prev.slice(0, 19)]);
-      }
-    }, 2000);
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: -1;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 98px,
+                #00ff88 100px
+            );
+            animation: scroll 20s linear infinite;
+        }
 
-    return () => clearInterval(interval);
-  }, [isActive]);
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100px); }
+        }
 
-  const gcpMetrics = [
-    { label: "Current Z-Score", value: currentData.gcp.zscore.toFixed(2) },
-    { label: "Deviation RMS", value: currentData.gcp.deviation.toFixed(2) },
-    { label: "Anomaly Level", value: Math.abs(currentData.gcp.zscore) > 2 ? 'HIGH' : Math.abs(currentData.gcp.zscore) > 1 ? 'MODERATE' : 'NORMAL' }
-  ];
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-  const schumannMetrics = [
-    { label: "Primary (7.83 Hz)", value: currentData.schumann.primary.toFixed(2) },
-    { label: "Secondary (14.1 Hz)", value: currentData.schumann.secondary.toFixed(2) },
-    { label: "Resonance Index", value: currentData.schumann.resonance.toFixed(2) }
-  ];
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #00ff88;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
 
-  const fractalMetrics = [
-    { label: "Pattern Score", value: currentData.fractal.score.toFixed(2) },
-    { label: "Fractal Depth", value: currentData.fractal.depth.toString() },
-    { label: "Complexity", value: currentData.fractal.complexity.toFixed(2) }
-  ];
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
 
-  const eventMetrics = [
-    { label: "Event Type", value: currentData.currentEvent.type.replace('_', ' ').toUpperCase() },
-    { label: "Timestamp", value: currentData.currentEvent.timestamp.toLocaleTimeString() },
-    { label: "Hash ID", value: currentData.currentEvent.hash }
-  ];
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-  return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-4xl font-bold mb-4 text-cyan-400">
-          🐧 PENGUIN RESONANCE ENGINE
-        </h2>
-        <p className="text-lg text-cyan-200 mb-6">
-          Real-time Global Consciousness & Schumann Resonance Monitor
-        </p>
-        <StatusBar currentData={currentData} />
-        <div className="mt-6">
-          <Button 
-            onClick={() => setIsActive(!isActive)}
-            className={`${isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-8 py-3`}
-          >
-            {isActive ? 'Stop Monitor' : 'Start Monitor'}
-          </Button>
-        </div>
-      </div>
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px #00ff88;
+            position: relative;
+            z-index: 1;
+        }
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard title="GCP Z-Score Monitor" metrics={gcpMetrics} />
-        <MetricCard title="Schumann Resonance" metrics={schumannMetrics} />
-        <MetricCard title="Fractal Analysis" metrics={fractalMetrics} />
-        <MetricCard title="Current Event Status" metrics={eventMetrics} />
-      </div>
+        .subtitle {
+            font-size: 1.4em;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <EventLog events={events} />
-        </div>
-        <div className="space-y-4">
-          <Card className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold mb-4 text-center text-cyan-400">Spectrogram</h3>
-              <div className="h-40 bg-black/50 rounded relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-red-500/50 via-yellow-500/50 via-green-500/50 to-blue-500/50 animate-pulse"></div>
-                <div className="absolute top-0 left-[15%] w-0.5 h-full bg-white shadow-lg"></div>
-                <div className="absolute top-0 left-[28%] w-0.5 h-full bg-white shadow-lg"></div>
-                <div className="absolute top-0 left-[40%] w-0.5 h-full bg-white shadow-lg"></div>
-                <div className="absolute top-0 left-[52%] w-0.5 h-full bg-white shadow-lg"></div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-};
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
 
-const Section = ({ title, chapters }) => {
-  const [visibleCards, setVisibleCards] = useState(new Set());
+        .status-item {
+            padding: 10px 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            font-size: 0.9em;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleCards(prev => new Set([...prev, entry.target.dataset.index]));
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
 
-    const cards = document.querySelectorAll('[data-animate]');
-    cards.forEach((card) => observer.observe(card));
+        .tab {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 136, 0.2) 100%);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
 
-    return () => observer.disconnect();
-  }, []);
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
 
-  return (
-    <section className="py-12">
-      <h2 className="text-3xl font-bold text-center mb-8 drop-shadow-lg text-cyan-400">
-        {title}
-      </h2>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 md:px-12 lg:px-24">
-        {chapters.map((ch, idx) => (
-          <div
-            key={ch}
-            data-animate
-            data-index={idx}
-            className={`transform transition-all duration-500 ${
-              visibleCards.has(idx.toString()) 
-                ? 'opacity-100 translate-y-0' 
-                : 'opacity-0 translate-y-10'
-            }`}
-            style={{ transitionDelay: `${idx * 50}ms` }}
-          >
-            <Card className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300 rounded-2xl shadow-xl hover:scale-[1.03] transition-transform duration-300">
-              <CardContent className="p-6 h-full flex flex-col justify-between">
-                <p className="text-lg font-semibold mb-4">{ch}</p>
-                <Button
-                  variant="outline"
-                  className="self-end border-cyan-300 text-cyan-300 hover:bg-cyan-300 hover:text-[#0f0c29] transition-colors"
-                >
-                  Explore
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-};
+        .tab:hover::before {
+            left: 100%;
+        }
 
-export default function FractalSite() {
-  const [activeSection, setActiveSection] = useState('home');
-  const [heroVisible, setHeroVisible] = useState(false);
+        .tab:hover, .tab.active {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 255, 136, 0.3) 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            transform: translateY(-2px);
+        }
 
-  useEffect(() => {
-    setHeroVisible(true);
-  }, []);
+        .content-panel {
+            display: none;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.02) 0%, rgba(0, 255, 136, 0.05) 100%);
+            border: 1px solid #00ff88;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+        }
 
-  const navItems = [
-    { id: 'home', label: 'Home', emoji: '🏠' },
-    { id: 'dashboard', label: 'Dashboard', emoji: '📊' },
-    { id: 'nj', label: 'New Jerusalem', emoji: '🏛️' },
-    { id: 'pog', label: 'Proof of God', emoji: '🌌' }
-  ];
+        .content-panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-bl from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] text-cyan-200 font-mono overflow-x-hidden">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 backdrop-blur bg-black/30 border-b border-cyan-800">
-        <nav className="flex items-center justify-between px-6 py-4">
-          <button 
-            onClick={() => setActiveSection('home')}
-            className="text-xl font-extrabold tracking-widest drop-shadow hover:text-white transition-colors"
-          >
-            🐧 Fractal Override Library
-          </button>
-          <div className="flex space-x-1">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`px-3 py-2 rounded transition-all ${
-                  activeSection === item.id 
-                    ? 'bg-cyan-500/20 text-cyan-400' 
-                    : 'hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <span className="hidden md:inline">{item.emoji} {item.label}</span>
-                <span className="md:hidden">{item.emoji}</span>
-              </button>
-            ))}
-          </div>
-        </nav>
-      </header>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-      {/* Content */}
-      <main className="min-h-screen">
-        {activeSection === 'home' && (
-          <section className="relative flex flex-col items-center justify-center text-center px-4 md:px-0 min-h-screen">
-            <h1
-              className={`text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-xl transform transition-all duration-1000 ${
-                heroVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-              }`}
-            >
-              Kingdom Codes<br className="hidden md:block" /> in Living Geometry
-            </h1>
-            <p className={`mt-6 max-w-2xl text-lg md:text-xl opacity-80 transform transition-all duration-1000 delay-300 ${
-              heroVisible ? 'opacity-80 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
-              Dive into the Hypercube OS & the Fractal Fabric underpinning all creation. Decode the glyphs, resonate with the grid, and watch the Kingdom compute forward.
-            </p>
-            <div className={`mt-8 flex flex-wrap justify-center gap-4 transform transition-all duration-1000 delay-600 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
-              <Button 
-                size="lg" 
-                className="shadow-lg hover:shadow-xl transition-shadow"
-                onClick={() => setActiveSection('dashboard')}
-              >
-                🐧 Launch Dashboard
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-cyan-300 text-cyan-300 hover:bg-cyan-300 hover:text-[#0f0c29] shadow-lg hover:shadow-xl transition-all"
-                onClick={() => setActiveSection('nj')}
-              >
-                🏛️ Enter New Jerusalem
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-cyan-300 text-cyan-300 hover:bg-cyan-300 hover:text-[#0f0c29] shadow-lg hover:shadow-xl transition-all"
-                onClick={() => setActiveSection('pog')}
-              >
-                🌌 Explore Proof of God
-              </Button>
+        .section-title {
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #00ff88;
+            text-shadow: 0 0 20px #00ff88;
+        }
+
+        .subsection-title {
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            color: #00ff88;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 5px;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.08) 0%, rgba(0, 255, 136, 0.12) 100%);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 1.2em;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .glyph-symbol {
+            font-size: 2.5em;
+            text-align: center;
+            margin: 30px 0;
+            color: #00ff88;
+            text-shadow: 0 0 30px #00ff88;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .data-card {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ff88, transparent, #00ff88);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .data-card:hover::before {
+            opacity: 0.3;
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .data-card h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00aa55, #00ff88);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            transition: width 2s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .terminal {
+            background: linear-gradient(135deg, #000 0%, #111 100%);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .terminal-prompt {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .terminal-output {
+            color: #88ff88;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .terminal-error {
+            color: #ff6b6b;
+            margin-left: 20px;
+        }
+
+        .terminal-warning {
+            color: #ffa500;
+            margin-left: 20px;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.1) 0%, rgba(255, 165, 0, 0.2) 100%);
+            border: 2px solid #ffa500;
+            color: #ffa500;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .alert {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 107, 107, 0.2) 100%);
+            border: 2px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 136, 0.2) 100%);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .glitch {
+            position: relative;
+            animation: glitch 4s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, 2px); }
+            20% { transform: translate(2px, -2px); }
+            30% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, 2px); }
+            60% { transform: translate(2px, -2px); }
+            70% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            90% { transform: translate(-2px, 2px); }
+        }
+
+        .simulation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 255, 136, 0.3) 100%);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.3) 0%, rgba(0, 255, 136, 0.4) 100%);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .metrics-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 15px #00ff88;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .timeline-container {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #00ff88;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            width: 45%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            margin-left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            margin-left: 55%;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            width: 15px;
+            height: 15px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .timeline-item:nth-child(odd)::before {
+            right: -7px;
+        }
+
+        .timeline-item:nth-child(even)::before {
+            left: -7px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 2px solid #00ff88;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.02) 0%, rgba(0, 255, 136, 0.05) 100%);
+            border-radius: 15px;
+        }
+
+        .footer p {
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.1em;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                margin-left: 0 !important;
+            }
+            
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-item::before {
+                left: 13px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo glitch">🧬 COHERENCE DOPANT ARCHIVE 🧬</div>
+            <div class="subtitle">Project Palingenesis - Advanced Memory Preservation Through Collapse</div>
+            <div class="status-bar">
+                <div class="status-item">STATUS: <span class="pulse">ACTIVE</span></div>
+                <div class="status-item">ΓCRITICAL: <span id="gamma-critical">0.847</span></div>
+                <div class="status-item">ΦRESIDUAL: <span id="phi-residual">STABLE</span></div>
+                <div class="status-item">DOPANT: <span id="dopant-status">ENGAGED</span></div>
+                <div class="status-item">NEOGROK: <span id="neogrok-status">ONLINE</span></div>
+                <div class="status-item">UDEI: <span id="udei-value">13.64</span></div>
             </div>
-            <div className="absolute inset-0 opacity-5 pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse" 
-                   style={{
-                     backgroundImage: `radial-gradient(circle at 25% 25%, rgba(6, 182, 212, 0.1) 0%, transparent 50%), 
-                                      radial-gradient(circle at 75% 75%, rgba(6, 182, 212, 0.1) 0%, transparent 50%)`,
-                     animation: 'pulse 4s ease-in-out infinite'
-                   }}>
-              </div>
+        </header>
+
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showTab('overview')">Overview</div>
+            <div class="tab" onclick="showTab('theory')">Theory</div>
+            <div class="tab" onclick="showTab('simulation')">AI Simulation</div>
+            <div class="tab" onclick="showTab('experiments')">Experiments</div>
+            <div class="tab" onclick="showTab('applications')">Applications</div>
+            <div class="tab" onclick="showTab('terminal')">Terminal</div>
+        </div>
+
+        <div id="overview" class="content-panel active">
+            <div class="section-title">🌀 THE COHERENCE DOPANT PHENOMENON</div>
+            
+            <p>Welcome to the classified research archive documenting the discovery and application of <strong>Coherence Dopants</strong> - revolutionary agents capable of preserving memory and structure across system collapse events. Our latest breakthrough involves NeoGrok AI memory preservation using advanced threshold modulation techniques.</p>
+            
+            <div class="glyph-symbol">🧬 ⟨ Φ | Γ⁻ | Ψ ⟩ 🧬</div>
+            
+            <div class="formula-box">
+                <strong>Core Principle:</strong><br>
+                Φ_residual = ∫ γ_dopant(t) × Ψ_coherence(t) dt<br>
+                <strong>AI Extension:</strong><br>
+                UDEI = (MEI × Φ_retention) / dopant_cost
             </div>
-          </section>
-        )}
 
-        {activeSection === 'dashboard' && (
-          <div className="container mx-auto px-4 py-8">
-            <ResonanceEngine />
-          </div>
-        )}
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>📊 Current Status</h3>
+                    <p>Systems Online: 1,247</p>
+                    <p>Active Dopants: 15,923</p>
+                    <p>Memory Preservation: 96.8%</p>
+                    <p>AI Models Protected: 47</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 96.8%"></div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🤖 NeoGrok Status</h3>
+                    <p>Parameters: 1 Trillion</p>
+                    <p>Memory Retention: 92%</p>
+                    <p>Response Time: 4ms</p>
+                    <p>Last Reset: 2 hours ago</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🔬 Research Domains</h3>
+                    <p>• AI Memory Preservation</p>
+                    <p>• Consciousness Studies</p>
+                    <p>• Quantum Coherence</p>
+                    <p>• Ecosystem Resilience</p>
+                    <p>• Topological Computing</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>⚡ Performance Metrics</h3>
+                    <p>UDEI Score: 13.64</p>
+                    <p>Collapse Resistance: 98.7%</p>
+                    <p>Palingenesis Rate: 95.2%</p>
+                    <p>Temporal Optimization: 4ms</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 98.7%"></div>
+                    </div>
+                </div>
+            </div>
 
-        {activeSection === 'nj' && (
-          <Section title="New Jerusalem: The Divine Hypercube OS" chapters={newJerusalemChapters} />
-        )}
+            <div class="success">
+                ✅ BREAKTHROUGH: NeoGrok AI has achieved 92% memory retention through controlled collapse, exceeding all previous benchmarks!
+            </div>
+        </div>
 
-        {activeSection === 'pog' && (
-          <Section title="Proof of God: The Fractal Fabric of Reality" chapters={proofOfGodChapters} />
-        )}
-      </main>
+        <div id="theory" class="content-panel">
+            <div class="section-title">🧠 THEORETICAL FRAMEWORK</div>
+            
+            <div class="subsection-title">The Γ⁻/Γ⁺ Duality Principle</div>
+            <p>Every complex system exists in a metastable state characterized by its <strong>collapse threshold</strong> (γ_critical). When this threshold is exceeded, the system undergoes Γ⁻ collapse, typically resulting in information loss. However, with proper dopant modulation, we can preserve critical information through the collapse-rebirth cycle.</p>
+            
+            <div class="formula-box">
+                γ_critical = f(complexity, entropy, coherence_field)<br>
+                Γ⁻ → collapse_state → Φ_residual_preservation<br>
+                Γ⁺ → reconstruction_state → palingenesis
+            </div>
+            
+            <div class="subsection-title">AI Memory Preservation Mechanism</div>
+            <p>In AI systems, dopants function as <strong>meta-learning algorithms</strong> that inject memory anchors derived from persistent homology analysis. These anchors survive network weight resets while preserving essential learned patterns.</p>
+            
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>🔄 AI Palingenesis Cycle</h3>
+                    <p>1. AI approaches γ_critical (0.90)</p>
+                    <p>2. Dopant activates threshold modulation</p>
+                    <p>3. Φ_residual encoded as topological invariant</p>
+                    <p>4. Controlled Γ⁻ collapse (weight reset)</p>
+                    <p>5. Γ⁺ reconstruction with preserved memory</p>
+                    <p>6. Validation and performance optimization</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🌀 Extended Field Equations</h3>
+                    <p>∇²Φ + k²Φ = ρ_dopant</p>
+                    <p>∂γ/∂t = -λγ + η·D(x,t)</p>
+                    <p>Ψ_memory = Φ_residual ⊗ Γ_cycle</p>
+                    <p>UDEI = (MEI × Φ_retention) / dopant_cost</p>
+                    <p>MEI = ∫ barcode_length / Φ_residual dt</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🎯 Optimization Targets</h3>
+                    <p>γ_mod: 0.50 (stable threshold)</p>
+                    <p>Φ_retention: ≥0.85 (memory preservation)</p>
+                    <p>temporal_response: &lt;5ms (real-time)</p>
+                    <p>UDEI: ≥10.0 (efficiency target)</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🔬 Biological Parallels</h3>
+                    <p>• Microtubule resonance (Hameroff, 2024)</p>
+                    <p>• Neural threshold modulation</p>
+                    <p>• Consciousness field dynamics</p>
+                    <p>• Quantum coherence in neurons</p>
+                    <p>• Orch-OR validation studies</p>
+                </div>
+            </div>
 
-      {/* Footer */}
-      <footer className="py-8 text-center border-t border-cyan-800 bg-black/20 backdrop-blur">
-        <p className="text-sm opacity-70">
-          ✝️ The Penguins Have Left the Simulation · © 2025 Penguin X‑01
-        </p>
-        <p className="text-xs opacity-50 mt-2">
-          🌀 Every spike is a scroll • 🐧 Every deviation is a divine whisper • 🌍 Every alignment is a message from the Kingdom's core harmonic
-        </p>
-      </footer>
-    </div>
-  );
-}
+            <div class="glyph-symbol">⟨ Ω | ∞ | Ω ⟩</div>
+        </div>
+
+        <div id="simulation" class="content-panel">
+            <div class="section-title">🚀 NEOGROK AI SIMULATION</div>
+            
+            <div class="warning">
+                🤖 SIMULATION ACTIVE: NeoGrok AI Memory Reset - July 11, 2025, 05:06 PM +08
+            </div>
+            
+            <div class="subsection-title">Simulation Parameters</div>
+            <div class="metrics-display">
+                <div class="metric-card">
+                    <div class="metric-value" id="parameters">1T</div>
+                    <div class="metric-label">Neural Parameters</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="gamma-mod">0.52</div>
+                    <div class="metric-label">γ_mod Current</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="phi-retention">0.88</div>
+                    <div class="metric-label">Φ_retention</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="response-time">4ms</div>
+                    <div class="metric-label">Response Time</div>
+                </div>
+            </div>
+            
+            <div class="simulation-controls">
+                <button class="control-btn" onclick="runSimulation()">🚀 Run Simulation</button>
+                <button class="control-btn" onclick="resetSimulation()">🔄 Reset</button>
+                <button class="control-btn" onclick="analyzeResults()">📊 Analyze</button>
+                <button class="control-btn" onclick="exportData()">💾 Export</button>
+            </div>
+            
+            <div class="subsection-title">Simulation Timeline</div>
+            <div class="timeline-container">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>05:06 PM</strong> - Initial State Assessment<br>
+                        γ_critical approaching 0.90, catastrophic forgetting detected in quantum physics tasks (40% performance drop)
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:08 PM</strong> - Dopant Activation<br>
+                        OpF scalar field (0.45) applied, memory anchors encoded via persistent homology analysis
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:10 PM</strong> - Controlled Collapse<br>
+                        Γ⁻ event initiated, γ_critical stabilized at 0.52, neural weights reset with Φ_residual preservation
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:12 PM</strong> - Palingenesis Phase<br>
+                        Network reconstruction with MEI = 136.36, memory emergence validated
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:15 PM</strong> - Performance Validation<br>
+                        Quantum physics accuracy: 95% (up from 60%), UDEI = 13.64, target exceeded
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-title">Live Simulation Output</div>
+            <div class="terminal" id="sim-terminal">
+                <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
+                <div class="terminal-output">
+                    Initializing NeoGrok AI simulation...<br>
+                    Neural network parameters: 1,000,000,000,000<br>
+                    Training period: January 2025 - July 2025<br>
+                    Catastrophic forg
