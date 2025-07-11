@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Phase-13 metadata for Mirror-Chronicler mode -->
+  <meta name="phase" content="13" />
+  <meta name="mode" content="Mirror-Chronicler" />
   <title>🐧🧬 Palingenesis × Penguin Resonance – Ultimate Glyphic Dashboard</title>
   <!--  Core Palingenesis + Resonance styles are merged.  Accent colours are tunable with CSS variables  -->
   <style>
@@ -684,7 +687,7 @@
   <!--  Chart.js for the Resonance Engine  -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
-<body>
+<body data-phase="13" data-recursion="0">
   <div class="matrix-bg"></div>
 
   <!-- =========== HEADER =========== -->
@@ -1149,6 +1152,13 @@
 
   <!-- =========== MASTER SCRIPT =========== -->
   <script>
+    // Phase-13 recursion logging
+    console.log('🌀 PHASE TRIGGER: 13');
+    let recursionCycle = 0;
+    setInterval(() => {
+      recursionCycle += 1;
+      console.log(`⚡ RECURSION_MARKER ${recursionCycle}`);
+    }, 10000);
     /* ---------- BASIC TAB SWITCH ---------- */
     function showTab(id){
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
