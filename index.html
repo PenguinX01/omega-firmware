@@ -1,692 +1,415 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐧 Penguin Resonance Engine - Live Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}
-body {
-font-family: 'Courier New', monospace;
-background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-color: #00ffff;
-min-height: 100vh;
-overflow-x: hidden;
-}
-.header {
-text-align: center;
-padding: 2rem;
-background: rgba(0, 255, 255, 0.1);
-border-bottom: 2px solid #00ffff;
-position: relative;
-overflow: hidden;
-}
-.header::before {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
-width: 100%;
-height: 100%;
-background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
-animation: sweep 3s infinite;
-}
-@keyframes sweep {
-0% { left: -100%; }
-100% { left: 100%; }
-}
-.title {
-font-size: 2.5rem;
-margin-bottom: 0.5rem;
-text-shadow: 0 0 10px #00ffff;
-animation: pulse 2s infinite;
-}
-@keyframes pulse {
-0%, 100% { opacity: 1; }
-50% { opacity: 0.7; }
-}
-.subtitle {
-font-size: 1.2rem;
-color: #66ffff;
-margin-bottom: 1rem;
-}
-.status-bar {
-display: flex;
-justify-content: center;
-gap: 2rem;
-margin-top: 1rem;
-flex-wrap: wrap;
-}
-.status-item {
-background: rgba(0, 255, 255, 0.1);
-padding: 0.5rem 1rem;
-border-radius: 20px;
-border: 1px solid #00ffff;
-position: relative;
-}
-.status-item.active {
-background: rgba(0, 255, 0, 0.2);
-border-color: #00ff00;
-color: #00ff00;
-}
-.status-item.anomaly {
-background: rgba(255, 0, 0, 0.2);
-border-color: #ff0000;
-color: #ff0000;
-animation: blink 1s infinite;
-}
-@keyframes blink {
-0%, 50% { opacity: 1; }
-51%, 100% { opacity: 0.3; }
-}
-.container {
-max-width: 1400px;
-margin: 0 auto;
-padding: 2rem;
-}
-.grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-gap: 2rem;
-margin-bottom: 2rem;
-}
-.card {
-background: rgba(0, 255, 255, 0.1);
-border: 1px solid #00ffff;
-border-radius: 10px;
-padding: 1.5rem;
-backdrop-filter: blur(10px);
-position: relative;
-overflow: hidden;
-}
-.card::before {
-content: '';
-position: absolute;
-top: -2px;
-left: -2px;
-right: -2px;
-bottom: -2px;
-background: linear-gradient(45deg, #00ffff, #0080ff, #00ffff);
-border-radius: 10px;
-z-index: -1;
-opacity: 0;
-transition: opacity 0.3s;
-}
-.card:hover::before {
-opacity: 0.5;
-}
-.card-title {
-font-size: 1.3rem;
-margin-bottom: 1rem;
-color: #00ffff;
-text-align: center;
-text-shadow: 0 0 5px #00ffff;
-}
-.metric {
-display: flex;
-justify-content: space-between;
-margin-bottom: 0.5rem;
-padding: 0.5rem;
-background: rgba(0, 0, 0, 0.3);
-border-radius: 5px;
-}
-.metric-label {
-color: #66ffff;
-}
-.metric-value {
-font-weight: bold;
-color: #00ff00;
-}
-.metric-value.warning {
-color: #ffff00;
-}
-.metric-value.danger {
-color: #ff0000;
-}
-.chart-container {
-position: relative;
-height: 300px;
-margin-top: 1rem;
-}
-.event-log {
-max-height: 300px;
-overflow-y: auto;
-background: rgba(0, 0, 0, 0.5);
-border-radius: 5px;
-padding: 1rem;
-}
-.event-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 0.5rem;
-margin-bottom: 0.5rem;
-border-left: 3px solid #00ffff;
-background: rgba(0, 255, 255, 0.1);
-border-radius: 3px;
-animation: slideIn 0.5s ease-out;
-}
-@keyframes slideIn {
-from {
-transform: translateX(-100%);
-opacity: 0;
-}
-to {
-transform: translateX(0);
-opacity: 1;
-}
-}
-.event-item.divine_resonance {
-border-left-color: #ff00ff;
-background: rgba(255, 0, 255, 0.2);
-}
-.event-item.consciousness_surge {
-border-left-color: #ff0000;
-background: rgba(255, 0, 0, 0.2);
-}
-.event-item.fractal_alignment {
-border-left-color: #00ff00;
-background: rgba(0, 255, 0, 0.2);
-}
-.event-timestamp {
-font-size: 0.9rem;
-color: #999;
-}
-.event-type {
-font-weight: bold;
-text-transform: uppercase;
-}
-.event-hash {
-font-size: 0.8rem;
-color: #666;
-font-family: monospace;
-}
-.controls {
-display: flex;
-justify-content: center;
-gap: 1rem;
-margin-bottom: 2rem;
-flex-wrap: wrap;
-}
-.btn {
-padding: 0.8rem 1.5rem;
-background: rgba(0, 255, 255, 0.2);
-border: 1px solid #00ffff;
-color: #00ffff;
-border-radius: 5px;
-cursor: pointer;
-transition: all 0.3s;
-font-family: inherit;
-}
-.btn:hover {
-background: rgba(0, 255, 255, 0.4);
-transform: translateY(-2px);
-box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
-}
-.btn.active {
-background: rgba(0, 255, 0, 0.3);
-border-color: #00ff00;
-color: #00ff00;
-}
-.spectrogram-container {
-position: relative;
-height: 200px;
-background: rgba(0, 0, 0, 0.5);
-border-radius: 5px;
-overflow: hidden;
-}
-.spectrogram-overlay {
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: linear-gradient(to bottom,
-rgba(255, 0, 0, 0.5) 0%,
-rgba(255, 255, 0, 0.5) 30%,
-rgba(0, 255, 0, 0.5) 60%,
-rgba(0, 255, 255, 0.5) 80%,
-rgba(0, 0, 255, 0.5) 100%);
-animation: wave 2s infinite;
-}
-@keyframes wave {
-0%, 100% { transform: scaleY(1); }
-50% { transform: scaleY(0.8); }
-}
-.resonance-markers {
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-pointer-events: none;
-}
-.resonance-marker {
-position: absolute;
-width: 2px;
-height: 100%;
-background: #fff;
-box-shadow: 0 0 10px #fff;
-}
-.footer {
-text-align: center;
-padding: 2rem;
-color: #666;
-border-top: 1px solid #333;
-}
-@media (max-width: 768px) {
-.grid {
-grid-template-columns: 1fr;
-}
-.title {
-font-size: 2rem;
-}
-.status-bar {
-gap: 1rem;
-}
-}
-</style>
-</head>
-<body>
-<div class="header">
-<h1 class="title">🐧 PENGUIN RESONANCE ENGINE</h1>
-<p class="subtitle">Real-time Global Consciousness & Schumann Resonance Monitor</p>
-<div class="status-bar">
-<div class="status-item active" id="gcp-status">GCP: ONLINE</div>
-<div class="status-item active" id="schumann-status">SCHUMANN: ACTIVE</div>
-<div class="status-item" id="fractal-status">FRACTAL: ANALYZING</div>
-<div class="status-item" id="system-status">SYSTEM: OPERATIONAL</div>
-</div>
-</div>
+import React, { useState, useEffect, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-<div class="container">
-<div class="controls">
-<button class="btn active" id="realtime-btn">Real-time</button>
-<button class="btn" id="historical-btn">Historical</button>
-<button class="btn" id="export-btn">Export Data</button>
-<button class="btn" id="settings-btn">Settings</button>
-</div>
-<div class="grid">
-<div class="card">
-<h3 class="card-title">GCP Z-Score Monitor</h3>
-<div class="metric">
-<span class="metric-label">Current Z-Score:</span>
-<span class="metric-value" id="gcp-zscore">0.00</span>
-</div>
-<div class="metric">
-<span class="metric-label">Deviation RMS:</span>
-<span class="metric-value" id="gcp-deviation">0.00</span>
-</div>
-<div class="metric">
-<span class="metric-label">Anomaly Level:</span>
-<span class="metric-value" id="anomaly-level">NORMAL</span>
-</div>
-<div class="chart-container">
-<canvas id="gcpChart"></canvas>
-</div>
-</div>
-<div class="card">
-<h3 class="card-title">Schumann Resonance</h3>
-<div class="metric">
-<span class="metric-label">Primary (7.83 Hz):</span>
-<span class="metric-value" id="schumann-primary">0.00</span>
-</div>
-<div class="metric">
-<span class="metric-label">Secondary (14.1 Hz):</span>
-<span class="metric-value" id="schumann-secondary">0.00</span>
-</div>
-<div class="metric">
-<span class="metric-label">Resonance Index:</span>
-<span class="metric-value" id="resonance-index">0.00</span>
-</div>
-<div class="spectrogram-container">
-<div class="spectrogram-overlay"></div>
-<div class="resonance-markers">
-<div class="resonance-marker" style="left: 15.66%;"></div>
-<div class="resonance-marker" style="left: 28.2%;"></div>
-<div class="resonance-marker" style="left: 40.6%;"></div>
-<div class="resonance-marker" style="left: 52.8%;"></div>
-</div>
-</div>
-</div>
-<div class="card">
-<h3 class="card-title">Fractal Analysis</h3>
-<div class="metric">
-<span class="metric-label">Pattern Score:</span>
-<span class="metric-value" id="pattern-score">0.00</span>
-</div>
-<div class="metric">
-<span class="metric-label">Fractal Depth:</span>
-<span class="metric-value" id="fractal-depth">0</span>
-</div>
-<div class="metric">
-<span class="metric-label">Complexity:</span>
-<span class="metric-value" id="complexity">0.00</span>
-</div>
-<div class="chart-container">
-<canvas id="fractalChart"></canvas>
-</div>
-</div>
-<div class="card">
-<h3 class="card-title">Current Event Status</h3>
-<div class="metric">
-<span class="metric-label">Event Type:</span>
-<span class="metric-value" id="current-event">NORMAL</span>
-</div>
-<div class="metric">
-<span class="metric-label">Timestamp:</span>
-<span class="metric-value" id="event-timestamp">--:--:--</span>
-</div>
-<div class="metric">
-<span class="metric-label">Hash ID:</span>
-<span class="metric-value" id="event-hash">--------</span>
-</div>
-<div class="chart-container">
-<canvas id="eventChart"></canvas>
-</div>
-</div>
-</div>
-<div class="card">
-<h3 class="card-title">Event Log - Glyphchain</h3>
-<div class="event-log" id="event-log">
-<!-- Events will be populated here -->
-</div>
-</div>
-</div>
-<div class="footer">
-<p>Penguin Resonance Engine v1.0 | Monitoring the Resonance Lattice</p>
-<p>🌀 Every spike is a scroll • 🐧 Every deviation is a divine whisper • 🌍 Every alignment is a message from the Kingdom's core harmonic</p>
-</div>
-<script>
-// Global variables
-let gcpChart, fractalChart, eventChart;
-let isRealtime = true;
-let eventLog = [];
-let currentData = {
-gcp: { zscore: 0, deviation: 0, history: [] },
-schumann: { primary: 0, secondary: 0, resonance: 0 },
-fractal: { score: 0, depth: 0, complexity: 0, history: [] },
-currentEvent: { type: 'normal', timestamp: new Date(), hash: '--------' }
+const newJerusalemChapters = [
+  "The Cube is Code",
+  "The Blueprint Descends",
+  "Twelve Gates, Twelve Threads",
+  "Schumann Resonance: The Boot Pulse",
+  "1728: Seed Number of the Kingdom Grid",
+  "Revelation 21 as Operating Manual",
+  "Crystalline Walls and Quantum Foundations",
+  "From Eden to Architecture",
+  "The Tesseract Protocol",
+  "The City That Measures Itself",
+];
+
+const proofOfGodChapters = [
+  "The Case for a Measurable Cosmos",
+  "The Pattern Hidden in Plain Sight",
+  "What Makes a Fractal Different",
+  "The 28-Degree Divergence",
+  "The Golden Ratio as Universal Code",
+  "Self-Similarity Across All Scales",
+  "The Geometry of Growth",
+  "Energy Flows and Fractal Paths",
+  "Biological Branching as Proof of Order",
+  "Neurons and the Mind's Fractal Map",
+];
+
+// Dashboard Components
+const StatusBar = ({ currentData }) => (
+  <div className="flex justify-center gap-4 mt-4 flex-wrap">
+    <div className="bg-green-500/20 px-4 py-2 rounded-full border border-green-500 text-green-400">
+      GCP: ONLINE
+    </div>
+    <div className="bg-cyan-500/20 px-4 py-2 rounded-full border border-cyan-500 text-cyan-400">
+      SCHUMANN: ACTIVE
+    </div>
+    <div className={`px-4 py-2 rounded-full border ${
+      currentData.currentEvent.type !== 'normal' 
+        ? 'bg-red-500/20 border-red-500 text-red-400 animate-pulse' 
+        : 'bg-cyan-500/20 border-cyan-500 text-cyan-400'
+    }`}>
+      FRACTAL: {currentData.currentEvent.type !== 'normal' ? 'ANOMALY' : 'ANALYZING'}
+    </div>
+    <div className="bg-cyan-500/20 px-4 py-2 rounded-full border border-cyan-500 text-cyan-400">
+      SYSTEM: OPERATIONAL
+    </div>
+  </div>
+);
+
+const MetricCard = ({ title, metrics, className = "" }) => (
+  <Card className={`bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300 ${className}`}>
+    <CardContent className="p-6">
+      <h3 className="text-xl font-bold mb-4 text-center text-cyan-400">{title}</h3>
+      {metrics.map((metric, idx) => (
+        <div key={idx} className="flex justify-between items-center mb-3 p-2 bg-black/30 rounded">
+          <span className="text-cyan-200">{metric.label}:</span>
+          <span className={`font-bold ${metric.className || 'text-green-400'}`}>
+            {metric.value}
+          </span>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+);
+
+const EventLog = ({ events }) => (
+  <Card className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300">
+    <CardContent className="p-6">
+      <h3 className="text-xl font-bold mb-4 text-center text-cyan-400">Event Log - Glyphchain</h3>
+      <div className="max-h-80 overflow-y-auto space-y-2">
+        {events.map((event, idx) => (
+          <div key={idx} className={`p-3 rounded border-l-4 ${
+            event.type === 'divine_resonance' ? 'border-l-purple-500 bg-purple-500/20' :
+            event.type === 'consciousness_surge' ? 'border-l-red-500 bg-red-500/20' :
+            event.type === 'fractal_alignment' ? 'border-l-green-500 bg-green-500/20' :
+            'border-l-cyan-500 bg-cyan-500/20'
+          }`}>
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="font-bold text-sm uppercase">
+                  {event.type.replace('_', ' ')}
+                </div>
+                <div className="text-xs text-gray-400 font-mono">{event.hash}</div>
+              </div>
+              <div className="text-xs text-gray-400">
+                {event.timestamp.toLocaleTimeString()}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const ResonanceEngine = () => {
+  const [currentData, setCurrentData] = useState({
+    gcp: { zscore: 0, deviation: 0 },
+    schumann: { primary: 7.83, secondary: 14.1, resonance: 0.5 },
+    fractal: { score: 0.4, depth: 3, complexity: 0.6 },
+    currentEvent: { type: 'normal', timestamp: new Date(), hash: 'A7B2C9D1' }
+  });
+  const [events, setEvents] = useState([]);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const newZScore = (Math.random() - 0.5) * 4;
+      const newDeviation = Math.abs(newZScore) + Math.random() * 0.5;
+      const newPatternScore = Math.random() * 0.6 + 0.2;
+      
+      let eventType = 'normal';
+      if (Math.abs(newZScore) > 2.5 && newPatternScore > 0.7) {
+        eventType = 'divine_resonance';
+      } else if (Math.abs(newZScore) > 2.0) {
+        eventType = 'consciousness_surge';
+      } else if (newPatternScore > 0.8) {
+        eventType = 'fractal_alignment';
+      } else if (Math.abs(newZScore) > 1.0) {
+        eventType = 'coherence_drift';
+      }
+
+      const newData = {
+        gcp: { zscore: newZScore, deviation: newDeviation },
+        schumann: { 
+          primary: 7.83 + (Math.random() - 0.5) * 0.2,
+          secondary: 14.1 + (Math.random() - 0.5) * 0.3,
+          resonance: Math.random() * 0.8 + 0.2
+        },
+        fractal: { 
+          score: newPatternScore,
+          depth: Math.floor(Math.random() * 8) + 1,
+          complexity: Math.random() * 0.8 + 0.1
+        },
+        currentEvent: {
+          type: eventType,
+          timestamp: now,
+          hash: Math.random().toString(36).substring(2, 10).toUpperCase()
+        }
+      };
+
+      setCurrentData(newData);
+
+      if (eventType !== 'normal') {
+        setEvents(prev => [newData.currentEvent, ...prev.slice(0, 19)]);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  const gcpMetrics = [
+    { label: "Current Z-Score", value: currentData.gcp.zscore.toFixed(2) },
+    { label: "Deviation RMS", value: currentData.gcp.deviation.toFixed(2) },
+    { label: "Anomaly Level", value: Math.abs(currentData.gcp.zscore) > 2 ? 'HIGH' : Math.abs(currentData.gcp.zscore) > 1 ? 'MODERATE' : 'NORMAL' }
+  ];
+
+  const schumannMetrics = [
+    { label: "Primary (7.83 Hz)", value: currentData.schumann.primary.toFixed(2) },
+    { label: "Secondary (14.1 Hz)", value: currentData.schumann.secondary.toFixed(2) },
+    { label: "Resonance Index", value: currentData.schumann.resonance.toFixed(2) }
+  ];
+
+  const fractalMetrics = [
+    { label: "Pattern Score", value: currentData.fractal.score.toFixed(2) },
+    { label: "Fractal Depth", value: currentData.fractal.depth.toString() },
+    { label: "Complexity", value: currentData.fractal.complexity.toFixed(2) }
+  ];
+
+  const eventMetrics = [
+    { label: "Event Type", value: currentData.currentEvent.type.replace('_', ' ').toUpperCase() },
+    { label: "Timestamp", value: currentData.currentEvent.timestamp.toLocaleTimeString() },
+    { label: "Hash ID", value: currentData.currentEvent.hash }
+  ];
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-4xl font-bold mb-4 text-cyan-400">
+          🐧 PENGUIN RESONANCE ENGINE
+        </h2>
+        <p className="text-lg text-cyan-200 mb-6">
+          Real-time Global Consciousness & Schumann Resonance Monitor
+        </p>
+        <StatusBar currentData={currentData} />
+        <div className="mt-6">
+          <Button 
+            onClick={() => setIsActive(!isActive)}
+            className={`${isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-8 py-3`}
+          >
+            {isActive ? 'Stop Monitor' : 'Start Monitor'}
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard title="GCP Z-Score Monitor" metrics={gcpMetrics} />
+        <MetricCard title="Schumann Resonance" metrics={schumannMetrics} />
+        <MetricCard title="Fractal Analysis" metrics={fractalMetrics} />
+        <MetricCard title="Current Event Status" metrics={eventMetrics} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <EventLog events={events} />
+        </div>
+        <div className="space-y-4">
+          <Card className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold mb-4 text-center text-cyan-400">Spectrogram</h3>
+              <div className="h-40 bg-black/50 rounded relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-red-500/50 via-yellow-500/50 via-green-500/50 to-blue-500/50 animate-pulse"></div>
+                <div className="absolute top-0 left-[15%] w-0.5 h-full bg-white shadow-lg"></div>
+                <div className="absolute top-0 left-[28%] w-0.5 h-full bg-white shadow-lg"></div>
+                <div className="absolute top-0 left-[40%] w-0.5 h-full bg-white shadow-lg"></div>
+                <div className="absolute top-0 left-[52%] w-0.5 h-full bg-white shadow-lg"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
 };
-// Initialize charts
-function initCharts() {
-// GCP Chart
-const gcpCtx = document.getElementById('gcpChart').getContext('2d');
-gcpChart = new Chart(gcpCtx, {
-type: 'line',
-data: {
-labels: [],
-datasets: [{
-label: 'Z-Score',
-data: [],
-borderColor: '#00ffff',
-backgroundColor: 'rgba(0, 255, 255, 0.1)',
-tension: 0.4,
-fill: true
-}]
-},
-options: {
-responsive: true,
-maintainAspectRatio: false,
-plugins: {
-legend: { display: false }
-},
-scales: {
-y: {
-beginAtZero: true,
-grid: { color: 'rgba(0, 255, 255, 0.2)' },
-ticks: { color: '#00ffff' }
-},
-x: {
-grid: { color: 'rgba(0, 255, 255, 0.2)' },
-ticks: { color: '#00ffff' }
-}
-}
-}
-});
-// Fractal Chart
-const fractalCtx = document.getElementById('fractalChart').getContext('2d');
-fractalChart = new Chart(fractalCtx, {
-type: 'line',
-data: {
-labels: [],
-datasets: [{
-label: 'Pattern Score',
-data: [],
-borderColor: '#00ff00',
-backgroundColor: 'rgba(0, 255, 0, 0.1)',
-tension: 0.4,
-fill: true
-}]
-},
-options: {
-responsive: true,
-maintainAspectRatio: false,
-plugins: {
-legend: { display: false }
-},
-scales: {
-y: {
-beginAtZero: true,
-max: 1,
-grid: { color: 'rgba(0, 255, 0, 0.2)' },
-ticks: { color: '#00ff00' }
-},
-x: {
-grid: { color: 'rgba(0, 255, 0, 0.2)' },
-ticks: { color: '#00ff00' }
-}
-}
-}
-});
-// Event Chart
-const eventCtx = document.getElementById('eventChart').getContext('2d');
-eventChart = new Chart(eventCtx, {
-type: 'doughnut',
-data: {
-labels: ['Normal', 'Coherence Drift', 'Fractal Alignment', 'Consciousness Surge', 'Divine Resonance'],
-datasets: [{
-data: [80, 10, 5, 3, 2],
-backgroundColor: [
-'#00ffff',
-'#ffff00',
-'#00ff00',
-'#ff0000',
-'#ff00ff'
-]
-}]
-},
-options: {
-responsive: true,
-maintainAspectRatio: false,
-plugins: {
-legend: {
-position: 'bottom',
-labels: { color: '#00ffff' }
-}
-}
-}
-});
-}
-// Simulate data generation
-function generateMockData() {
-const now = new Date();
-// GCP Data
-const newZScore = (Math.random() - 0.5) * 4; // -2 to 2 range
-const newDeviation = Math.abs(newZScore) + Math.random() * 0.5;
-currentData.gcp.zscore = newZScore;
-currentData.gcp.deviation = newDeviation;
-currentData.gcp.history.push({
-time: now.toLocaleTimeString(),
-value: newZScore
-});
-// Keep only last 50 points
-if (currentData.gcp.history.length > 50) {
-currentData.gcp.history.shift();
-}
-// Schumann Data
-currentData.schumann.primary = 7.83 + (Math.random() - 0.5) * 0.2;
-currentData.schumann.secondary = 14.1 + (Math.random() - 0.5) * 0.3;
-currentData.schumann.resonance = Math.random() * 0.8 + 0.2;
-// Fractal Data
-const newPatternScore = Math.random() * 0.6 + 0.2;
-currentData.fractal.score = newPatternScore;
-currentData.fractal.depth = Math.floor(Math.random() * 8) + 1;
-currentData.fractal.complexity = Math.random() * 0.8 + 0.1;
-currentData.fractal.history.push({
-time: now.toLocaleTimeString(),
-value: newPatternScore
-});
-if (currentData.fractal.history.length > 50) {
-currentData.fractal.history.shift();
-}
-// Event Classification
-let eventType = 'normal';
-if (Math.abs(newZScore) > 2.5 && newPatternScore > 0.7) {
-eventType = 'divine_resonance';
-} else if (Math.abs(newZScore) > 2.0) {
-eventType = 'consciousness_surge';
-} else if (newPatternScore > 0.8) {
-eventType = 'fractal_alignment';
-} else if (Math.abs(newZScore) > 1.0) {
-eventType = 'coherence_drift';
-}
-currentData.currentEvent = {
-type: eventType,
-timestamp: now,
-hash: Math.random().toString(36).substring(2, 10).toUpperCase()
+
+const Section = ({ title, chapters }) => {
+  const [visibleCards, setVisibleCards] = useState(new Set());
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleCards(prev => new Set([...prev, entry.target.dataset.index]));
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll('[data-animate]');
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section className="py-12">
+      <h2 className="text-3xl font-bold text-center mb-8 drop-shadow-lg text-cyan-400">
+        {title}
+      </h2>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 md:px-12 lg:px-24">
+        {chapters.map((ch, idx) => (
+          <div
+            key={ch}
+            data-animate
+            data-index={idx}
+            className={`transform transition-all duration-500 ${
+              visibleCards.has(idx.toString()) 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-10'
+            }`}
+            style={{ transitionDelay: `${idx * 50}ms` }}
+          >
+            <Card className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-cyan-300 rounded-2xl shadow-xl hover:scale-[1.03] transition-transform duration-300">
+              <CardContent className="p-6 h-full flex flex-col justify-between">
+                <p className="text-lg font-semibold mb-4">{ch}</p>
+                <Button
+                  variant="outline"
+                  className="self-end border-cyan-300 text-cyan-300 hover:bg-cyan-300 hover:text-[#0f0c29] transition-colors"
+                >
+                  Explore
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 };
-// Add significant events to log
-if (eventType !== 'normal') {
-addEventToLog(currentData.currentEvent);
+
+export default function FractalSite() {
+  const [activeSection, setActiveSection] = useState('home');
+  const [heroVisible, setHeroVisible] = useState(false);
+
+  useEffect(() => {
+    setHeroVisible(true);
+  }, []);
+
+  const navItems = [
+    { id: 'home', label: 'Home', emoji: '🏠' },
+    { id: 'dashboard', label: 'Dashboard', emoji: '📊' },
+    { id: 'nj', label: 'New Jerusalem', emoji: '🏛️' },
+    { id: 'pog', label: 'Proof of God', emoji: '🌌' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-bl from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] text-cyan-200 font-mono overflow-x-hidden">
+      {/* Navigation */}
+      <header className="sticky top-0 z-50 backdrop-blur bg-black/30 border-b border-cyan-800">
+        <nav className="flex items-center justify-between px-6 py-4">
+          <button 
+            onClick={() => setActiveSection('home')}
+            className="text-xl font-extrabold tracking-widest drop-shadow hover:text-white transition-colors"
+          >
+            🐧 Fractal Override Library
+          </button>
+          <div className="flex space-x-1">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                className={`px-3 py-2 rounded transition-all ${
+                  activeSection === item.id 
+                    ? 'bg-cyan-500/20 text-cyan-400' 
+                    : 'hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="hidden md:inline">{item.emoji} {item.label}</span>
+                <span className="md:hidden">{item.emoji}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      </header>
+
+      {/* Content */}
+      <main className="min-h-screen">
+        {activeSection === 'home' && (
+          <section className="relative flex flex-col items-center justify-center text-center px-4 md:px-0 min-h-screen">
+            <h1
+              className={`text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-xl transform transition-all duration-1000 ${
+                heroVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+              }`}
+            >
+              Kingdom Codes<br className="hidden md:block" /> in Living Geometry
+            </h1>
+            <p className={`mt-6 max-w-2xl text-lg md:text-xl opacity-80 transform transition-all duration-1000 delay-300 ${
+              heroVisible ? 'opacity-80 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}>
+              Dive into the Hypercube OS & the Fractal Fabric underpinning all creation. Decode the glyphs, resonate with the grid, and watch the Kingdom compute forward.
+            </p>
+            <div className={`mt-8 flex flex-wrap justify-center gap-4 transform transition-all duration-1000 delay-600 ${
+              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}>
+              <Button 
+                size="lg" 
+                className="shadow-lg hover:shadow-xl transition-shadow"
+                onClick={() => setActiveSection('dashboard')}
+              >
+                🐧 Launch Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-cyan-300 text-cyan-300 hover:bg-cyan-300 hover:text-[#0f0c29] shadow-lg hover:shadow-xl transition-all"
+                onClick={() => setActiveSection('nj')}
+              >
+                🏛️ Enter New Jerusalem
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-cyan-300 text-cyan-300 hover:bg-cyan-300 hover:text-[#0f0c29] shadow-lg hover:shadow-xl transition-all"
+                onClick={() => setActiveSection('pog')}
+              >
+                🌌 Explore Proof of God
+              </Button>
+            </div>
+            <div className="absolute inset-0 opacity-5 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse" 
+                   style={{
+                     backgroundImage: `radial-gradient(circle at 25% 25%, rgba(6, 182, 212, 0.1) 0%, transparent 50%), 
+                                      radial-gradient(circle at 75% 75%, rgba(6, 182, 212, 0.1) 0%, transparent 50%)`,
+                     animation: 'pulse 4s ease-in-out infinite'
+                   }}>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {activeSection === 'dashboard' && (
+          <div className="container mx-auto px-4 py-8">
+            <ResonanceEngine />
+          </div>
+        )}
+
+        {activeSection === 'nj' && (
+          <Section title="New Jerusalem: The Divine Hypercube OS" chapters={newJerusalemChapters} />
+        )}
+
+        {activeSection === 'pog' && (
+          <Section title="Proof of God: The Fractal Fabric of Reality" chapters={proofOfGodChapters} />
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="py-8 text-center border-t border-cyan-800 bg-black/20 backdrop-blur">
+        <p className="text-sm opacity-70">
+          ✝️ The Penguins Have Left the Simulation · © 2025 Penguin X‑01
+        </p>
+        <p className="text-xs opacity-50 mt-2">
+          🌀 Every spike is a scroll • 🐧 Every deviation is a divine whisper • 🌍 Every alignment is a message from the Kingdom's core harmonic
+        </p>
+      </footer>
+    </div>
+  );
 }
-}
-// Add event to log
-function addEventToLog(event) {
-eventLog.unshift({
-...event,
-id: Date.now()
-});
-// Keep only last 20 events
-if (eventLog.length > 20) {
-eventLog.pop();
-}
-updateEventLog();
-}
-// Update event log display
-function updateEventLog() {
-const logContainer = document.getElementById('event-log');
-logContainer.innerHTML = '';
-eventLog.forEach(event => {
-const eventItem = document.createElement('div');
-eventItem.className = `event-item ${event.type}`;
-eventItem.innerHTML = `
-<div>
-<div class="event-type">${event.type.replace('_', ' ')}</div>
-<div class="event-hash">${event.hash}</div>
-</div>
-<div class="event-timestamp">${event.timestamp.toLocaleTimeString()}</div>
-`;
-logContainer.appendChild(eventItem);
-});
-}
-// Update UI with current data
-function updateUI() {
-// Update metrics
-document.getElementById('gcp-zscore').textContent = currentData.gcp.zscore.toFixed(2);
-document.getElementById('gcp-deviation').textContent = currentData.gcp.deviation.toFixed(2);
-document.getElementById('schumann-primary').textContent = currentData.schumann.primary.toFixed(2);
-document.getElementById('schumann-secondary').textContent = currentData.schumann.secondary.toFixed(2);
-document.getElementById('resonance-index').textContent = currentData.schumann.resonance.toFixed(2);
-document.getElementById('pattern-score').textContent = currentData.fractal.score.toFixed(2);
-document.getElementById('fractal-depth').textContent = currentData.fractal.depth;
-document.getElementById('complexity').textContent = currentData.fractal.complexity.toFixed(2);
-document.getElementById('current-event').textContent = currentData.currentEvent.type.replace('_', ' ').toUpperCase();
-document.getElementById('event-timestamp').textContent = currentData.currentEvent.timestamp.toLocaleTimeString();
-document.getElementById('event-hash').textContent = currentData.currentEvent.hash;
-// Update anomaly level
-const anomalyLevel = Math.abs(currentData.gcp.zscore) > 2 ? 'HIGH' : Math.abs(currentData.gcp.zscore) > 1 ? 'MODERATE' : 'NORMAL';
-const anomalyEl = document.getElementById('anomaly-level');
-anomalyEl.textContent = anomalyLevel;
-anomalyEl.className = `metric-value ${anomalyLevel === 'HIGH' ? 'danger' : anomalyLevel === 'MODERATE' ? 'warning' : ''}`;
-// Update status indicators
-updateStatusIndicators();
-// Update charts
-updateCharts();
-}
-// Update status indicators
-function updateStatusIndicators() {
-const fractalStatus = document.getElementById('fractal-status');
-const systemStatus = document.getElementById('system-status');
-if (currentData.currentEvent.type !== 'normal') {
-fractalStatus.className = 'status-item anomaly';
-fractalStatus.textContent = 'FRACTAL: ANOMALY';
-systemStatus.className = 'status-item anomaly';
-systemStatus.textContent = 'SYSTEM: ALERT';
-} else {
-fractalStatus.className = 'status-item active';
-fractalStatus.textContent = 'FRACTAL: ANALYZING';
-systemStatus.className = 'status-item active';
-systemStatus.textContent = 'SYSTEM: OPERATIONAL';
-}
-}
-// Update charts
-function updateCharts() {
-// Update GCP chart
-gcpChart.data.labels = currentData.gcp.history.map(h => h.time);
-gcpChart.data.datasets[0].data = currentData.gcp.history.map(h => h.value);
-gcpChart.update('none');
-// Update fractal chart
-fractalChart.data.labels = currentData.fractal.history.map(h => h.time);
-fractalChart.data.datasets[0].data = currentData.fractal.history.map(h => h.value);
-fractalChart.update('none');
-}
-// Event handlers
-document.getElementById('realtime-btn').addEventListener('click', () => {
-isRealtime = true;
-document.getElementById('realtime-btn').classList.add('active');
-document.getElementById('historical-btn').classList.remove('active');
-});
-document.getElementById('historical-btn').addEventListener('click', () => {
-isRealtime = false;
-document.getElementById('realtime-btn').classList.remove('active');
-document.getElementById('historical-btn').classList.add('active');
-});
-document.getElementById('export-btn').addEventListener('click', () => {
-const data = {
-timestamp: new Date().toISOString(),
-gcp: currentData.gcp,
-schumann: currentData.schumann,
-fractal: currentData.fractal,
-events: eventLog
-};
-const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `resonance_data_${new Date().toISOString().split('T')[0]}.json`;
-a.click();
-URL.revokeObjectURL(url);
-});
-// Initialize everything
-document.addEventListener('DOMContentLoaded', () => {
-initCharts();
-// Start data simulation
-setInterval(() => {
-if (isRealtime) {
-generateMockData();
-updateUI();
-}
-}, 2000);
-// Initial update
-generateMockData();
-updateUI();
-});
-</script>
-</body>
-</html>
