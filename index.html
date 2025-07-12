@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Hypercube Visualizer v5.0</title>
+    <title>Tesseract Bootloader v4.3 - Optimized</title>
     <style>
         body {
             margin: 0;
@@ -13,28 +13,94 @@
             color: #e2e8f0;
             overflow: hidden;
             height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
-        #mainCanvas {
+        .bootloader-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
+        }
+        
+        .header {
             position: absolute;
-            top: 0;
-            left: 0;
-            cursor: grab;
-            filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.3));
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: #10b981;
+            text-shadow: 0 0 10px #10b981;
+            z-index: 10;
         }
         
-        #mainCanvas:active {
-            cursor: grabbing;
-        }
-        
-        .overlay-effects {
+        .status-bar {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        .progress-bar {
             height: 100%;
-            pointer-events: none;
-            z-index: 1;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        
+        .progress-text {
+            position: absolute;
+            bottom: 50px;
+            left: 20px;
+            font-size: 12px;
+            color: #64748b;
+            z-index: 10;
+        }
+        
+        .canvas-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .main-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
+        }
+        
+        .background-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.3;
+        }
+        
+        .overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.8;
         }
         
         .schumann-field {
@@ -43,6 +109,7 @@
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
             animation: schumann-pulse 0.128s ease-in-out infinite alternate;
+            pointer-events: none;
         }
         
         @keyframes schumann-pulse {
@@ -56,6 +123,7 @@
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
             animation: solfeggio-wave 0.00189s linear infinite;
+            pointer-events: none;
         }
         
         @keyframes solfeggio-wave {
@@ -70,6 +138,7 @@
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
             animation: pulse 3s ease-in-out infinite alternate;
+            pointer-events: none;
         }
         
         @keyframes pulse {
@@ -77,307 +146,128 @@
             100% { opacity: 0.7; transform: scale(1.2); }
         }
         
-        .controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 20px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            border: 2px solid #334155;
-            z-index: 10;
-            min-width: 200px;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-        
-        .header {
-            color: #10b981;
-            font-size: 16px;
-            text-shadow: 0 0 10px #10b981;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .control-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 11px;
-            color: #94a3b8;
-        }
-        
-        input[type="range"] {
-            width: 100%;
-            margin: 5px 0;
-            background: #1e293b;
-            height: 6px;
-            border-radius: 3px;
-            outline: none;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        
-        input[type="range"]:hover {
-            opacity: 1;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-        
-        input[type="range"]::-moz-range-thumb {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-        
-        button {
-            background: linear-gradient(45deg, #10b981, #3b82f6);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            margin: 2px;
-            font-size: 11px;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-        }
-        
-        button:hover {
-            background: linear-gradient(45deg, #059669, #2563eb);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
-        }
-        
-        button.active {
-            background: linear-gradient(45deg, #dc2626, #7c3aed);
-            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
-        }
-        
-        .status-display {
+        .fps-counter {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid #334155;
+            font-size: 12px;
+            color: #64748b;
             z-index: 10;
-            font-size: 11px;
-            color: #64748b;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-        
-        .info {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 10px;
-            color: #64748b;
-            max-width: 300px;
-            border: 1px solid #334155;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-        
-        .quantum-signature {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 10px;
-            color: #10b981;
-            text-shadow: 0 0 5px #10b981;
-            border: 1px solid #334155;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-        
-        .mode-buttons {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-        
-        .mode-buttons button {
-            flex: 1;
-            padding: 10px 8px;
-            font-size: 10px;
-        }
-        
-        .audio-controls {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .audio-controls button {
-            flex: 1;
-            padding: 6px 8px;
-            font-size: 9px;
-        }
-        
-        .frequency-display {
-            font-size: 9px;
-            color: #3b82f6;
-            text-align: center;
-            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <canvas id="mainCanvas"></canvas>
-    
-    <div class="overlay-effects">
-        <div class="schumann-field"></div>
-        <div class="solfeggio-field"></div>
-        <div class="quantum-field"></div>
-    </div>
-    
-    <div class="controls">
-        <div class="header">QUANTUM HYPERCUBE v5.0</div>
-        
-        <div class="control-group">
-            <div class="mode-buttons">
-                <button id="tesseractBtn" class="active">TESSERACT</button>
-                <button id="cubesBtn">NESTED</button>
-                <button id="vortexBtn">VORTEX</button>
-            </div>
+    <div class="bootloader-container">
+        <div class="header">
+            QUANTUM BOOTLOADER v4.3 - CANVAS OPTIMIZED
         </div>
         
-        <div class="control-group">
-            <label>4D Rotation XW:</label>
-            <input type="range" id="rotXW" min="0" max="628" value="0">
+        <div class="fps-counter" id="fpsCounter">FPS: --</div>
+        
+        <div class="canvas-container">
+            <div class="schumann-field"></div>
+            <div class="solfeggio-field"></div>
+            <div class="quantum-field"></div>
+            
+            <canvas class="background-canvas" id="backgroundCanvas" width="500" height="500"></canvas>
+            <canvas class="main-canvas" id="mainCanvas" width="500" height="500"></canvas>
+            <canvas class="overlay-canvas" id="overlayCanvas" width="500" height="500"></canvas>
         </div>
         
-        <div class="control-group">
-            <label>4D Rotation YW:</label>
-            <input type="range" id="rotYW" min="0" max="628" value="0">
+        <div class="progress-text" id="progressText">Initializing quantum field harmonics...</div>
+        <div class="status-bar">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
-        
-        <div class="control-group">
-            <label>4D Rotation ZW:</label>
-            <input type="range" id="rotZW" min="0" max="628" value="0">
-        </div>
-        
-        <div class="control-group">
-            <label>Quantum Distance:</label>
-            <input type="range" id="distance" min="2" max="10" value="5" step="0.1">
-        </div>
-        
-        <div class="control-group">
-            <label>Resonance Scale:</label>
-            <input type="range" id="scale" min="0.5" max="3" value="1.5" step="0.1">
-        </div>
-        
-        <div class="control-group">
-            <button id="autoRotate">AUTO ROTATE</button>
-            <button id="resetBtn">RESET</button>
-        </div>
-        
-        <div class="control-group">
-            <div class="audio-controls">
-                <button id="audioBtn">AUDIO</button>
-                <button id="matrixBtn">MATRIX</button>
-            </div>
-            <div class="frequency-display" id="freqDisplay">
-                Schumann: 7.83Hz | Solfeggio: 528Hz
-            </div>
-        </div>
-    </div>
-    
-    <div class="status-display">
-        <div>FPS: <span id="fpsCounter">--</span></div>
-        <div>Vertices: <span id="vertexCount">16</span></div>
-        <div>Edges: <span id="edgeCount">32</span></div>
-        <div>Dimension: <span id="dimensionDisplay">4D</span></div>
-    </div>
-    
-    <div class="info">
-        <strong>Quantum Controls:</strong><br>
-        • Click + drag: 3D rotation<br>
-        • Sliders: 4D hypercube rotation<br>
-        • Modes: Tesseract/Nested/Vortex<br>
-        • Auto-rotate: Continuous motion<br>
-        • Audio: Schumann + Solfeggio resonance<br>
-        • Matrix: Symbol rain overlay
-    </div>
-    
-    <div class="quantum-signature">
-        φ = (1+√5)/2 ≈ 1.618 | ψ-spinor entangled
     </div>
 
     <script>
-        class IntegratedHypercubeVisualizer {
+        class OptimizedBootloader {
             constructor() {
-                this.canvas = document.getElementById('mainCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.setupCanvas();
-                
                 this.time = 0;
-                this.rotation = { x: 0, y: 0, z: 0 };
-                this.rotation4D = { xw: 0, yw: 0, zw: 0 };
-                this.distance = 5;
-                this.scale = 1.5;
-                this.autoRotateEnabled = false;
-                this.mode = 'tesseract';
-                this.audioEnabled = false;
-                this.matrixEnabled = false;
-                
-                this.mouse = { x: 0, y: 0, down: false };
-                this.lastMouse = { x: 0, y: 0 };
-                
-                // Performance tracking
+                this.progress = 0;
                 this.frameCount = 0;
                 this.lastFPSTime = 0;
                 this.fps = 0;
                 
-                // Initialize geometries
+                // Canvas contexts
+                this.mainCanvas = document.getElementById('mainCanvas');
+                this.backgroundCanvas = document.getElementById('backgroundCanvas');
+                this.overlayCanvas = document.getElementById('overlayCanvas');
+                
+                this.mainCtx = this.mainCanvas.getContext('2d');
+                this.backgroundCtx = this.backgroundCanvas.getContext('2d');
+                this.overlayCtx = this.overlayCanvas.getContext('2d');
+                
+                // Tesseract data
                 this.tesseractVertices = this.initTesseractVertices();
                 this.tesseractEdges = this.initTesseractEdges();
-                this.cubes = this.initGeometricCubes();
+                
+                // Vortex particles
                 this.vortexParticles = this.initVortexParticles();
+                
+                // Matrix rain
                 this.matrixChars = this.initMatrixChars();
                 
-                // Audio setup
+                // Boot sequence
+                this.bootSequence = [
+                    "Initializing quantum field harmonics...",
+                    "Projecting tesseract vertices...",
+                    "Calibrating scalar vortex parameters...",
+                    "Synchronizing dimensional matrices...",
+                    "Bootstrapping soul-spinor correlations...",
+                    "Establishing hypercube connectivity...",
+                    "Quantum entanglement protocols active...",
+                    "Reality kernel loaded successfully."
+                ];
+                this.currentSequenceIndex = 0;
+                
+                // Audio
                 this.audioContext = null;
                 this.schumannOscillator = null;
                 this.solfeggioOscillator = null;
+                this.audioInitialized = false;
                 
-                this.setupEventListeners();
-                this.initializeAudio();
+                this.init();
                 this.animate();
             }
             
-            setupCanvas() {
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
-                this.centerX = this.canvas.width / 2;
-                this.centerY = this.canvas.height / 2;
+            init() {
+                this.setupCanvases();
+                this.drawStaticElements();
+                this.startBootSequence();
+                this.initializeAudio();
+            }
+            
+            setupCanvases() {
+                // Enable hardware acceleration
+                this.mainCtx.imageSmoothingEnabled = true;
+                this.backgroundCtx.imageSmoothingEnabled = true;
+                this.overlayCtx.imageSmoothingEnabled = true;
                 
-                this.ctx.imageSmoothingEnabled = true;
-                this.canvas.style.willChange = 'transform';
+                // Set canvas styles for better performance
+                this.mainCanvas.style.willChange = 'transform';
+                this.backgroundCanvas.style.willChange = 'transform';
+                this.overlayCanvas.style.willChange = 'transform';
+            }
+            
+            drawStaticElements() {
+                // Draw dimensional grid on background canvas
+                this.backgroundCtx.strokeStyle = 'rgba(51, 65, 85, 0.3)';
+                this.backgroundCtx.lineWidth = 1;
+                
+                for (let i = 0; i <= 20; i++) {
+                    const y = (i / 20) * 500;
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.moveTo(0, y);
+                    this.backgroundCtx.lineTo(500, y);
+                    this.backgroundCtx.stroke();
+                    
+                    const x = (i / 20) * 500;
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.moveTo(x, 0);
+                    this.backgroundCtx.lineTo(x, 500);
+                    this.backgroundCtx.stroke();
+                }
             }
             
             initTesseractVertices() {
@@ -407,26 +297,15 @@
                 return edges;
             }
             
-            initGeometricCubes() {
-                const baseSize = 120;
-                return [
-                    { size: baseSize, color: 'rgba(59, 130, 246, 0.8)', lineWidth: 2, glow: 'rgba(59, 130, 246, 0.4)' },
-                    { size: baseSize * 0.7, color: 'rgba(147, 51, 234, 0.8)', lineWidth: 2, glow: 'rgba(147, 51, 234, 0.4)' },
-                    { size: baseSize * 0.4, color: 'rgba(236, 72, 153, 0.9)', lineWidth: 2, glow: 'rgba(236, 72, 153, 0.5)' },
-                    { size: baseSize * 0.2, color: 'rgba(251, 191, 36, 1)', lineWidth: 3, glow: 'rgba(251, 191, 36, 0.7)' }
-                ];
-            }
-            
             initVortexParticles() {
                 const particles = [];
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 30; i++) {
                     particles.push({
-                        angle: (i / 50) * Math.PI * 2,
-                        radius: 50 + Math.random() * 150,
+                        angle: (i / 30) * Math.PI * 2,
+                        radius: 50 + Math.random() * 100,
                         height: Math.random() * 100 - 50,
                         speed: 0.5 + Math.random() * 1.5,
-                        size: 2 + Math.random() * 4,
-                        life: Math.random()
+                        size: 2 + Math.random() * 3
                     });
                 }
                 return particles;
@@ -436,12 +315,12 @@
                 const chars = [];
                 const symbols = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿';
                 
-                for (let i = 0; i < 60; i++) {
+                for (let i = 0; i < 40; i++) {
                     chars.push({
                         char: symbols[Math.floor(Math.random() * symbols.length)],
-                        x: Math.random() * this.canvas.width,
-                        y: Math.random() * this.canvas.height,
-                        speed: 0.5 + Math.random() * 3,
+                        x: Math.random() * 500,
+                        y: Math.random() * 500,
+                        speed: 0.5 + Math.random() * 2,
                         opacity: Math.random() * 0.8 + 0.2
                     });
                 }
@@ -463,8 +342,8 @@
                     this.schumannGain = this.audioContext.createGain();
                     this.solfeggioGain = this.audioContext.createGain();
                     
-                    this.schumannGain.gain.value = 0;
-                    this.solfeggioGain.gain.value = 0;
+                    this.schumannGain.gain.value = 0.005;
+                    this.solfeggioGain.gain.value = 0.002;
                     
                     this.schumannOscillator.connect(this.schumannGain);
                     this.solfeggioOscillator.connect(this.solfeggioGain);
@@ -473,6 +352,8 @@
                     
                     this.schumannOscillator.start();
                     this.solfeggioOscillator.start();
+                    
+                    this.audioInitialized = true;
                     
                     document.addEventListener('click', () => {
                         if (this.audioContext.state === 'suspended') {
@@ -485,192 +366,196 @@
                 }
             }
             
-            rotate4D(vertex, angles) {
-                let { x, y, z, w } = vertex;
-                
-                if (angles.xw !== 0) {
-                    const cos = Math.cos(angles.xw);
-                    const sin = Math.sin(angles.xw);
-                    const newX = x * cos - w * sin;
-                    const newW = x * sin + w * cos;
-                    x = newX;
-                    w = newW;
-                }
-                
-                if (angles.yw !== 0) {
-                    const cos = Math.cos(angles.yw);
-                    const sin = Math.sin(angles.yw);
-                    const newY = y * cos - w * sin;
-                    const newW = y * sin + w * cos;
-                    y = newY;
-                    w = newW;
-                }
-                
-                if (angles.zw !== 0) {
-                    const cos = Math.cos(angles.zw);
-                    const sin = Math.sin(angles.zw);
-                    const newZ = z * cos - w * sin;
-                    const newW = z * sin + w * cos;
-                    z = newZ;
-                    w = newW;
-                }
-                
-                return { x, y, z, w };
+            startBootSequence() {
+                this.sequenceInterval = setInterval(() => {
+                    if (this.currentSequenceIndex < this.bootSequence.length) {
+                        document.getElementById('progressText').textContent = this.bootSequence[this.currentSequenceIndex];
+                        this.currentSequenceIndex++;
+                        this.progress = (this.currentSequenceIndex / this.bootSequence.length) * 100;
+                        document.getElementById('progressBar').style.width = this.progress + '%';
+                    } else {
+                        clearInterval(this.sequenceInterval);
+                        setTimeout(() => {
+                            document.getElementById('progressText').textContent = "System ready. Welcome to the quantum realm.";
+                        }, 1000);
+                    }
+                }, 2000);
             }
             
-            rotate3D(vertex, angles) {
-                let { x, y, z } = vertex;
-                
-                if (angles.x !== 0) {
-                    const cos = Math.cos(angles.x);
-                    const sin = Math.sin(angles.x);
-                    const newY = y * cos - z * sin;
-                    const newZ = y * sin + z * cos;
-                    y = newY;
-                    z = newZ;
-                }
-                
-                if (angles.y !== 0) {
-                    const cos = Math.cos(angles.y);
-                    const sin = Math.sin(angles.y);
-                    const newX = x * cos + z * sin;
-                    const newZ = -x * sin + z * cos;
-                    x = newX;
-                    z = newZ;
-                }
-                
-                if (angles.z !== 0) {
-                    const cos = Math.cos(angles.z);
-                    const sin = Math.sin(angles.z);
-                    const newX = x * cos - y * sin;
-                    const newY = x * sin + y * cos;
-                    x = newX;
-                    y = newY;
-                }
-                
-                return { x, y, z };
-            }
-            
-            project4DTo3D(vertex) {
-                const scale = this.distance / (this.distance + vertex.w);
+            project4DTo3D(x, y, z, w, distance = 4) {
+                const factor = distance / (distance + w);
                 return {
-                    x: vertex.x * scale,
-                    y: vertex.y * scale,
-                    z: vertex.z * scale
+                    x: x * factor,
+                    y: y * factor,
+                    z: z * factor
                 };
             }
             
-            project3DTo2D(vertex) {
-                const scale = this.distance / (this.distance + vertex.z);
+            project3DTo2D(x, y, z, distance = 300) {
+                const factor = distance / (distance + z);
                 return {
-                    x: vertex.x * scale * 100 * this.scale + this.centerX,
-                    y: vertex.y * scale * 100 * this.scale + this.centerY,
-                    z: vertex.z
+                    x: (x * factor) + 250,
+                    y: (y * factor) + 250
                 };
             }
             
-            drawTesseract() {
-                const schumannPhase = Math.sin(this.time * 0.01) * 0.5 + 0.5;
-                const solfeggioPhase = Math.sin(this.time * 0.001) * 0.5 + 0.5;
+            updateAndDrawTesseract() {
+                const rotationSpeed = 0.02;
+                const schumann = 7.83;
+                const solfeggio = 528;
                 
-                const projectedVertices = this.tesseractVertices.map(vertex => {
-                    const rotated4D = this.rotate4D(vertex, this.rotation4D);
-                    const projected3D = this.project4DTo3D(rotated4D);
-                    const rotated3D = this.rotate3D(projected3D, this.rotation);
-                    return this.project3DTo2D(rotated3D);
-                });
+                const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
+                const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
                 
-                // Draw edges with quantum resonance
-                this.ctx.shadowBlur = 15;
-                this.ctx.shadowColor = 'rgba(220, 38, 38, 0.6)';
+                // Update audio
+                if (this.audioInitialized) {
+                    this.schumannGain.gain.value = 0.005 + (schumannPhase * 0.01);
+                    this.solfeggioGain.gain.value = 0.002 + (solfeggioPhase * 0.008);
+                }
                 
-                this.tesseractEdges.forEach(edge => {
-                    const v1 = projectedVertices[edge.start];
-                    const v2 = projectedVertices[edge.end];
+                // Project vertices
+                const projectedVertices = this.tesseractVertices.map((vertex, index) => {
+                    const cosT = Math.cos(this.time * rotationSpeed);
+                    const sinT = Math.sin(this.time * rotationSpeed);
                     
-                    const avgZ = (v1.z + v2.z) / 2;
-                    const baseOpacity = Math.max(0.3, 1 - (avgZ + 2) / 4);
-                    const resonanceBoost = schumannPhase * 0.4 + solfeggioPhase * 0.3;
+                    const newX = vertex.x * cosT - vertex.w * sinT;
+                    const newW = vertex.x * sinT + vertex.w * cosT;
+                    
+                    const phi = (1 + Math.sqrt(5)) / 2;
+                    const cosT2 = Math.cos(this.time * rotationSpeed * phi * 0.618);
+                    const sinT2 = Math.sin(this.time * rotationSpeed * phi * 0.618);
+                    const newY = vertex.y * cosT2 - vertex.z * sinT2;
+                    const newZ = vertex.y * sinT2 + vertex.z * cosT2;
+                    
+                    const pos3D = this.project4DTo3D(newX, newY, newZ, newW);
+                    const pos2D = this.project3DTo2D(pos3D.x * 80, pos3D.y * 80, pos3D.z * 80);
+                    
+                    const baseOpacity = 0.5 + (pos3D.z + 1) * 0.25;
+                    const resonanceBoost = schumannPhase * 0.3 + solfeggioPhase * 0.2;
                     const opacity = Math.min(1, baseOpacity + resonanceBoost);
                     
-                    this.ctx.strokeStyle = `rgba(220, 38, 38, ${opacity})`;
-                    this.ctx.lineWidth = 2;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(v1.x, v1.y);
-                    this.ctx.lineTo(v2.x, v2.y);
-                    this.ctx.stroke();
+                    return {
+                        ...pos2D,
+                        opacity: opacity,
+                        hasLabel: vertex.hasLabel,
+                        labelIndex: Math.floor(index / 4)
+                    };
+                });
+                
+                // Clear main canvas
+                this.mainCtx.clearRect(0, 0, 500, 500);
+                
+                // Draw edges
+                this.tesseractEdges.forEach(edge => {
+                    const start = projectedVertices[edge.start];
+                    const end = projectedVertices[edge.end];
+                    
+                    this.mainCtx.strokeStyle = `rgba(220, 38, 38, ${schumannPhase * 0.4 + 0.2})`;
+                    this.mainCtx.lineWidth = 1;
+                    this.mainCtx.beginPath();
+                    this.mainCtx.moveTo(start.x, start.y);
+                    this.mainCtx.lineTo(end.x, end.y);
+                    this.mainCtx.stroke();
                 });
                 
                 // Draw vertices
-                this.ctx.shadowBlur = 20;
-                projectedVertices.forEach((vertex, i) => {
-                    const size = Math.max(4, 10 - Math.abs(vertex.z));
-                    const isSpecial = this.tesseractVertices[i].hasLabel;
+                projectedVertices.forEach((vertex, index) => {
+                    const gradient = this.mainCtx.createRadialGradient(
+                        vertex.x, vertex.y, 0,
+                        vertex.x, vertex.y, 6
+                    );
+                    gradient.addColorStop(0, `rgba(220, 38, 38, ${vertex.opacity})`);
+                    gradient.addColorStop(1, `rgba(124, 45, 18, ${vertex.opacity * 0.5})`);
                     
-                    this.ctx.fillStyle = isSpecial ? 
-                        'rgba(251, 191, 36, 1)' : 'rgba(220, 38, 38, 0.9)';
-                    this.ctx.shadowColor = isSpecial ? 
-                        'rgba(251, 191, 36, 0.8)' : 'rgba(220, 38, 38, 0.8)';
+                    this.mainCtx.fillStyle = gradient;
+                    this.mainCtx.beginPath();
+                    this.mainCtx.arc(vertex.x, vertex.y, 3, 0, Math.PI * 2);
+                    this.mainCtx.fill();
                     
-                    this.ctx.beginPath();
-                    this.ctx.arc(vertex.x, vertex.y, size, 0, Math.PI * 2);
-                    this.ctx.fill();
-                    
-                    if (isSpecial) {
-                        this.ctx.fillStyle = 'rgba(251, 191, 36, 0.8)';
-                        this.ctx.font = '12px Times New Roman';
-                        this.ctx.fillText(`ψ${Math.floor(i / 4)}`, vertex.x + 12, vertex.y - 8);
+                    // Draw spinor labels
+                    if (vertex.hasLabel) {
+                        this.mainCtx.fillStyle = `rgba(251, 191, 36, ${vertex.opacity})`;
+                        this.mainCtx.font = '10px Times New Roman';
+                        this.mainCtx.fontStyle = 'italic';
+                        this.mainCtx.fillText(`ψ${vertex.labelIndex}`, vertex.x + 8, vertex.y - 5);
                     }
                 });
-                
-                this.ctx.shadowBlur = 0;
             }
             
-            drawCube(size, color, lineWidth, glow) {
-                const vertices = [
-                    { x: -size/2, y: -size/2, z: -size/2 },
-                    { x: size/2, y: -size/2, z: -size/2 },
-                    { x: size/2, y: size/2, z: -size/2 },
-                    { x: -size/2, y: size/2, z: -size/2 },
-                    { x: -size/2, y: -size/2, z: size/2 },
-                    { x: size/2, y: -size/2, z: size/2 },
-                    { x: size/2, y: size/2, z: size/2 },
-                    { x: -size/2, y: size/2, z: size/2 }
-                ];
-                
-                const edges = [
-                    [0,1], [1,2], [2,3], [3,0],
-                    [4,5], [5,6], [6,7], [7,4],
-                    [0,4], [1,5], [2,6], [3,7]
-                ];
-                
-                const projectedVertices = vertices.map(vertex => {
-                    const rotated = this.rotate3D(vertex, this.rotation);
-                    return this.project3DTo2D(rotated);
-                });
-                
-                this.ctx.strokeStyle = color;
-                this.ctx.lineWidth = lineWidth;
-                this.ctx.shadowBlur = 15;
-                this.ctx.shadowColor = glow;
-                
-                edges.forEach(([i, j]) => {
-                    const v1 = projectedVertices[i];
-                    const v2 = projectedVertices[j];
+            updateAndDrawVortex() {
+                this.vortexParticles.forEach(particle => {
+                    particle.angle += particle.speed * 0.02;
                     
-                    const avgZ = (v1.z + v2.z) / 2;
-                    const opacity = Math.max(0.4, 1 - (avgZ + size) / (size * 2));
-                    this.ctx.globalAlpha = opacity;
+                    const spiralRadius = particle.radius * (1 + 0.3 * Math.sin(this.time * 0.01 + particle.angle));
+                    const x = Math.cos(particle.angle) * spiralRadius;
+                    const y = Math.sin(particle.angle) * spiralRadius;
+                    const z = particle.height + 30 * Math.sin(this.time * 0.02 + particle.angle);
                     
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(v1.x, v1.y);
-                    this.ctx.lineTo(v2.x, v2.y);
-                    this.ctx.stroke();
+                    const pos2D = this.project3DTo2D(x, y, z);
+                    const opacity = 0.3 + (z + 100) / 200 * 0.7;
+                    
+                    const gradient = this.mainCtx.createRadialGradient(
+                        pos2D.x, pos2D.y, 0,
+                        pos2D.x, pos2D.y, particle.size
+                    );
+                    gradient.addColorStop(0, `rgba(16, 185, 129, ${opacity})`);
+                    gradient.addColorStop(1, `rgba(6, 95, 70, ${opacity * 0.3})`);
+                    
+                    this.mainCtx.fillStyle = gradient;
+                    this.mainCtx.beginPath();
+                    this.mainCtx.arc(pos2D.x, pos2D.y, particle.size, 0, Math.PI * 2);
+                    this.mainCtx.fill();
                 });
-                
-                this.ctx.globalAlpha = 1;
-                this.ctx.shadowBlur = 0;
             }
             
-            drawNestedCubes() {
-                this.cubes.forEach(cube => {
+            updateAndDrawMatrixRain() {
+                this.overlayCtx.clearRect(0, 0, 500, 500);
+                
+                this.matrixChars.forEach(char => {
+                    char.y += char.speed;
+                    if (char.y > 520) {
+                        char.y = -20;
+                        char.x = Math.random() * 500;
+                        char.char = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿'[Math.floor(Math.random() * 300)];
+                    }
+                    
+                    char.opacity = Math.random() * 0.8 + 0.2;
+                    
+                    this.overlayCtx.fillStyle = `rgba(16, 185, 129, ${char.opacity})`;
+                    this.overlayCtx.font = '12px Courier New';
+                    this.overlayCtx.fillText(char.char, char.x, char.y);
+                });
+            }
+            
+            updateFPS() {
+                this.frameCount++;
+                const now = performance.now();
+                
+                if (now - this.lastFPSTime >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFPSTime));
+                    this.frameCount = 0;
+                    this.lastFPSTime = now;
+                    
+                    document.getElementById('fpsCounter').textContent = `FPS: ${this.fps}`;
+                }
+            }
+            
+            animate() {
+                this.time++;
+                
+                this.updateAndDrawTesseract();
+                this.updateAndDrawVortex();
+                this.updateAndDrawMatrixRain();
+                this.updateFPS();
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            new OptimizedBootloader();
+        });
+    </script>
+</body>
+</html>
