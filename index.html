@@ -251,6 +251,10 @@
                     "Reality kernel loaded successfully."
                 ];
                 this.currentSequenceIndex = 0;
+                this.audioContext = null;
+                this.schumannOscillator = null;
+                this.solfeggioOscillator = null;
+                this.audioInitialized = false;
                 
                 this.init();
                 this.animate();
@@ -262,6 +266,54 @@
                 this.createVortexParticles();
                 this.createMatrixRain();
                 this.startBootSequence();
+                this.initializeAudio();
+            }
+            
+            async initializeAudio() {
+                try {
+                    // Initialize Web Audio API
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create Schumann resonance oscillator (7.83 Hz)
+                    this.schumannOscillator = this.audioContext.createOscillator();
+                    this.schumannOscillator.frequency.value = 7.83;
+                    this.schumannOscillator.type = 'sine';
+                    
+                    // Create Solfeggio oscillator (528 Hz)
+                    this.solfeggioOscillator = this.audioContext.createOscillator();
+                    this.solfeggioOscillator.frequency.value = 528;
+                    this.solfeggioOscillator.type = 'sine';
+                    
+                    // Create gain nodes for volume control
+                    this.schumannGain = this.audioContext.createGain();
+                    this.solfeggioGain = this.audioContext.createGain();
+                    
+                    // Set very low volumes for ambient effect
+                    this.schumannGain.gain.value = 0.01;
+                    this.solfeggioGain.gain.value = 0.005;
+                    
+                    // Connect oscillators to gain nodes to destination
+                    this.schumannOscillator.connect(this.schumannGain);
+                    this.solfeggioOscillator.connect(this.solfeggioGain);
+                    this.schumannGain.connect(this.audioContext.destination);
+                    this.solfeggioGain.connect(this.audioContext.destination);
+                    
+                    // Start oscillators
+                    this.schumannOscillator.start();
+                    this.solfeggioOscillator.start();
+                    
+                    this.audioInitialized = true;
+                    
+                    // Add click listener to handle audio context resume
+                    document.addEventListener('click', () => {
+                        if (this.audioContext.state === 'suspended') {
+                            this.audioContext.resume();
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.log('Audio initialization failed (this is normal in some browsers):', error);
+                }
             }
             
             createDimensionalGrid() {
@@ -417,6 +469,12 @@
                 // Apply frequency-responsive glow
                 const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
                 const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
+                
+                // Modulate audio gain based on visual phases
+                if (this.audioInitialized) {
+                    this.schumannGain.gain.value = 0.005 + (schumannPhase * 0.01);
+                    this.solfeggioGain.gain.value = 0.002 + (solfeggioPhase * 0.008);
+                }
                 
                 this.tesseractVertices.forEach((vertex, index) => {
                     // Apply 4D rotation with quaternion-inspired smoothing
