@@ -103,6 +103,43 @@
             box-shadow: 0 0 5px #dc2626;
         }
         
+        .spinor-label {
+            position: absolute;
+            font-size: 8px;
+            color: #fbbf24;
+            text-shadow: 0 0 8px #fbbf24;
+            pointer-events: none;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+        
+        .schumann-resonance {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+            animation: schumann-pulse 0.128s ease-in-out infinite alternate;
+        }
+        
+        @keyframes schumann-pulse {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.6; }
+        }
+        
+        .solfeggio-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            animation: solfeggio-wave 0.00189s linear infinite;
+        }
+        
+        @keyframes solfeggio-wave {
+            0% { transform: scale(0.98); opacity: 0.3; }
+            50% { transform: scale(1.02); opacity: 0.5; }
+            100% { transform: scale(0.98); opacity: 0.3; }
+        }
+        
         .scalar-vortex {
             position: absolute;
             width: 100%;
@@ -181,6 +218,8 @@
         <div class="matrix-rain" id="matrixRain"></div>
         
         <div class="cube-container">
+            <div class="solfeggio-field"></div>
+            <div class="schumann-resonance"></div>
             <div class="quantum-field"></div>
             <div class="dimensional-grid" id="dimensionalGrid"></div>
             <div class="tesseract-projection" id="tesseractProjection"></div>
@@ -245,14 +284,58 @@
                     vertex.className = 'tesseract-vertex';
                     container.appendChild(vertex);
                     
-                    // Store vertex data
-                    this.tesseractVertices.push({
-                        element: vertex,
-                        x: (i & 1) ? 1 : -1,
-                        y: (i & 2) ? 1 : -1,
-                        z: (i & 4) ? 1 : -1,
-                        w: (i & 8) ? 1 : -1
-                    });
+                    // Add spinor labels for key vertices
+                    if (i % 4 === 0) {
+                        const label = document.createElement('div');
+                        label.className = 'spinor-label';
+                        label.textContent = `ψ${i/4}`;
+                        container.appendChild(label);
+                        
+                        this.tesseractVertices.push({
+                            element: vertex,
+                            label: label,
+                            x: (i & 1) ? 1 : -1,
+                            y: (i & 2) ? 1 : -1,
+                            z: (i & 4) ? 1 : -1,
+                            w: (i & 8) ? 1 : -1
+                        });
+                    } else {
+                        this.tesseractVertices.push({
+                            element: vertex,
+                            label: null,
+                            x: (i & 1) ? 1 : -1,
+                            y: (i & 2) ? 1 : -1,
+                            z: (i & 4) ? 1 : -1,
+                            w: (i & 8) ? 1 : -1
+                        });
+                    }
+                }
+                
+                // Create edges between connected vertices
+                this.createTesseractEdges();
+            }
+            
+            createTesseractEdges() {
+                const container = document.getElementById('tesseractProjection');
+                this.tesseractEdges = [];
+                
+                // Create edges for tesseract connectivity
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        // Two vertices are connected if they differ in exactly one coordinate
+                        const diff = i ^ j;
+                        if ((diff & (diff - 1)) === 0) { // Check if diff is a power of 2
+                            const edge = document.createElement('div');
+                            edge.className = 'tesseract-edge';
+                            container.appendChild(edge);
+                            
+                            this.tesseractEdges.push({
+                                element: edge,
+                                start: i,
+                                end: j
+                            });
+                        }
+                    }
                 }
             }
             
@@ -328,9 +411,15 @@
             
             updateTesseract() {
                 const rotationSpeed = 0.02;
+                const schumann = 7.83; // Hz
+                const solfeggio = 528; // Hz
+                
+                // Apply frequency-responsive glow
+                const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
+                const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
                 
                 this.tesseractVertices.forEach((vertex, index) => {
-                    // Apply 4D rotation
+                    // Apply 4D rotation with quaternion-inspired smoothing
                     const cosT = Math.cos(this.time * rotationSpeed);
                     const sinT = Math.sin(this.time * rotationSpeed);
                     
@@ -338,9 +427,10 @@
                     const newX = vertex.x * cosT - vertex.w * sinT;
                     const newW = vertex.x * sinT + vertex.w * cosT;
                     
-                    // Rotate in YZ plane
-                    const cosT2 = Math.cos(this.time * rotationSpeed * 0.7);
-                    const sinT2 = Math.sin(this.time * rotationSpeed * 0.7);
+                    // Rotate in YZ plane with golden ratio offset
+                    const phi = (1 + Math.sqrt(5)) / 2;
+                    const cosT2 = Math.cos(this.time * rotationSpeed * phi * 0.618);
+                    const sinT2 = Math.sin(this.time * rotationSpeed * phi * 0.618);
                     const newY = vertex.y * cosT2 - vertex.z * sinT2;
                     const newZ = vertex.y * sinT2 + vertex.z * cosT2;
                     
@@ -352,7 +442,42 @@
                     
                     vertex.element.style.left = pos2D.x + 'px';
                     vertex.element.style.top = pos2D.y + 'px';
-                    vertex.element.style.opacity = 0.5 + (pos3D.z + 1) * 0.25;
+                    
+                    // Frequency-responsive glow
+                    const baseOpacity = 0.5 + (pos3D.z + 1) * 0.25;
+                    const resonanceBoost = schumannPhase * 0.3 + solfeggioPhase * 0.2;
+                    vertex.element.style.opacity = Math.min(1, baseOpacity + resonanceBoost);
+                    
+                    // Update spinor labels
+                    if (vertex.label) {
+                        vertex.label.style.left = (pos2D.x + 10) + 'px';
+                        vertex.label.style.top = (pos2D.y - 5) + 'px';
+                        vertex.label.style.opacity = baseOpacity + resonanceBoost;
+                    }
+                });
+                
+                // Update tesseract edges
+                this.tesseractEdges.forEach(edge => {
+                    const start = this.tesseractVertices[edge.start];
+                    const end = this.tesseractVertices[edge.end];
+                    
+                    const startRect = start.element.getBoundingClientRect();
+                    const endRect = end.element.getBoundingClientRect();
+                    const containerRect = start.element.parentElement.getBoundingClientRect();
+                    
+                    const startX = startRect.left - containerRect.left + 3;
+                    const startY = startRect.top - containerRect.top + 3;
+                    const endX = endRect.left - containerRect.left + 3;
+                    const endY = endRect.top - containerRect.top + 3;
+                    
+                    const length = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
+                    const angle = Math.atan2(endY - startY, endX - startX);
+                    
+                    edge.element.style.left = startX + 'px';
+                    edge.element.style.top = startY + 'px';
+                    edge.element.style.width = length + 'px';
+                    edge.element.style.transform = `rotate(${angle}rad)`;
+                    edge.element.style.opacity = (schumannPhase * 0.4 + 0.2);
                 });
             }
             
