@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesseract Bootloader Visualization</title>
+    <title>Tesseract Bootloader v4.3 - Optimized</title>
     <style>
         body {
             margin: 0;
@@ -40,6 +40,7 @@
             font-size: 18px;
             color: #10b981;
             text-shadow: 0 0 10px #10b981;
+            z-index: 10;
         }
         
         .status-bar {
@@ -51,6 +52,7 @@
             background: #1e293b;
             border-radius: 10px;
             overflow: hidden;
+            z-index: 10;
         }
         
         .progress-bar {
@@ -68,57 +70,46 @@
             left: 20px;
             font-size: 12px;
             color: #64748b;
+            z-index: 10;
         }
         
-        .cube-container {
+        .canvas-container {
             position: relative;
             width: 500px;
             height: 500px;
-            perspective: 1000px;
-            perspective-origin: center center;
-            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
-        .tesseract-projection {
+        .main-canvas {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
+            top: 0;
+            left: 0;
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
         }
         
-        .tesseract-vertex {
+        .background-canvas {
             position: absolute;
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle, #dc2626, #7c2d12);
-            border-radius: 50%;
-            box-shadow: 0 0 10px #dc2626;
+            top: 0;
+            left: 0;
+            opacity: 0.3;
         }
         
-        .tesseract-edge {
+        .overlay-canvas {
             position: absolute;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #dc2626, transparent);
-            transform-origin: left center;
-            box-shadow: 0 0 5px #dc2626;
+            top: 0;
+            left: 0;
+            opacity: 0.8;
         }
         
-        .spinor-label {
-            position: absolute;
-            font-size: 8px;
-            color: #fbbf24;
-            text-shadow: 0 0 8px #fbbf24;
-            pointer-events: none;
-            font-family: 'Times New Roman', serif;
-            font-style: italic;
-        }
-        
-        .schumann-resonance {
+        .schumann-field {
             position: absolute;
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
             animation: schumann-pulse 0.128s ease-in-out infinite alternate;
+            pointer-events: none;
         }
         
         @keyframes schumann-pulse {
@@ -132,6 +123,7 @@
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
             animation: solfeggio-wave 0.00189s linear infinite;
+            pointer-events: none;
         }
         
         @keyframes solfeggio-wave {
@@ -140,49 +132,13 @@
             100% { transform: scale(0.98); opacity: 0.3; }
         }
         
-        .scalar-vortex {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-        }
-        
-        .vortex-particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle, #10b981, #065f46);
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-        }
-        
-        .soul-spinor-annotation {
-            position: absolute;
-            font-size: 10px;
-            color: #10b981;
-            text-shadow: 0 0 5px #10b981;
-            pointer-events: none;
-        }
-        
-        .dimensional-grid {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0.3;
-        }
-        
-        .grid-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, #334155, transparent);
-            height: 1px;
-        }
-        
         .quantum-field {
             position: absolute;
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
             animation: pulse 3s ease-in-out infinite alternate;
+            pointer-events: none;
         }
         
         @keyframes pulse {
@@ -190,40 +146,32 @@
             100% { opacity: 0.7; transform: scale(1.2); }
         }
         
-        .matrix-rain {
+        .fps-counter {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: 0.2;
-        }
-        
-        .matrix-char {
-            position: absolute;
-            color: #10b981;
+            top: 20px;
+            right: 20px;
             font-size: 12px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 5px #10b981;
+            color: #64748b;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
     <div class="bootloader-container">
         <div class="header">
-            QUANTUM BOOTLOADER v4.2.1 - TESSERACT PROJECTION ACTIVE
+            QUANTUM BOOTLOADER v4.3 - CANVAS OPTIMIZED
         </div>
         
-        <div class="matrix-rain" id="matrixRain"></div>
+        <div class="fps-counter" id="fpsCounter">FPS: --</div>
         
-        <div class="cube-container">
+        <div class="canvas-container">
+            <div class="schumann-field"></div>
             <div class="solfeggio-field"></div>
-            <div class="schumann-resonance"></div>
             <div class="quantum-field"></div>
-            <div class="dimensional-grid" id="dimensionalGrid"></div>
-            <div class="tesseract-projection" id="tesseractProjection"></div>
-            <div class="scalar-vortex" id="scalarVortex"></div>
+            
+            <canvas class="background-canvas" id="backgroundCanvas" width="500" height="500"></canvas>
+            <canvas class="main-canvas" id="mainCanvas" width="500" height="500"></canvas>
+            <canvas class="overlay-canvas" id="overlayCanvas" width="500" height="500"></canvas>
         </div>
         
         <div class="progress-text" id="progressText">Initializing quantum field harmonics...</div>
@@ -233,13 +181,34 @@
     </div>
 
     <script>
-        class BootloaderVisualization {
+        class OptimizedBootloader {
             constructor() {
                 this.time = 0;
                 this.progress = 0;
-                this.tesseractVertices = [];
-                this.vortexParticles = [];
-                this.matrixChars = [];
+                this.frameCount = 0;
+                this.lastFPSTime = 0;
+                this.fps = 0;
+                
+                // Canvas contexts
+                this.mainCanvas = document.getElementById('mainCanvas');
+                this.backgroundCanvas = document.getElementById('backgroundCanvas');
+                this.overlayCanvas = document.getElementById('overlayCanvas');
+                
+                this.mainCtx = this.mainCanvas.getContext('2d');
+                this.backgroundCtx = this.backgroundCanvas.getContext('2d');
+                this.overlayCtx = this.overlayCanvas.getContext('2d');
+                
+                // Tesseract data
+                this.tesseractVertices = this.initTesseractVertices();
+                this.tesseractEdges = this.initTesseractEdges();
+                
+                // Vortex particles
+                this.vortexParticles = this.initVortexParticles();
+                
+                // Matrix rain
+                this.matrixChars = this.initMatrixChars();
+                
+                // Boot sequence
                 this.bootSequence = [
                     "Initializing quantum field harmonics...",
                     "Projecting tesseract vertices...",
@@ -251,6 +220,8 @@
                     "Reality kernel loaded successfully."
                 ];
                 this.currentSequenceIndex = 0;
+                
+                // Audio
                 this.audioContext = null;
                 this.schumannOscillator = null;
                 this.solfeggioOscillator = null;
@@ -261,50 +232,129 @@
             }
             
             init() {
-                this.createDimensionalGrid();
-                this.createTesseractVertices();
-                this.createVortexParticles();
-                this.createMatrixRain();
+                this.setupCanvases();
+                this.drawStaticElements();
                 this.startBootSequence();
                 this.initializeAudio();
             }
             
+            setupCanvases() {
+                // Enable hardware acceleration
+                this.mainCtx.imageSmoothingEnabled = true;
+                this.backgroundCtx.imageSmoothingEnabled = true;
+                this.overlayCtx.imageSmoothingEnabled = true;
+                
+                // Set canvas styles for better performance
+                this.mainCanvas.style.willChange = 'transform';
+                this.backgroundCanvas.style.willChange = 'transform';
+                this.overlayCanvas.style.willChange = 'transform';
+            }
+            
+            drawStaticElements() {
+                // Draw dimensional grid on background canvas
+                this.backgroundCtx.strokeStyle = 'rgba(51, 65, 85, 0.3)';
+                this.backgroundCtx.lineWidth = 1;
+                
+                for (let i = 0; i <= 20; i++) {
+                    const y = (i / 20) * 500;
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.moveTo(0, y);
+                    this.backgroundCtx.lineTo(500, y);
+                    this.backgroundCtx.stroke();
+                    
+                    const x = (i / 20) * 500;
+                    this.backgroundCtx.beginPath();
+                    this.backgroundCtx.moveTo(x, 0);
+                    this.backgroundCtx.lineTo(x, 500);
+                    this.backgroundCtx.stroke();
+                }
+            }
+            
+            initTesseractVertices() {
+                const vertices = [];
+                for (let i = 0; i < 16; i++) {
+                    vertices.push({
+                        x: (i & 1) ? 1 : -1,
+                        y: (i & 2) ? 1 : -1,
+                        z: (i & 4) ? 1 : -1,
+                        w: (i & 8) ? 1 : -1,
+                        hasLabel: i % 4 === 0
+                    });
+                }
+                return vertices;
+            }
+            
+            initTesseractEdges() {
+                const edges = [];
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        const diff = i ^ j;
+                        if ((diff & (diff - 1)) === 0) {
+                            edges.push({ start: i, end: j });
+                        }
+                    }
+                }
+                return edges;
+            }
+            
+            initVortexParticles() {
+                const particles = [];
+                for (let i = 0; i < 30; i++) {
+                    particles.push({
+                        angle: (i / 30) * Math.PI * 2,
+                        radius: 50 + Math.random() * 100,
+                        height: Math.random() * 100 - 50,
+                        speed: 0.5 + Math.random() * 1.5,
+                        size: 2 + Math.random() * 3
+                    });
+                }
+                return particles;
+            }
+            
+            initMatrixChars() {
+                const chars = [];
+                const symbols = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿';
+                
+                for (let i = 0; i < 40; i++) {
+                    chars.push({
+                        char: symbols[Math.floor(Math.random() * symbols.length)],
+                        x: Math.random() * 500,
+                        y: Math.random() * 500,
+                        speed: 0.5 + Math.random() * 2,
+                        opacity: Math.random() * 0.8 + 0.2
+                    });
+                }
+                return chars;
+            }
+            
             async initializeAudio() {
                 try {
-                    // Initialize Web Audio API
                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    // Create Schumann resonance oscillator (7.83 Hz)
                     this.schumannOscillator = this.audioContext.createOscillator();
                     this.schumannOscillator.frequency.value = 7.83;
                     this.schumannOscillator.type = 'sine';
                     
-                    // Create Solfeggio oscillator (528 Hz)
                     this.solfeggioOscillator = this.audioContext.createOscillator();
                     this.solfeggioOscillator.frequency.value = 528;
                     this.solfeggioOscillator.type = 'sine';
                     
-                    // Create gain nodes for volume control
                     this.schumannGain = this.audioContext.createGain();
                     this.solfeggioGain = this.audioContext.createGain();
                     
-                    // Set very low volumes for ambient effect
-                    this.schumannGain.gain.value = 0.01;
-                    this.solfeggioGain.gain.value = 0.005;
+                    this.schumannGain.gain.value = 0.005;
+                    this.solfeggioGain.gain.value = 0.002;
                     
-                    // Connect oscillators to gain nodes to destination
                     this.schumannOscillator.connect(this.schumannGain);
                     this.solfeggioOscillator.connect(this.solfeggioGain);
                     this.schumannGain.connect(this.audioContext.destination);
                     this.solfeggioGain.connect(this.audioContext.destination);
                     
-                    // Start oscillators
                     this.schumannOscillator.start();
                     this.solfeggioOscillator.start();
                     
                     this.audioInitialized = true;
                     
-                    // Add click listener to handle audio context resume
                     document.addEventListener('click', () => {
                         if (this.audioContext.state === 'suspended') {
                             this.audioContext.resume();
@@ -312,119 +362,7 @@
                     });
                     
                 } catch (error) {
-                    console.log('Audio initialization failed (this is normal in some browsers):', error);
-                }
-            }
-            
-            createDimensionalGrid() {
-                const grid = document.getElementById('dimensionalGrid');
-                for (let i = 0; i < 20; i++) {
-                    const line = document.createElement('div');
-                    line.className = 'grid-line';
-                    line.style.top = `${i * 5}%`;
-                    line.style.width = '100%';
-                    grid.appendChild(line);
-                }
-            }
-            
-            createTesseractVertices() {
-                const container = document.getElementById('tesseractProjection');
-                
-                // Create 16 vertices for a tesseract (4D hypercube)
-                for (let i = 0; i < 16; i++) {
-                    const vertex = document.createElement('div');
-                    vertex.className = 'tesseract-vertex';
-                    container.appendChild(vertex);
-                    
-                    // Add spinor labels for key vertices
-                    if (i % 4 === 0) {
-                        const label = document.createElement('div');
-                        label.className = 'spinor-label';
-                        label.textContent = `ψ${i/4}`;
-                        container.appendChild(label);
-                        
-                        this.tesseractVertices.push({
-                            element: vertex,
-                            label: label,
-                            x: (i & 1) ? 1 : -1,
-                            y: (i & 2) ? 1 : -1,
-                            z: (i & 4) ? 1 : -1,
-                            w: (i & 8) ? 1 : -1
-                        });
-                    } else {
-                        this.tesseractVertices.push({
-                            element: vertex,
-                            label: null,
-                            x: (i & 1) ? 1 : -1,
-                            y: (i & 2) ? 1 : -1,
-                            z: (i & 4) ? 1 : -1,
-                            w: (i & 8) ? 1 : -1
-                        });
-                    }
-                }
-                
-                // Create edges between connected vertices
-                this.createTesseractEdges();
-            }
-            
-            createTesseractEdges() {
-                const container = document.getElementById('tesseractProjection');
-                this.tesseractEdges = [];
-                
-                // Create edges for tesseract connectivity
-                for (let i = 0; i < 16; i++) {
-                    for (let j = i + 1; j < 16; j++) {
-                        // Two vertices are connected if they differ in exactly one coordinate
-                        const diff = i ^ j;
-                        if ((diff & (diff - 1)) === 0) { // Check if diff is a power of 2
-                            const edge = document.createElement('div');
-                            edge.className = 'tesseract-edge';
-                            container.appendChild(edge);
-                            
-                            this.tesseractEdges.push({
-                                element: edge,
-                                start: i,
-                                end: j
-                            });
-                        }
-                    }
-                }
-            }
-            
-            createVortexParticles() {
-                const container = document.getElementById('scalarVortex');
-                
-                for (let i = 0; i < 50; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'vortex-particle';
-                    container.appendChild(particle);
-                    
-                    this.vortexParticles.push({
-                        element: particle,
-                        angle: (i / 50) * Math.PI * 2,
-                        radius: 50 + Math.random() * 150,
-                        height: Math.random() * 100 - 50,
-                        speed: 0.5 + Math.random() * 1.5
-                    });
-                }
-            }
-            
-            createMatrixRain() {
-                const container = document.getElementById('matrixRain');
-                const chars = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿';
-                
-                for (let i = 0; i < 100; i++) {
-                    const char = document.createElement('div');
-                    char.className = 'matrix-char';
-                    char.textContent = chars[Math.floor(Math.random() * chars.length)];
-                    container.appendChild(char);
-                    
-                    this.matrixChars.push({
-                        element: char,
-                        x: Math.random() * 100,
-                        y: Math.random() * 100,
-                        speed: 0.5 + Math.random() * 2
-                    });
+                    console.log('Audio initialization failed:', error);
                 }
             }
             
@@ -461,85 +399,90 @@
                 };
             }
             
-            updateTesseract() {
+            updateAndDrawTesseract() {
                 const rotationSpeed = 0.02;
-                const schumann = 7.83; // Hz
-                const solfeggio = 528; // Hz
+                const schumann = 7.83;
+                const solfeggio = 528;
                 
-                // Apply frequency-responsive glow
                 const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
                 const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
                 
-                // Modulate audio gain based on visual phases
+                // Update audio
                 if (this.audioInitialized) {
                     this.schumannGain.gain.value = 0.005 + (schumannPhase * 0.01);
                     this.solfeggioGain.gain.value = 0.002 + (solfeggioPhase * 0.008);
                 }
                 
-                this.tesseractVertices.forEach((vertex, index) => {
-                    // Apply 4D rotation with quaternion-inspired smoothing
+                // Project vertices
+                const projectedVertices = this.tesseractVertices.map((vertex, index) => {
                     const cosT = Math.cos(this.time * rotationSpeed);
                     const sinT = Math.sin(this.time * rotationSpeed);
                     
-                    // Rotate in XW plane
                     const newX = vertex.x * cosT - vertex.w * sinT;
                     const newW = vertex.x * sinT + vertex.w * cosT;
                     
-                    // Rotate in YZ plane with golden ratio offset
                     const phi = (1 + Math.sqrt(5)) / 2;
                     const cosT2 = Math.cos(this.time * rotationSpeed * phi * 0.618);
                     const sinT2 = Math.sin(this.time * rotationSpeed * phi * 0.618);
                     const newY = vertex.y * cosT2 - vertex.z * sinT2;
                     const newZ = vertex.y * sinT2 + vertex.z * cosT2;
                     
-                    // Project 4D to 3D
                     const pos3D = this.project4DTo3D(newX, newY, newZ, newW);
-                    
-                    // Project 3D to 2D
                     const pos2D = this.project3DTo2D(pos3D.x * 80, pos3D.y * 80, pos3D.z * 80);
                     
-                    vertex.element.style.left = pos2D.x + 'px';
-                    vertex.element.style.top = pos2D.y + 'px';
-                    
-                    // Frequency-responsive glow
                     const baseOpacity = 0.5 + (pos3D.z + 1) * 0.25;
                     const resonanceBoost = schumannPhase * 0.3 + solfeggioPhase * 0.2;
-                    vertex.element.style.opacity = Math.min(1, baseOpacity + resonanceBoost);
+                    const opacity = Math.min(1, baseOpacity + resonanceBoost);
                     
-                    // Update spinor labels
-                    if (vertex.label) {
-                        vertex.label.style.left = (pos2D.x + 10) + 'px';
-                        vertex.label.style.top = (pos2D.y - 5) + 'px';
-                        vertex.label.style.opacity = baseOpacity + resonanceBoost;
-                    }
+                    return {
+                        ...pos2D,
+                        opacity: opacity,
+                        hasLabel: vertex.hasLabel,
+                        labelIndex: Math.floor(index / 4)
+                    };
                 });
                 
-                // Update tesseract edges
+                // Clear main canvas
+                this.mainCtx.clearRect(0, 0, 500, 500);
+                
+                // Draw edges
                 this.tesseractEdges.forEach(edge => {
-                    const start = this.tesseractVertices[edge.start];
-                    const end = this.tesseractVertices[edge.end];
+                    const start = projectedVertices[edge.start];
+                    const end = projectedVertices[edge.end];
                     
-                    const startRect = start.element.getBoundingClientRect();
-                    const endRect = end.element.getBoundingClientRect();
-                    const containerRect = start.element.parentElement.getBoundingClientRect();
+                    this.mainCtx.strokeStyle = `rgba(220, 38, 38, ${schumannPhase * 0.4 + 0.2})`;
+                    this.mainCtx.lineWidth = 1;
+                    this.mainCtx.beginPath();
+                    this.mainCtx.moveTo(start.x, start.y);
+                    this.mainCtx.lineTo(end.x, end.y);
+                    this.mainCtx.stroke();
+                });
+                
+                // Draw vertices
+                projectedVertices.forEach((vertex, index) => {
+                    const gradient = this.mainCtx.createRadialGradient(
+                        vertex.x, vertex.y, 0,
+                        vertex.x, vertex.y, 6
+                    );
+                    gradient.addColorStop(0, `rgba(220, 38, 38, ${vertex.opacity})`);
+                    gradient.addColorStop(1, `rgba(124, 45, 18, ${vertex.opacity * 0.5})`);
                     
-                    const startX = startRect.left - containerRect.left + 3;
-                    const startY = startRect.top - containerRect.top + 3;
-                    const endX = endRect.left - containerRect.left + 3;
-                    const endY = endRect.top - containerRect.top + 3;
+                    this.mainCtx.fillStyle = gradient;
+                    this.mainCtx.beginPath();
+                    this.mainCtx.arc(vertex.x, vertex.y, 3, 0, Math.PI * 2);
+                    this.mainCtx.fill();
                     
-                    const length = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
-                    const angle = Math.atan2(endY - startY, endX - startX);
-                    
-                    edge.element.style.left = startX + 'px';
-                    edge.element.style.top = startY + 'px';
-                    edge.element.style.width = length + 'px';
-                    edge.element.style.transform = `rotate(${angle}rad)`;
-                    edge.element.style.opacity = (schumannPhase * 0.4 + 0.2);
+                    // Draw spinor labels
+                    if (vertex.hasLabel) {
+                        this.mainCtx.fillStyle = `rgba(251, 191, 36, ${vertex.opacity})`;
+                        this.mainCtx.font = '10px Times New Roman';
+                        this.mainCtx.fontStyle = 'italic';
+                        this.mainCtx.fillText(`ψ${vertex.labelIndex}`, vertex.x + 8, vertex.y - 5);
+                    }
                 });
             }
             
-            updateVortex() {
+            updateAndDrawVortex() {
                 this.vortexParticles.forEach(particle => {
                     particle.angle += particle.speed * 0.02;
                     
@@ -549,41 +492,69 @@
                     const z = particle.height + 30 * Math.sin(this.time * 0.02 + particle.angle);
                     
                     const pos2D = this.project3DTo2D(x, y, z);
+                    const opacity = 0.3 + (z + 100) / 200 * 0.7;
                     
-                    particle.element.style.left = pos2D.x + 'px';
-                    particle.element.style.top = pos2D.y + 'px';
-                    particle.element.style.opacity = 0.3 + (z + 100) / 200 * 0.7;
+                    const gradient = this.mainCtx.createRadialGradient(
+                        pos2D.x, pos2D.y, 0,
+                        pos2D.x, pos2D.y, particle.size
+                    );
+                    gradient.addColorStop(0, `rgba(16, 185, 129, ${opacity})`);
+                    gradient.addColorStop(1, `rgba(6, 95, 70, ${opacity * 0.3})`);
+                    
+                    this.mainCtx.fillStyle = gradient;
+                    this.mainCtx.beginPath();
+                    this.mainCtx.arc(pos2D.x, pos2D.y, particle.size, 0, Math.PI * 2);
+                    this.mainCtx.fill();
                 });
             }
             
-            updateMatrixRain() {
+            updateAndDrawMatrixRain() {
+                this.overlayCtx.clearRect(0, 0, 500, 500);
+                
                 this.matrixChars.forEach(char => {
                     char.y += char.speed;
-                    if (char.y > 100) {
-                        char.y = -10;
-                        char.x = Math.random() * 100;
+                    if (char.y > 520) {
+                        char.y = -20;
+                        char.x = Math.random() * 500;
+                        char.char = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿'[Math.floor(Math.random() * 300)];
                     }
                     
-                    char.element.style.left = char.x + '%';
-                    char.element.style.top = char.y + '%';
-                    char.element.style.opacity = Math.random() * 0.8 + 0.2;
+                    char.opacity = Math.random() * 0.8 + 0.2;
+                    
+                    this.overlayCtx.fillStyle = `rgba(16, 185, 129, ${char.opacity})`;
+                    this.overlayCtx.font = '12px Courier New';
+                    this.overlayCtx.fillText(char.char, char.x, char.y);
                 });
+            }
+            
+            updateFPS() {
+                this.frameCount++;
+                const now = performance.now();
+                
+                if (now - this.lastFPSTime >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFPSTime));
+                    this.frameCount = 0;
+                    this.lastFPSTime = now;
+                    
+                    document.getElementById('fpsCounter').textContent = `FPS: ${this.fps}`;
+                }
             }
             
             animate() {
                 this.time++;
                 
-                this.updateTesseract();
-                this.updateVortex();
-                this.updateMatrixRain();
+                this.updateAndDrawTesseract();
+                this.updateAndDrawVortex();
+                this.updateAndDrawMatrixRain();
+                this.updateFPS();
                 
                 requestAnimationFrame(() => this.animate());
             }
         }
         
-        // Initialize the visualization when the page loads
+        // Initialize when page loads
         window.addEventListener('load', () => {
-            new BootloaderVisualization();
+            new OptimizedBootloader();
         });
     </script>
 </body>
