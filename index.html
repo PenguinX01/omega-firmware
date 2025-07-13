@@ -31,11 +31,10 @@
         body {
             font-family: var(--font);
             background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%);
-            color: var(--green);
+            color: #e2e8f0; /* Changed to a more neutral color to suit both sections */
             line-height: 1.6;
             overflow-x: hidden; /* Prevent horizontal scroll */
-            /* Removed Tesseract's full-height, centering body styles as content will be scrollable */
-            margin-top: 60px; /* Space for fixed navigation */
+            margin-top: 0; /* Removed top margin as fixed nav is gone */
         }
         a {
             color: var(--green);
@@ -66,35 +65,6 @@
         @keyframes scroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-100px); }
-        }
-
-        /* --- Unified Navigation Bar (adapted from previous combined version) --- */
-        .site-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
-            background: rgba(15, 23, 42, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            font-family: var(--font);
-            z-index: 9999;
-            backdrop-filter: blur(6px);
-            border-bottom: 1px solid #334155;
-        }
-        .site-nav a {
-            font-weight: bold;
-            font-size: 14px;
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-        /* Style for current active section in unified nav */
-        .site-nav a.active-section {
-            color: var(--cyan); /* A vibrant color to indicate active section */
-            text-shadow: 0 0 15px var(--cyan), 0 0 5px var(--cyan);
-            transform: scale(1.05);
         }
 
         /* --- Container & Header (from Dashboard) --- */
@@ -211,19 +181,17 @@
         }
 
         /* --- Content Panels (Palingenesis Dashboard) --- */
-        /* These are now always visible, not toggled by display:none/block */
-        .content-panel { /* This class is now used for *sections* within the main dashboard */
+        .content-panel {
             background: linear-gradient(135deg, rgba(var(--green-rgb), .02) 0%, rgba(var(--green-rgb), .05) 100%);
             border: 1px solid var(--green);
             border-radius: 15px;
             padding: 40px;
             margin-bottom: 30px;
             backdrop-filter: blur(5px);
-            /* Removed display:none, display:block, and fadeIn animation as they are always present */
         }
         /* Specific content panels within the dashboard still use active for internal tab logic */
         .dashboard-content-section:not(.active) {
-             display: none; /* Only hide internal sections that are not active */
+             display: none;
         }
         .dashboard-content-section.active {
             display: block;
@@ -242,7 +210,7 @@
             text-shadow: 0 0 20px var(--green);
         }
 
-        /* Palingenesis Specific Styles */
+        /* Palingenesis Specific Styles (continued) */
         .subsection-title {
             font-size: 1.6em;
             margin: 30px 0 15px 0;
@@ -700,8 +668,9 @@
         /* --- Tesseract Bootloader Specific Styles (copied and adapted) --- */
         /* This container is now part of the scrollable flow */
         .bootloader-container {
-            position: relative; /* Not absolute anymore, so it flows */
+            position: relative;
             width: 800px;
+            max-width: 100%;
             height: 600px;
             border: 2px solid #334155;
             border-radius: 10px;
@@ -712,11 +681,11 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
-            margin: 40px auto; /* Center horizontally and add vertical spacing */
+            margin: 40px auto;
         }
         /* Tesseract header/status elements keep their original names,
            but their styles are specific to `.bootloader-container` children. */
-        .bootloader-container .header { /* Specificity for tesseract header */
+        .bootloader-container .header {
             position: absolute;
             top: 20px;
             left: 20px;
@@ -725,7 +694,7 @@
             text-shadow: 0 0 10px #10b981;
             z-index: 10;
         }
-        .bootloader-container .status-bar { /* Specificity for tesseract status bar */
+        .bootloader-container .status-bar {
             position: absolute;
             bottom: 20px;
             left: 20px;
@@ -736,7 +705,7 @@
             overflow: hidden;
             z-index: 10;
         }
-        .bootloader-container .progress-bar { /* Specificity for tesseract progress bar */
+        .bootloader-container .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #10b981, #3b82f6);
             border-radius: 10px;
@@ -744,7 +713,7 @@
             transition: width 0.3s ease;
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
         }
-        .bootloader-container .progress-text { /* Specificity for tesseract progress text */
+        .bootloader-container .progress-text {
             position: absolute;
             bottom: 50px;
             left: 20px;
@@ -752,19 +721,25 @@
             color: #64748b;
             z-index: 10;
         }
+        /* New Responsive Canvas Container for Tesseract */
         .canvas-container {
             position: relative;
-            width: 500px;
-            height: 500px;
+            width: 100%; /* Fill parent */
+            max-width: 500px; /* Max size for desktop view */
+            aspect-ratio: 1/1; /* Maintain square aspect ratio */
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-top: 50px;
+            margin-bottom: 50px;
         }
+        /* Canvas elements inside .canvas-container now truly fill it */
         .main-canvas, .background-canvas, .overlay-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            /* No longer need filter: drop-shadow here as it's less necessary with fields */
+            width: 100%; /* Fill parent container */
+            height: 100%; /* Fill parent container */
         }
         .main-canvas {
             filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
@@ -806,14 +781,14 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-            animation: pulse-field 3s ease-in-out infinite alternate; /* Renamed to avoid dashboard glitch conflict */
+            animation: pulse-field 3s ease-in-out infinite alternate;
             pointer-events: none;
         }
-        @keyframes pulse-field { /* Tesseract's specific pulse animation for the field */
+        @keyframes pulse-field {
             0% { opacity: 0.3; transform: scale(0.8); }
             100% { opacity: 0.7; transform: scale(1.2); }
         }
-        .bootloader-container .fps-counter { /* Specificity for tesseract fps counter */
+        .bootloader-container .fps-counter {
             position: absolute;
             top: 20px;
             right: 20px;
@@ -822,7 +797,7 @@
             z-index: 10;
         }
 
-        /* --- Media Queries (adapted for unified layout) --- */
+        /* --- Media Queries (adapted for unified layout and added smaller screen sizes) --- */
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-direction: column;
@@ -841,30 +816,20 @@
             #resonance-app .grid {
                 grid-template-columns: 1fr;
             }
-            /* Make tesseract responsive within the scrollable content */
+            /* Tesseract container adjustments */
             .bootloader-container {
-                width: 100%;
-                max-width: 550px; /* Constrain max width for aesthetics */
-                height: 450px; /* Adjusted height for smaller screens */
+                max-width: 95%;
+                height: 500px;
+                border-radius: 10px;
                 padding: 10px;
-                margin: 20px auto; /* Adjust margin */
+                margin: 20px auto;
             }
-            .canvas-container {
-                width: 100%; /* Fill parent */
-                height: 100%; /* Fill parent */
-                padding-bottom: 120px; /* Space for text below canvas */
-                box-sizing: border-box;
-            }
-            .main-canvas, .background-canvas, .overlay-canvas {
-                width: 100%;
-                height: 100%;
-            }
-            /* Adjustments for text positions in tesseract container */
+            /* Tesseract header/status elements retain their absolute positioning within the smaller container */
             .bootloader-container .header,
             .bootloader-container .fps-counter,
             .bootloader-container .progress-text,
             .bootloader-container .status-bar {
-                position: absolute; /* Re-affirm absolute positioning */
+                position: absolute;
                 left: 10px;
                 right: 10px;
                 width: auto;
@@ -873,23 +838,48 @@
                 right: 10px;
                 left: auto;
             }
-            /* Adjust canvas dimensions relative to their container */
-            .main-canvas, .background-canvas, .overlay-canvas {
-                width: calc(100% - 20px); /* Account for some padding/margin */
-                height: calc(100% - 100px); /* Adjust to fit other elements */
-                max-width: 400px; /* max-width for smaller screens */
-                max-height: 400px; /* max-height for smaller screens */
+        }
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2em;
+            }
+            .subtitle {
+                font-size: 1em;
+            }
+            .status-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .status-item {
+                font-size: 0.8em;
+                padding: 8px 10px;
+            }
+            .tab {
+                padding: 10px 18px;
+                font-size: 0.85em;
+            }
+            .section-title {
+                font-size: 1.8em;
+            }
+            .subsection-title {
+                font-size: 1.4em;
+            }
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            .bootloader-container {
+                height: 400px;
+            }
+            .canvas-container {
+                margin-top: 40px;
+                margin-bottom: 40px;
             }
         }
     </style>
 </head>
 <body data-phase="13" data-recursion="0">
 
-<!-- Unified Site Navigation -->
-<nav class="site-nav">
-  <a href="#tesseract-section" onclick="highlightSection('tesseract-section')">🌀 Tesseract Show</a>
-  <a href="#dashboard-main" class="active-section" onclick="highlightSection('dashboard-main')">🧬 Glyphic Dashboard</a>
-</nav>
+<!-- No top fixed navigation bar -->
 
 <div class="matrix-bg"></div>
 
@@ -911,9 +901,9 @@
                 <div class="solfeggio-field"></div>
                 <div class="quantum-field"></div>
                 
-                <canvas class="background-canvas" id="backgroundCanvas" width="500" height="500"></canvas>
-                <canvas class="main-canvas" id="mainCanvas" width="500" height="500"></canvas>
-                <canvas class="overlay-canvas" id="overlayCanvas" width="500" height="500"></canvas>
+                <canvas class="background-canvas" id="backgroundCanvas"></canvas>
+                <canvas class="main-canvas" id="mainCanvas"></canvas>
+                <canvas class="overlay-canvas" id="overlayCanvas"></canvas>
             </div>
             
             <div class="progress-text" id="progressText">Initializing quantum field harmonics...</div>
@@ -1398,27 +1388,28 @@
         console.log(`⚡ RECURSION_MARKER ${recursionCycle}`);
     }, 10000);
 
-    /* --- Tesseract Bootloader Class (from index.html) --- */
+    // ========== ENHANCED TESSERACT BOOTLOADER ==========
     class OptimizedBootloader {
         constructor() {
+            // Check if canvases exist immediately, and return if not
+            this.mainCanvas = document.getElementById('mainCanvas');
+            this.backgroundCanvas = document.getElementById('backgroundCanvas');
+            this.overlayCanvas = document.getElementById('overlayCanvas');
+            
+            if (!this.mainCanvas || !this.backgroundCanvas || !this.overlayCanvas) {
+                console.error("Tesseract canvases not found. Tesseract Bootloader will not initialize.");
+                return; 
+            }
+            
             this.time = 0;
             this.progress = 0;
             this.frameCount = 0;
             this.lastFPSTime = 0;
             this.fps = 0;
-            this.animationFrameId = null; // To control animation loop
+            this.animationFrameId = null;
+            this.isVisible = false; // Initially assume not visible until IntersectionObserver confirms
 
             // Canvas contexts
-            this.mainCanvas = document.getElementById('mainCanvas');
-            this.backgroundCanvas = document.getElementById('backgroundCanvas');
-            this.overlayCanvas = document.getElementById('overlayCanvas');
-            
-            // Check if canvases are found before getting context
-            if (!this.mainCanvas || !this.backgroundCanvas || !this.overlayCanvas) {
-                console.error("Tesseract canvases not found. Ensure HTML elements with matching IDs are present.");
-                return; 
-            }
-
             this.mainCtx = this.mainCanvas.getContext('2d');
             this.backgroundCtx = this.backgroundCanvas.getContext('2d');
             this.overlayCtx = this.overlayCanvas.getContext('2d');
@@ -1426,11 +1417,7 @@
             // Tesseract data
             this.tesseractVertices = this.initTesseractVertices();
             this.tesseractEdges = this.initTesseractEdges();
-            
-            // Vortex particles
             this.vortexParticles = this.initVortexParticles();
-            
-            // Matrix rain
             this.matrixChars = this.initMatrixChars();
             
             // Boot sequence
@@ -1452,20 +1439,41 @@
             this.solfeggioOscillator = null;
             this.audioInitialized = false;
 
-            this.init(); // Call init on construction
-            this.animate(); // Start animation immediately as it's always displayed
+            this.initCommon(); // Setup everything except starting the animation loop
         }
-        
-        init() {
-            this.setupCanvases();
-            this.drawStaticElements();
-            this.startBootSequence();
+
+        initCommon() {
+            this.setupCanvases(); // Handles canvas resizing and context setup
             this.initializeAudio();
+            this.startBootSequence(); // Starts the progress text sequence
+            this.initVisibilityObserver(); // Sets up observer, which will call resume() if visible
+        }
+
+        // Method to resize canvas resolution dynamically
+        resizeCanvases() {
+            const container = this.mainCanvas.parentElement; 
+            if (!container) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            this.mainCanvas.width = width;
+            this.mainCanvas.height = height;
+            this.backgroundCanvas.width = width;
+            this.backgroundCanvas.height = height;
+            this.overlayCanvas.width = width;
+            this.overlayCanvas.height = height;
+
+            // Redraw static elements with new dimensions
+            this.drawStaticElements();
+            // Re-initialize matrix chars to fit new canvas dimensions
+            this.matrixChars = this.initMatrixChars(); 
         }
 
         setupCanvases() {
-            if (!this.mainCtx || !this.backgroundCtx || !this.overlayCtx) return;
-
+            this.resizeCanvases(); // Initial resize call
+            window.addEventListener('resize', this.resizeCanvases.bind(this));
+            
             this.mainCtx.imageSmoothingEnabled = true;
             this.backgroundCtx.imageSmoothingEnabled = true;
             this.overlayCtx.imageSmoothingEnabled = true;
@@ -1478,20 +1486,21 @@
         drawStaticElements() {
             if (!this.backgroundCtx) return;
 
+            this.backgroundCtx.clearRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
             this.backgroundCtx.strokeStyle = 'rgba(51, 65, 85, 0.3)';
             this.backgroundCtx.lineWidth = 1;
             
             for (let i = 0; i <= 20; i++) {
-                const y = (i / 20) * this.backgroundCanvas.height; // Use canvas height
+                const y = (i / 20) * this.backgroundCanvas.height; 
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(0, y);
-                this.backgroundCtx.lineTo(this.backgroundCanvas.width, y); // Use canvas width
+                this.backgroundCtx.lineTo(this.backgroundCanvas.width, y);
                 this.backgroundCtx.stroke();
                 
-                const x = (i / 20) * this.backgroundCanvas.width; // Use canvas width
+                const x = (i / 20) * this.backgroundCanvas.width;
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(x, 0);
-                this.backgroundCtx.lineTo(x, this.backgroundCanvas.height); // Use canvas height
+                this.backgroundCtx.lineTo(x, this.backgroundCanvas.height);
                 this.backgroundCtx.stroke();
             }
         }
@@ -1519,6 +1528,9 @@
                         edges.push({ start: i, end: j });
                     }
                 }
+                // Also add connections for 4D - this part seems to be duplicated in original
+                // The logical "edges" in a tesseract are 32 (16 vertices * 4 dimensions / 2 for unique connections).
+                // The previous code generates this correctly. No changes needed to logic.
             }
             return edges;
         }
@@ -1544,8 +1556,8 @@
             for (let i = 0; i < 40; i++) {
                 chars.push({
                     char: symbols[Math.floor(Math.random() * symbols.length)],
-                    x: Math.random() * this.overlayCanvas.width, // Use canvas width
-                    y: Math.random() * this.overlayCanvas.height, // Use canvas height
+                    x: Math.random() * this.overlayCanvas.width,
+                    y: Math.random() * this.overlayCanvas.height,
                     speed: 0.5 + Math.random() * 2,
                     opacity: Math.random() * 0.8 + 0.2
                 });
@@ -1601,9 +1613,9 @@
             }
 
             if (this.sequenceInterval) clearInterval(this.sequenceInterval);
-            this.currentSequenceIndex = 0; // Reset sequence on start
-            this.progress = 0; // Reset progress
-            progressBar.style.width = '0%'; // Reset progress bar visual
+            this.currentSequenceIndex = 0;
+            this.progress = 0;
+            progressBar.style.width = '0%';
 
             this.sequenceInterval = setInterval(() => {
                 if (this.currentSequenceIndex < this.bootSequence.length) {
@@ -1754,9 +1766,9 @@
             
             this.matrixChars.forEach(char => {
                 char.y += char.speed;
-                if (char.y > this.overlayCanvas.height + 20) { // Adjusted for canvas height
+                if (char.y > this.overlayCanvas.height + 20) {
                     char.y = -20;
-                    char.x = Math.random() * this.overlayCanvas.width; // Adjusted for canvas width
+                    char.x = Math.random() * this.overlayCanvas.width;
                     char.char = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿'[Math.floor(Math.random() * 300)];
                 }
                 
@@ -1794,38 +1806,136 @@
             
             this.animationFrameId = requestAnimationFrame(() => this.animate());
         }
+
+        // Pause animation and audio
+        pause() {
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            if (this.audioInitialized && this.audioContext && this.audioContext.state === 'running') {
+                this.audioContext.suspend();
+            }
+        }
+
+        // Resume animation and audio
+        resume() {
+            if (!this.animationFrameId) {
+                this.animate();
+            }
+            if (this.audioInitialized && this.audioContext && this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+        }
+
+        // Intersection Observer for pausing/resuming based on visibility
+        initVisibilityObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting) {
+                    if (!document.hidden) { // Only resume if browser tab is also visible
+                        this.resume();
+                    }
+                    this.isVisible = true;
+                } else {
+                    this.pause();
+                    this.isVisible = false;
+                }
+            }, { threshold: 0.1 });
+            
+            const bootloaderContainer = this.mainCanvas.closest('.bootloader-container');
+            if (bootloaderContainer) {
+                observer.observe(bootloaderContainer);
+            }
+        }
     }
 
     let tesseractBootloaderInstance = null; // Global instance for Tesseract
 
-    /* --- Unified Top Navigation --- */
-    function highlightSection(sectionId) {
-        document.querySelectorAll('.site-nav a').forEach(link => {
-            link.classList.remove('active-section');
-        });
-        const activeLink = document.querySelector(`.site-nav a[href="#${sectionId}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active-section');
-        }
-
-        // Scroll to the section
-        const section = document.getElementById(sectionId);
-        if (section) {
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-
-    /* ---------- Dashboard Tab Switching (Internal) ---------- */
+    // ========== DASHBOARD TAB SWITCHING (Internal) ==========
     function showDashboardTab(id) {
-        // Update dashboard's internal nav tabs active state
-        document.querySelectorAll('.nav-tabs .tab').forEach(t => t.classList.remove('active'));
-        document.querySelector(`.tab[onclick="showDashboardTab('${id}')"]`).classList.add('active');
+        // Update URL hash for dashboard internal tabs
+        // Using replaceState to avoid cluttering history for internal tabs, pushState for initial load.
+        window.history.replaceState(null, '', `#dashboard-main:${id}`);
+        
+        document.querySelectorAll('.nav-tabs .tab').forEach(t => {
+            t.classList.toggle('active', t.getAttribute('onclick') === `showDashboardTab('${id}')`);
+        });
 
-        // Hide all internal dashboard content sections
-        document.querySelectorAll('.dashboard-content-section').forEach(p => p.classList.remove('active'));
-        // Show the requested internal dashboard content section
-        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.dashboard-content-section').forEach(p => {
+            p.classList.toggle('active', p.id === id);
+        });
     }
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Tesseract after DOM is ready
+        tesseractBootloaderInstance = new OptimizedBootloader();
+        // initVisibilityObserver is called in OptimizedBootloader constructor
+
+        // Initialize dashboard charts
+        initCharts();
+        
+        // Initial status updates for dashboard mini items
+        const gcpStatusElement = document.getElementById('gcp-status');
+        const schumannStatusElement = document.getElementById('schumann-status');
+        const fractalStatusElement = document.getElementById('fractal-status');
+        const systemStatusElement = document.getElementById('system-status');
+
+        if (gcpStatusElement) gcpStatusElement.textContent = 'GCP: CONNECTING';
+        if (schumannStatusElement) schumannStatusElement.textContent = 'SCHUMANN: CONNECTING';
+        if (fractalStatusElement) fractalStatusElement.textContent = 'FRACTAL: INITIALISING';
+        if (systemStatusElement) systemStatusElement.textContent = 'SYSTEM: ONLINE';
+
+        // Simulate data stream for dashboard
+        setInterval(pushData, 5000);
+
+        // Parse initial URL state and navigate
+        const hash = window.location.hash.substring(1); // Remove '#'
+        if (hash.startsWith('dashboard-main:')) {
+            const tab = hash.split(':')[1];
+            if (tab) {
+                showDashboardTab(tab);
+            } else {
+                showDashboardTab('overview'); // Default if only #dashboard-main is present
+            }
+        } else {
+            // If no specific dashboard tab hash, or if it's #tesseract-section,
+            // the dashboard defaults to 'overview'. Tesseract is always visible.
+            showDashboardTab('overview');
+        }
+    });
+
+    // Handle hash changes (e.g., from manual URL entry or browser back/forward)
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash.substring(1);
+        if (hash.startsWith('dashboard-main:')) {
+            const tab = hash.split(':')[1];
+            if (tab) {
+                showDashboardTab(tab);
+            } else {
+                showDashboardTab('overview');
+            }
+        } else {
+            // If hash changes to something not a dashboard tab (e.g., #tesseract-section or empty)
+            // just ensure dashboard is on overview.
+            showDashboardTab('overview');
+        }
+    });
+
+    // Pause Tesseract animations when tab is inactive (browser window not focused)
+    document.addEventListener('visibilitychange', () => {
+        if (tesseractBootloaderInstance && tesseractBootloaderInstance.pause && tesseractBootloaderInstance.resume) {
+            if (document.hidden) {
+                tesseractBootloaderInstance.pause();
+            } else {
+                // Only resume if the Tesseract section is currently visible on screen
+                if (tesseractBootloaderInstance.isVisible) {
+                    tesseractBootloaderInstance.resume();
+                }
+            }
+        }
+    });
 
     /* ---------- MINI UDEI ANIMATION (from Dashboard) ---------- */
     setInterval(()=>{
@@ -2014,9 +2124,8 @@
     }
 
     function pushData() {
-        // Only push data if relevant dashboard elements exist (implies dashboard is loaded)
-        if (!document.getElementById('overview') || !document.getElementById('overview').offsetParent) {
-            return; // Dashboard content is not visible/in DOM, so don't update
+        if (!document.getElementById('overview') || document.getElementById('overview').offsetParent === null) {
+            return;
         }
 
         const now = new Date();
@@ -2133,58 +2242,6 @@
             }
         }
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Initialize Tesseract immediately as it's always visible
-        tesseractBootloaderInstance = new OptimizedBootloader();
-
-        // Initialize dashboard charts
-        initCharts();
-        
-        // Initial status updates for dashboard mini items
-        const gcpStatusElement = document.getElementById('gcp-status');
-        const schumannStatusElement = document.getElementById('schumann-status');
-        const fractalStatusElement = document.getElementById('fractal-status');
-        const systemStatusElement = document.getElementById('system-status');
-
-        if (gcpStatusElement) gcpStatusElement.textContent = 'GCP: CONNECTING';
-        if (schumannStatusElement) schumannStatusElement.textContent = 'SCHUMANN: CONNECTING';
-        if (fractalStatusElement) fractalStatusElement.textContent = 'FRACTAL: INITIALISING';
-        if (systemStatusElement) systemStatusElement.textContent = 'SYSTEM: ONLINE';
-
-        // Simulate data stream for dashboard
-        setInterval(pushData, 5000);
-
-        // Set initial dashboard internal tab and unified nav highlight
-        showDashboardTab('overview');
-        highlightSection('dashboard-main');
-
-        // Handle initial URL hash for deep linking (e.g., #tesseract-section or #resonance)
-        const hash = window.location.hash.substring(1);
-        if (hash) {
-            if (hash === 'tesseract-section' || hash === 'dashboard-main') {
-                highlightSection(hash);
-            } else {
-                // If it's a dashboard internal tab, switch to dashboard-main and then the tab
-                highlightSection('dashboard-main');
-                showDashboardTab(hash);
-            }
-        }
-    });
-
-    // Handle hash changes if user navigates with browser history
-    window.addEventListener('hashchange', () => {
-        const hash = window.location.hash.substring(1);
-        if (hash) {
-            if (hash === 'tesseract-section' || hash === 'dashboard-main') {
-                highlightSection(hash);
-            } else {
-                highlightSection('dashboard-main');
-                showDashboardTab(hash);
-            }
-        }
-    });
-
 </script>
 
 </body>
