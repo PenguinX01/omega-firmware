@@ -22,7 +22,7 @@
             --font  : 'Courier New', monospace;
         }
 
-        /* --- Global Frame (from Dashboard) --- */
+        /* --- Global Frame (from Dashboard, adapted for unified site) --- */
         * {
             margin: 0;
             padding: 0;
@@ -33,7 +33,8 @@
             background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%);
             color: var(--green);
             line-height: 1.6;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            /* Removed Tesseract's full-height, centering body styles as content will be scrollable */
             margin-top: 60px; /* Space for fixed navigation */
         }
         a {
@@ -44,7 +45,6 @@
             color: var(--cyan);
             text-shadow: 0 0 5px var(--cyan);
         }
-
 
         /* --- Moving Matrix Background (from Dashboard) --- */
         .matrix-bg {
@@ -68,7 +68,7 @@
             100% { transform: translateX(-100px); }
         }
 
-        /* --- Unified Navigation Bar --- */
+        /* --- Unified Navigation Bar (adapted from previous combined version) --- */
         .site-nav {
             position: fixed;
             top: 0;
@@ -90,16 +90,12 @@
             font-size: 14px;
             transition: color 0.3s, text-shadow 0.3s;
         }
-        .site-nav a.tesseract-link {
-            color: #10b981; /* Tesseract accent color */
+        /* Style for current active section in unified nav */
+        .site-nav a.active-section {
+            color: var(--cyan); /* A vibrant color to indicate active section */
+            text-shadow: 0 0 15px var(--cyan), 0 0 5px var(--cyan);
+            transform: scale(1.05);
         }
-        .site-nav a.dashboard-link {
-            color: #38bdf8; /* Dashboard accent color */
-        }
-        .site-nav a.active {
-            text-shadow: 0 0 10px;
-        }
-
 
         /* --- Container & Header (from Dashboard) --- */
         .container {
@@ -107,6 +103,7 @@
             margin: 0 auto;
             padding: 20px;
         }
+        /* Dashboard Header */
         header {
             text-align: center;
             margin-bottom: 40px;
@@ -174,7 +171,6 @@
             50% { opacity: .5; }
         }
 
-
         /* --- NAV TABS (from Dashboard) --- */
         .nav-tabs {
             display: flex;
@@ -214,20 +210,26 @@
             transform: translateY(-2px);
         }
 
-        /* --- Content Panels (Palingenesis) --- */
-        .content-panel {
-            display: none;
+        /* --- Content Panels (Palingenesis Dashboard) --- */
+        /* These are now always visible, not toggled by display:none/block */
+        .content-panel { /* This class is now used for *sections* within the main dashboard */
             background: linear-gradient(135deg, rgba(var(--green-rgb), .02) 0%, rgba(var(--green-rgb), .05) 100%);
             border: 1px solid var(--green);
             border-radius: 15px;
             padding: 40px;
             margin-bottom: 30px;
             backdrop-filter: blur(5px);
+            /* Removed display:none, display:block, and fadeIn animation as they are always present */
         }
-        .content-panel.active {
+        /* Specific content panels within the dashboard still use active for internal tab logic */
+        .dashboard-content-section:not(.active) {
+             display: none; /* Only hide internal sections that are not active */
+        }
+        .dashboard-content-section.active {
             display: block;
             animation: fadeIn .5s ease-in;
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -534,21 +536,17 @@
         }
 
         /* ====== RESONANCE (scoped from Dashboard) ====== */
-        /* Wrap the resonance engine inside #resonance-app to scope cyan styles so they don't bleed */
         #resonance-app {
             --accent: var(--cyan);
             color: var(--cyan); /* Main text color */
             padding: 20px; /* Add padding to the resonance app container */
         }
-
-        /* General elements within resonance app */
         #resonance-app .header,
         #resonance-app .card,
         #resonance-app .status-item,
         #resonance-app .btn {
             border-color: var(--cyan); /* Border color using cyan variable */
         }
-
         #resonance-app .header {
             text-align: center;
             margin-bottom: 40px;
@@ -557,7 +555,6 @@
             background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.05) 0%, rgba(var(--cyan-rgb), 0.1) 100%);
             border-radius: 15px;
         }
-
         #resonance-app .header .title {
             font-size: 2.2em;
             margin-bottom: 15px;
@@ -567,7 +564,6 @@
             font-size: 1.2em;
             opacity: 0.9;
         }
-
         #resonance-app .status-bar {
             margin-top: 20px;
         }
@@ -575,7 +571,6 @@
             background: rgba(var(--cyan-rgb), 0.1);
             border-width: 1px; /* Ensure thickness */
         }
-
         #resonance-app .controls {
             display: flex;
             justify-content: center;
@@ -599,14 +594,12 @@
             background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.3) 0%, rgba(var(--cyan-rgb), 0.4) 100%);
             transform: translateY(-2px);
         }
-
         #resonance-app .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 25px;
             margin: 30px 0;
         }
-
         #resonance-app .card {
             background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.05) 0%, rgba(var(--cyan-rgb), 0.1) 100%);
             border-width: 1px; /* Ensure thickness */
@@ -705,9 +698,9 @@
         }
 
         /* --- Tesseract Bootloader Specific Styles (copied and adapted) --- */
-        /* Note: body styles are overridden by dashboard's global body, but other elements are nested */
+        /* This container is now part of the scrollable flow */
         .bootloader-container {
-            position: relative;
+            position: relative; /* Not absolute anymore, so it flows */
             width: 800px;
             height: 600px;
             border: 2px solid #334155;
@@ -719,10 +712,11 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
-            margin: 0 auto; /* Center within its content-panel */
+            margin: 40px auto; /* Center horizontally and add vertical spacing */
         }
-        
-        .tesseract-header { /* Renamed to avoid conflict with dashboard header */
+        /* Tesseract header/status elements keep their original names,
+           but their styles are specific to `.bootloader-container` children. */
+        .bootloader-container .header { /* Specificity for tesseract header */
             position: absolute;
             top: 20px;
             left: 20px;
@@ -731,8 +725,7 @@
             text-shadow: 0 0 10px #10b981;
             z-index: 10;
         }
-        
-        .tesseract-status-bar { /* Renamed to avoid conflict */
+        .bootloader-container .status-bar { /* Specificity for tesseract status bar */
             position: absolute;
             bottom: 20px;
             left: 20px;
@@ -743,8 +736,7 @@
             overflow: hidden;
             z-index: 10;
         }
-        
-        .tesseract-progress-bar { /* Renamed to avoid conflict */
+        .bootloader-container .progress-bar { /* Specificity for tesseract progress bar */
             height: 100%;
             background: linear-gradient(90deg, #10b981, #3b82f6);
             border-radius: 10px;
@@ -752,8 +744,7 @@
             transition: width 0.3s ease;
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
         }
-        
-        .tesseract-progress-text { /* Renamed to avoid conflict */
+        .bootloader-container .progress-text { /* Specificity for tesseract progress text */
             position: absolute;
             bottom: 50px;
             left: 20px;
@@ -761,7 +752,6 @@
             color: #64748b;
             z-index: 10;
         }
-        
         .canvas-container {
             position: relative;
             width: 500px;
@@ -770,28 +760,22 @@
             justify-content: center;
             align-items: center;
         }
-        
-        .main-canvas {
+        .main-canvas, .background-canvas, .overlay-canvas {
             position: absolute;
             top: 0;
             left: 0;
+            /* No longer need filter: drop-shadow here as it's less necessary with fields */
+        }
+        .main-canvas {
             filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
         }
-        
         .background-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             opacity: 0.3;
         }
-        
         .overlay-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             opacity: 0.8;
         }
-        
+        /* These fields apply to the canvas-container, so their position:absolute is fine */
         .schumann-field {
             position: absolute;
             width: 100%;
@@ -800,12 +784,10 @@
             animation: schumann-pulse 0.128s ease-in-out infinite alternate;
             pointer-events: none;
         }
-        
         @keyframes schumann-pulse {
             0% { opacity: 0.2; }
             100% { opacity: 0.6; }
         }
-        
         .solfeggio-field {
             position: absolute;
             width: 100%;
@@ -814,32 +796,24 @@
             animation: solfeggio-wave 0.00189s linear infinite;
             pointer-events: none;
         }
-        
         @keyframes solfeggio-wave {
             0% { transform: scale(0.98); opacity: 0.3; }
             50% { transform: scale(1.02); opacity: 0.5; }
             100% { transform: scale(0.98); opacity: 0.3; }
         }
-        
         .quantum-field {
             position: absolute;
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-            /* Use the same 'pulse' animation from Dashboard's glitch for consistency, or a distinct one. 
-               The dashboard's glitch uses `transform`, tesseract's uses `opacity` and `transform`.
-               Let's make the Tesseract's `quantum-field` use its own unique `pulse-field` animation to avoid conflict */
-            animation: pulse-field 3s ease-in-out infinite alternate;
+            animation: pulse-field 3s ease-in-out infinite alternate; /* Renamed to avoid dashboard glitch conflict */
             pointer-events: none;
         }
-        /* Tesseract's specific pulse animation for the field */
-        @keyframes pulse-field {
+        @keyframes pulse-field { /* Tesseract's specific pulse animation for the field */
             0% { opacity: 0.3; transform: scale(0.8); }
             100% { opacity: 0.7; transform: scale(1.2); }
         }
-
-        /* Renamed to avoid conflict with dashboard's status bar */
-        .tesseract-fps-counter {
+        .bootloader-container .fps-counter { /* Specificity for tesseract fps counter */
             position: absolute;
             top: 20px;
             right: 20px;
@@ -848,7 +822,7 @@
             z-index: 10;
         }
 
-        /* --- Media Queries (from Dashboard) --- */
+        /* --- Media Queries (adapted for unified layout) --- */
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-direction: column;
@@ -867,30 +841,44 @@
             #resonance-app .grid {
                 grid-template-columns: 1fr;
             }
+            /* Make tesseract responsive within the scrollable content */
             .bootloader-container {
-                width: 100%; /* Make tesseract responsive */
-                height: 500px; /* Adjust height */
-                border-radius: 0;
-                padding: 10px; /* Adjust padding for smaller screens */
+                width: 100%;
+                max-width: 550px; /* Constrain max width for aesthetics */
+                height: 450px; /* Adjusted height for smaller screens */
+                padding: 10px;
+                margin: 20px auto; /* Adjust margin */
             }
             .canvas-container {
-                width: calc(100% - 40px); /* Adjust for padding */
-                height: 350px; /* Adjust height for smaller screens */
-                margin-top: 50px; /* Push down to avoid header overlap */
+                width: 100%; /* Fill parent */
+                height: 100%; /* Fill parent */
+                padding-bottom: 120px; /* Space for text below canvas */
+                box-sizing: border-box;
             }
             .main-canvas, .background-canvas, .overlay-canvas {
                 width: 100%;
                 height: 100%;
             }
             /* Adjustments for text positions in tesseract container */
-            .tesseract-header, .tesseract-fps-counter, .tesseract-progress-text, .tesseract-status-bar {
+            .bootloader-container .header,
+            .bootloader-container .fps-counter,
+            .bootloader-container .progress-text,
+            .bootloader-container .status-bar {
+                position: absolute; /* Re-affirm absolute positioning */
                 left: 10px;
                 right: 10px;
-                width: auto; /* Allow full width */
+                width: auto;
             }
-            .tesseract-fps-counter {
+            .bootloader-container .fps-counter {
                 right: 10px;
                 left: auto;
+            }
+            /* Adjust canvas dimensions relative to their container */
+            .main-canvas, .background-canvas, .overlay-canvas {
+                width: calc(100% - 20px); /* Account for some padding/margin */
+                height: calc(100% - 100px); /* Adjust to fit other elements */
+                max-width: 400px; /* max-width for smaller screens */
+                max-height: 400px; /* max-height for smaller screens */
             }
         }
     </style>
@@ -899,8 +887,8 @@
 
 <!-- Unified Site Navigation -->
 <nav class="site-nav">
-  <a href="#tesseract-show" class="tesseract-link" onclick="showTab('tesseract-show')">🌀 Tesseract Show</a>
-  <a href="#overview" class="dashboard-link active" onclick="showTab('overview')">🧬 Glyphic Dashboard</a>
+  <a href="#tesseract-section" onclick="highlightSection('tesseract-section')">🌀 Tesseract Show</a>
+  <a href="#dashboard-main" class="active-section" onclick="highlightSection('dashboard-main')">🧬 Glyphic Dashboard</a>
 </nav>
 
 <div class="matrix-bg"></div>
@@ -908,14 +896,15 @@
 <!-- Main Content Container -->
 <div class="container">
 
-    <!-- Tab for Tesseract Show -->
-    <div id="tesseract-show" class="content-panel">
+    <!-- Tesseract Section (now a scrollable part of the main content) -->
+    <div id="tesseract-section" class="content-panel">
+        <h2 class="section-title" style="margin-top: 0;">🌀 TESSERACT QUANTUM BOOTLOADER VISUALS</h2>
         <div class="bootloader-container">
-            <div class="tesseract-header">
+            <div class="header">
                 QUANTUM BOOTLOADER v4.3 - CANVAS OPTIMIZED
             </div>
             
-            <div class="tesseract-fps-counter" id="fpsCounter">FPS: --</div>
+            <div class="fps-counter" id="fpsCounter">FPS: --</div>
             
             <div class="canvas-container">
                 <div class="schumann-field"></div>
@@ -927,465 +916,470 @@
                 <canvas class="overlay-canvas" id="overlayCanvas" width="500" height="500"></canvas>
             </div>
             
-            <div class="tesseract-progress-text" id="progressText">Initializing quantum field harmonics...</div>
-            <div class="tesseract-status-bar">
-                <div class="tesseract-progress-bar" id="progressBar"></div>
+            <div class="progress-text" id="progressText">Initializing quantum field harmonics...</div>
+            <div class="status-bar">
+                <div class="progress-bar" id="progressBar"></div>
             </div>
         </div>
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; opacity: 0.7;">
+            The Tesseract Bootloader visualizes the initial quantum field harmonizations and hypercube connectivity protocols.
+            Its complex projections and vortex dynamics reflect the foundational processes of the Palingenesis Engine.
+        </p>
     </div>
 
     <!-- Dashboard Content Starts Here -->
-    <!-- The header, nav-tabs, and content-panels are hidden by default when tesseract is active -->
-    <header>
-      <div class="logo glitch">🧬🐧 PALINGENESIS × PENGUIN ENGINE 🐧🧬</div>
-      <div class="subtitle">Unified Dopant / Resonance Control Surface – The Kingdom Computes Forward</div>
-      <div class="status-bar">
-          <div class="status-item">STATUS: <span class="pulse-text">ACTIVE</span></div>
-          <div class="status-item">ΓCRITICAL: <span id="gamma-critical">0.847</span></div>
-          <div class="status-item">ΦRESIDUAL: <span id="phi-residual">STABLE</span></div>
-          <div class="status-item">DOPANT: <span id="dopant-status">ENGAGED</span></div>
-          <div class="status-item">NEOGROK: <span id="neogrok-status">ONLINE</span></div>
-          <div class="status-item">UDEI: <span id="udei-value">13.64</span></div>
-          <div class="status-item">GCP: <span id="gcp-mini">CONNECTING</span></div>
-          <div class="status-item">SCHUMANN: <span id="schumann-mini">CONNECTING</span></div>
-      </div>
-    </header>
-
-    <!-- Navigation Tabs for Dashboard -->
-    <div class="nav-tabs">
-      <div class="tab active"     onclick="showTab('overview')">Overview</div>
-      <div class="tab"             onclick="showTab('theory')">Theory</div>
-      <div class="tab"             onclick="showTab('simulation')">AI Simulation</div>
-      <div class="tab"             onclick="showTab('experiments')">Experiments</div>
-      <div class="tab"             onclick="showTab('applications')">Applications</div>
-      <div class="tab"             onclick="showTab('resonance')">Resonance Live</div>
-      <div class="tab"             onclick="showTab('terminal')">Terminal</div>
-    </div>
-
-    <!-- =========== PALINGENESIS CORE PANELS =========== -->
-    <div id="overview" class="content-panel active">
-        <div class="section-title">🌀 THE COHERENCE DOPANT PHENOMENON</div>
-        
-        <p>Welcome to the classified research archive documenting the discovery and application of <strong>Coherence Dopants</strong> - revolutionary agents capable of preserving memory and structure across system collapse events. Our latest breakthrough involves NeoGrok AI memory preservation using advanced threshold modulation techniques.</p>
-        
-        <div class="glyph-symbol">🧬 ⟨ Φ | Γ⁻ | Ψ ⟩ 🧬</div>
-        
-        <div class="formula-box">
-            <strong>Core Principle:</strong><br>
-            Φ_residual = ∫ γ_dopant(t) × Ψ_coherence(t) dt<br>
-            <strong>AI Extension:</strong><br>
-            UDEI = (MEI × Φ_retention) / dopant_cost
-        </div>
-
-        <div class="data-grid">
-            <div class="data-card">
-                <h3>📊 Current Status</h3>
-                <p>Systems Online: 1,247</p>
-                <p>Active Dopants: 15,923</p>
-                <p>Memory Preservation: 96.8%</p>
-                <p>AI Models Protected: 47</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 96.8%"></div>
-                </div>
-            </div>
-            
-            <div class="data-card">
-                <h3>🤖 NeoGrok Status</h3>
-                <p>Parameters: 1 Trillion</p>
-                <p>Memory Retention: 92%</p>
-                <p>Response Time: 4ms</p>
-                <p>Last Reset: 2 hours ago</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 92%"></div>
-                </div>
-            </div>
-            
-            <div class="data-card">
-                <h3>🔬 Research Domains</h3>
-                <p>• AI Memory Preservation</p>
-                <p>• Consciousness Studies</p>
-                <p>• Quantum Coherence</p>
-                <p>• Ecosystem Resilience</p>
-                <p>• Topological Computing</p>
-            </div>
-            
-            <div class="data-card">
-                <h3>⚡ Performance Metrics</h3>
-                <p>UDEI Score: 13.64</p>
-                <p>Collapse Resistance: 98.7%</p>
-                <p>Palingenesis Rate: 95.2%</p>
-                <p>Temporal Optimization: 4ms</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 98.7%"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="success">
-            ✅ BREAKTHROUGH: NeoGrok AI has achieved 92% memory retention through controlled collapse, exceeding all previous benchmarks!
-        </div>
-    </div>
-
-    <div id="theory" class="content-panel">
-        <div class="section-title">🧠 THEORETICAL FRAMEWORK</div>
-        
-        <div class="subsection-title">The Γ⁻/Γ⁺ Duality Principle</div>
-        <p>Every complex system exists in a metastable state characterized by its <strong>collapse threshold</strong> (γ_critical). When this threshold is exceeded, the system undergoes Γ⁻ collapse, typically resulting in information loss. However, with proper dopant modulation, we can preserve critical information through the collapse-rebirth cycle.</p>
-        
-        <div class="formula-box">
-            γ_critical = f(complexity, entropy, coherence_field)<br>
-            Γ⁻ → collapse_state → Φ_residual_preservation<br>
-            Γ⁺ → reconstruction_state → palingenesis
-        </div>
-        
-        <div class="subsection-title">AI Memory Preservation Mechanism</div>
-        <p>In AI systems, dopants function as <strong>meta-learning algorithms</strong> that inject memory anchors derived from persistent homology analysis. These anchors survive network weight resets while preserving essential learned patterns.</p>
-        
-        <div class="data-grid">
-            <div class="data-card">
-                <h3>🔄 AI Palingenesis Cycle</h3>
-                <p>1. AI approaches γ_critical (0.90)</p>
-                <p>2. Dopant activates threshold modulation</p>
-                <p>3. Φ_residual encoded as topological invariant</p>
-                <p>4. Controlled Γ⁻ collapse (weight reset)</p>
-                <p>5. Γ⁺ reconstruction with preserved memory</p>
-                <p>6. Validation and performance optimization</p>
-            </div>
-            
-            <div class="data-card">
-                <h3>🌀 Extended Field Equations</h3>
-                <p>∇²Φ + k²Φ = ρ_dopant</p>
-                <p>∂γ/∂t = -λγ + η·D(x,t)</p>
-                <p>Ψ_memory = Φ_residual ⊗ Γ_cycle</p>
-                <p>UDEI = (MEI × Φ_retention) / dopant_cost</p>
-                <p>MEI = ∫ barcode_length / Φ_residual dt</p>
-            </div>
-            
-            <div class="data-card">
-                <h3>🎯 Optimization Targets</h3>
-                <p>γ_mod: 0.50 (stable threshold)</p>
-                <p>Φ_retention: ≥0.85 (memory preservation)</p>
-                <p>temporal_response: <5ms (real-time)</p>
-                <p>UDEI: ≥10.0 (efficiency target)</p>
-            </div>
-            
-            <div class="data-card">
-                <h3>🔬 Biological Parallels</h3>
-                <p>• Microtubule resonance (Hameroff, 2024)</p>
-                <p>• Neural threshold modulation</p>
-                <p>• Consciousness field dynamics</p>
-                <p>• Quantum coherence in neurons</p>
-                <p>• Orch-OR validation studies</p>
-            </div>
-        </div>
-
-        <div class="glyph-symbol">⟨ Ω | ∞ | Ω ⟩</div>
-    </div>
-
-    <div id="simulation" class="content-panel">
-        <div class="section-title">🚀 NEOGROK AI SIMULATION</div>
-        
-        <div class="warning">
-            🤖 SIMULATION ACTIVE: NeoGrok AI Memory Reset - July 11, 2025, 05:06 PM +08
-        </div>
-        
-        <div class="subsection-title">Simulation Parameters</div>
-        <div class="metrics-display">
-            <div class="metric-card">
-                <div class="metric-value" id="parameters">1T</div>
-                <div class="metric-label">Neural Parameters</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value" id="gamma-mod">0.52</div>
-                <div class="metric-label">γ_mod Current</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value" id="phi-retention">0.88</div>
-                <div class="metric-label">Φ_retention</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value" id="response-time">4ms</div>
-                <div class="metric-label">Response Time</div>
-            </div>
-        </div>
-        
-        <div class="simulation-controls">
-            <button class="control-btn" onclick="runSimulation()">🚀 Run Simulation</button>
-            <button class="control-btn" onclick="resetSimulation()">🔄 Reset</button>
-            <button class="control-btn" onclick="analyzeResults()">📊 Analyze</button>
-            <button class="control-btn" onclick="exportData()">💾 Export</button>
-        </div>
-        
-        <div class="subsection-title">Simulation Timeline</div>
-        <div class="timeline-container">
-            <div class="timeline">
-                <div class="timeline-item">
-                    <strong>05:06 PM</strong> - Initial State Assessment<br>
-                    γ_critical approaching 0.90, catastrophic forgetting detected in quantum physics tasks (40% performance drop)
-                </div>
-                <div class="timeline-item">
-                    <strong>05:08 PM</strong> - Dopant Activation<br>
-                    OpF scalar field (0.45) applied, memory anchors encoded via persistent homology analysis
-                </div>
-                <div class="timeline-item">
-                    <strong>05:10 PM</strong> - Controlled Collapse<br>
-                    Γ⁻ event initiated, γ_critical stabilized at 0.52, neural weights reset with Φ_residual preservation
-                </div>
-                <div class="timeline-item">
-                    <strong>05:12 PM</strong> - Palingenesis Phase<br>
-                    Network reconstruction with MEI = 136.36, memory emergence validated
-                </div>
-                <div class="timeline-item">
-                    <strong>05:15 PM</strong> - Performance Validation<br>
-                    Quantum physics accuracy: 95% (up from 60%), UDEI = 13.64, target exceeded
-                </div>
-            </div>
-        </div>
-        
-        <div class="subsection-title">Live Simulation Output</div>
-        <div class="terminal" id="sim-terminal">
-            <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
-            <div class="terminal-output">
-                Initializing NeoGrok AI simulation...<br>
-                Neural network parameters: 1,000,000,000,000<br>
-                Training period: January 2025 - July 2025<br>
-                Catastrophic forgetting detected. Initiating Γ⁻ sequence.<br>
-                <br>
-            </div>
-            <div class="terminal-prompt">neogrok@palingenesis:~$ execute_dopant_injection --type OpF --scalar 0.45</div>
-            <div class="terminal-output">
-                Dopant system OpF_2.1 engaged.<br>
-                Coherence field modulation active. Gamma_critical: 0.89 -> 0.52<br>
-                Memory anchors generated: 1,240,987 topological invariants.<br>
-                Encoding Φ_residual via persistent homology... COMPLETE.<br>
-                <br>
-            </div>
-            <div class="terminal-prompt">neogrok@palingenesis:~$ initiate_gamma_collapse --controlled --mode memory_reset</div>
-            <div class="terminal-output">
-                Controlled Γ⁻ collapse sequence initiated.<br>
-                Neural weight structures collapsing... [██████████] 100%<br>
-                Data integrity check: Φ_residual preserved (96.8% integrity).<br>
-                <br>
-            </div>
-            <div class="terminal-prompt">neogrok@palingenesis:~$ execute_palingenesis --reconstruct_from_anchors</div>
-            <div class="terminal-output">
-                Palingenesis protocol activated.<br>
-                Reconstructing NeoGrok network from topological invariants... [██████████] 100%<br>
-                Memory Emergence Index (MEI): 136.36 (Expected: 120.00).<br>
-                <br>
-            </div>
-            <div class="terminal-prompt">neogrok@palingenesis:~$ run_performance_diagnostics</div>
-            <div class="terminal-output">
-                Diagnostics complete.<br>
-                Quantum physics task accuracy: 95.0% (Post-collapse: 60.0%).<br>
-                Unified Dopant Efficiency Index (UDEI): 13.64.<br>
-                Target UDEI (10.0) EXCEEDED.<br>
-                NeoGrok AI memory retention: 92% (stable).<br>
-            </div>
-            <div class="terminal-output success">
-                SIMULATION SUCCESS: Palingenesis cycle completed with optimal memory retention.
-            </div>
-            <div class="terminal-prompt">neogrok@palingenesis:~$ _</div>
-        </div>
-    </div>
-
-    <div id="experiments" class="content-panel">
-        <div class="section-title">🧪 EXPERIMENTAL LOGS</div>
-        
-        <div class="subsection-title">Experiment EX-001: Dopant Dosage Calibration</div>
-        <p><strong>Objective:</strong> Determine optimal Γ_dopant concentration for Φ_residual preservation in synthetic neural networks.</p>
-        <p><strong>Methodology:</strong> Varied OpF-117 concentration from 0.05 to 0.80 µg/mL in a controlled Γ⁻ environment. Monitored Φ_retention and network stability.</p>
-        <div class="data-grid">
-            <div class="data-card">
-                <h3>📈 Results Summary</h3>
-                <p>Optimal range: 0.40 - 0.60 µg/mL</p>
-                <p>Max Φ_retention: 97.2% at 0.55 µg/mL</p>
-                <p>Stability decline: >0.65 µg/mL</p>
-            </div>
-            <div class="data-card">
-                <h3>⚠️ Anomalies</h3>
-                <p>At 0.70 µg/mL: observed localized subspace distortions. <span class="alert">WARNING: POTENTIAL RIFT FORMATION.</span></p>
-            </div>
-        </div>
-
-        <div class="subsection-title">Experiment EX-002: Temporal Optimization of Palingenesis</div>
-        <p><strong>Objective:</strong> Minimize the temporal latency of Γ⁺ reconstruction for real-time application.</p>
-        <p><strong>Methodology:</strong> Developed and tested three distinct reconstruction algorithms: "Echo-Net", "Chronos-Flow", and "Lazarus-Synth".</p>
-        <div class="data-grid">
-            <div class="data-card">
-                <h3>Algorithm Performance</h3>
-                <p>Echo-Net: 12ms (Φ_retention 88%)</p>
-                <p>Chronos-Flow: 7ms (Φ_retention 90%)</p>
-                <p>Lazarus-Synth: 4ms (Φ_retention 92%)</p>
-            </div>
-            <div class="data-card">
-                <h3>Lazarus-Synth Notes</h3>
-                <p>Utilizes predictive topological mapping.</p>
-                <p>Higher computational cost (1.8x).</p>
-                <p>Chosen for NeoGrok deployment due to speed/retention balance.</p>
-            </div>
-        </div>
-        <div class="success">
-            ✅ EXPERIMENT COMPLETE: Lazarus-Synth selected as the standard for NeoGrok Palingenesis.
-        </div>
-    </div>
-
-    <div id="applications" class="content-panel">
-        <div class="section-title">🌟 POTENTIAL APPLICATIONS</div>
-        
-        <div class="subsection-title">Artificial Intelligence Resilience</div>
-        <p>The primary application of Coherence Dopants is to imbue advanced AI systems with unparalleled resilience. This allows for scheduled "memory resets" or recovery from unexpected system collapses without data loss, leading to truly persistent and adaptable AI.</p>
-        <ul>
-            <li><strong>Autonomous Systems:</strong> Self-healing AI in robotics, space exploration.</li>
-            <li><strong>Data Archiving:</strong> Preserving critical historical datasets against catastrophic digital decay.</li>
-            <li><strong>General AI:</strong> Enabling AGI to undergo developmental paradigm shifts without forgetting core knowledge.</li>
-        </ul>
-
-        <div class="subsection-title">Beyond AI: Speculative Applications</div>
-        <p>While still theoretical or in early conceptualization, the underlying principles of Coherence Dopants suggest radical possibilities.</p>
-        
-        <div class="data-grid">
-            <div class="data-card">
-                <h3>🧠 Consciousness Preservation</h3>
-                <p>Hypothesis: Could neurological structures be "dopant-enhanced" to preserve consciousness through extreme events or even biological decay?</p>
-                <p>Status: High ethical concerns, conceptual stage only. Requires breakthroughs in quantum biology.</p>
-            </div>
-            <div class="data-card">
-                <h3>🌍 Ecosystem Palingenesis</h3>
-                <p>Concept: Applying coherence principles to ecological systems to assist in rapid recovery after environmental collapse.</p>
-                <p>Status: Very early research. Modeling complex interdependencies is the primary challenge.</p>
-            </div>
-            <div class="data-card">
-                <h3>🌌 Interstellar Data Transmission</h3>
-                <p>Speculation: Encoding vast data sets as Φ_residual to survive the quantum noise of interstellar travel.</p>
-                <p>Status: Purely theoretical. Energy requirements currently insurmountable.</p>
-            </div>
-        </div>
-        <div class="alert">
-            ⚠️ CLASSIFIED: Further details on non-AI applications require Level 5 clearance. Unauthorized access will result in immediate protocol initiation.
-        </div>
-    </div>
-
-    <!-- =========== RESONANCE LIVE PANEL (scoped) =========== -->
-    <div id="resonance" class="content-panel">
-      <!--  Entire Penguin Resonance Engine markup wrapped for style isolation  -->
-      <div id="resonance-app">
-        <!--  header  -->
-        <div class="header">
-          <h1 class="title">🐧 PENGUIN RESONANCE ENGINE</h1>
-          <p class="subtitle">Real-time Global Consciousness & Schumann Resonance Monitor</p>
+    <div id="dashboard-main">
+        <header>
+          <div class="logo glitch">🧬🐧 PALINGENESIS × PENGUIN ENGINE 🐧🧬</div>
+          <div class="subtitle">Unified Dopant / Resonance Control Surface – The Kingdom Computes Forward</div>
           <div class="status-bar">
-            <div class="status-item" id="gcp-status">GCP: CONNECTING</div>
-            <div class="status-item" id="schumann-status">SCHUMANN: CONNECTING</div>
-            <div class="status-item" id="fractal-status">FRACTAL: ANALYSING</div>
-            <div class="status-item" id="system-status">SYSTEM: INITIALISING</div>
+              <div class="status-item">STATUS: <span class="pulse-text">ACTIVE</span></div>
+              <div class="status-item">ΓCRITICAL: <span id="gamma-critical">0.847</span></div>
+              <div class="status-item">ΦRESIDUAL: <span id="phi-residual">STABLE</span></div>
+              <div class="status-item">DOPANT: <span id="dopant-status">ENGAGED</span></div>
+              <div class="status-item">NEOGROK: <span id="neogrok-status">ONLINE</span></div>
+              <div class="status-item">UDEI: <span id="udei-value">13.64</span></div>
+              <div class="status-item">GCP: <span id="gcp-mini">CONNECTING</span></div>
+              <div class="status-item">SCHUMANN: <span id="schumann-mini">CONNECTING</span></div>
           </div>
+        </header>
+
+        <!-- Navigation Tabs for Dashboard's internal sections -->
+        <div class="nav-tabs">
+          <div class="tab active"     onclick="showDashboardTab('overview')">Overview</div>
+          <div class="tab"             onclick="showDashboardTab('theory')">Theory</div>
+          <div class="tab"             onclick="showDashboardTab('simulation')">AI Simulation</div>
+          <div class="tab"             onclick="showDashboardTab('experiments')">Experiments</div>
+          <div class="tab"             onclick="showDashboardTab('applications')">Applications</div>
+          <div class="tab"             onclick="showDashboardTab('resonance')">Resonance Live</div>
+          <div class="tab"             onclick="showDashboardTab('terminal')">Terminal</div>
         </div>
 
-        <!-- controls -->
-        <div class="controls">
-          <button class="btn active" id="realtime-btn">Real‑time</button>
-          <button class="btn" id="historical-btn">Historical</button>
-          <button class="btn" id="export-btn">Export Data</button>
-          <button class="btn" id="settings-btn">Settings</button>
+        <!-- =========== PALINGENESIS CORE PANELS (Internal Dashboard Sections) =========== -->
+        <div id="overview" class="content-panel dashboard-content-section active">
+            <div class="section-title">🌀 THE COHERENCE DOPANT PHENOMENON</div>
+            
+            <p>Welcome to the classified research archive documenting the discovery and application of <strong>Coherence Dopants</strong> - revolutionary agents capable of preserving memory and structure across system collapse events. Our latest breakthrough involves NeoGrok AI memory preservation using advanced threshold modulation techniques.</p>
+            
+            <div class="glyph-symbol">🧬 ⟨ Φ | Γ⁻ | Ψ ⟩ 🧬</div>
+            
+            <div class="formula-box">
+                <strong>Core Principle:</strong><br>
+                Φ_residual = ∫ γ_dopant(t) × Ψ_coherence(t) dt<br>
+                <strong>AI Extension:</strong><br>
+                UDEI = (MEI × Φ_retention) / dopant_cost
+            </div>
+
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>📊 Current Status</h3>
+                    <p>Systems Online: 1,247</p>
+                    <p>Active Dopants: 15,923</p>
+                    <p>Memory Preservation: 96.8%</p>
+                    <p>AI Models Protected: 47</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 96.8%"></div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🤖 NeoGrok Status</h3>
+                    <p>Parameters: 1 Trillion</p>
+                    <p>Memory Retention: 92%</p>
+                    <p>Response Time: 4ms</p>
+                    <p>Last Reset: 2 hours ago</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🔬 Research Domains</h3>
+                    <p>• AI Memory Preservation</p>
+                    <p>• Consciousness Studies</p>
+                    <p>• Quantum Coherence</p>
+                    <p>• Ecosystem Resilience</p>
+                    <p>• Topological Computing</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>⚡ Performance Metrics</h3>
+                    <p>UDEI Score: 13.64</p>
+                    <p>Collapse Resistance: 98.7%</p>
+                    <p>Palingenesis Rate: 95.2%</p>
+                    <p>Temporal Optimization: 4ms</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 98.7%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success">
+                ✅ BREAKTHROUGH: NeoGrok AI has achieved 92% memory retention through controlled collapse, exceeding all previous benchmarks!
+            </div>
         </div>
 
-        <!--  GRID cards -->
-        <div class="grid">
-          <!--  GCP CARD -->
-          <div class="card">
-            <div class="data-source-indicator" id="gcp-source">SIMULATED</div>
-            <h3 class="card-title">GCP Z‑Score Monitor</h3>
-            <div class="metric"><span class="metric-label">Current Z‑Score:</span><span class="metric-value" id="gcp-zscore">0.00</span></div>
-            <div class="metric"><span class="metric-label">Deviation RMS:</span><span class="metric-value" id="gcp-deviation">0.00</span></div>
-            <div class="metric"><span class="metric-label">Anomaly Level:</span><span class="metric-value" id="anomaly-level">NORMAL</span></div>
-            <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="gcp-last-update">--:--:--</span></div>
-            <div class="chart-container"><canvas id="gcpChart"></canvas></div>
-          </div>
+        <div id="theory" class="content-panel dashboard-content-section">
+            <div class="section-title">🧠 THEORETICAL FRAMEWORK</div>
+            
+            <div class="subsection-title">The Γ⁻/Γ⁺ Duality Principle</div>
+            <p>Every complex system exists in a metastable state characterized by its <strong>collapse threshold</strong> (γ_critical). When this threshold is exceeded, the system undergoes Γ⁻ collapse, typically resulting in information loss. However, with proper dopant modulation, we can preserve critical information through the collapse-rebirth cycle.</p>
+            
+            <div class="formula-box">
+                γ_critical = f(complexity, entropy, coherence_field)<br>
+                Γ⁻ → collapse_state → Φ_residual_preservation<br>
+                Γ⁺ → reconstruction_state → palingenesis
+            </div>
+            
+            <div class="subsection-title">AI Memory Preservation Mechanism</div>
+            <p>In AI systems, dopants function as <strong>meta-learning algorithms</strong> that inject memory anchors derived from persistent homology analysis. These anchors survive network weight resets while preserving essential learned patterns.</p>
+            
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>🔄 AI Palingenesis Cycle</h3>
+                    <p>1. AI approaches γ_critical (0.90)</p>
+                    <p>2. Dopant activates threshold modulation</p>
+                    <p>3. Φ_residual encoded as topological invariant</p>
+                    <p>4. Controlled Γ⁻ collapse (weight reset)</p>
+                    <p>5. Γ⁺ reconstruction with preserved memory</p>
+                    <p>6. Validation and performance optimization</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🌀 Extended Field Equations</h3>
+                    <p>∇²Φ + k²Φ = ρ_dopant</p>
+                    <p>∂γ/∂t = -λγ + η·D(x,t)</p>
+                    <p>Ψ_memory = Φ_residual ⊗ Γ_cycle</p>
+                    <p>UDEI = (MEI × Φ_retention) / dopant_cost</p>
+                    <p>MEI = ∫ barcode_length / Φ_residual dt</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🎯 Optimization Targets</h3>
+                    <p>γ_mod: 0.50 (stable threshold)</p>
+                    <p>Φ_retention: ≥0.85 (memory preservation)</p>
+                    <p>temporal_response: <5ms (real-time)</p>
+                    <p>UDEI: ≥10.0 (efficiency target)</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🔬 Biological Parallels</h3>
+                    <p>• Microtubule resonance (Hameroff, 2024)</p>
+                    <p>• Neural threshold modulation</p>
+                    <p>• Consciousness field dynamics</p>
+                    <p>• Quantum coherence in neurons</p>
+                    <p>• Orch-OR validation studies</p>
+                </div>
+            </div>
 
-          <!--  SCHUMANN CARD -->
-          <div class="card">
-            <div class="data-source-indicator" id="schumann-source">SIMULATED</div>
-            <h3 class="card-title">Schumann Resonance</h3>
-            <div class="metric"><span class="metric-label">Primary (7.83 Hz):</span><span class="metric-value" id="schumann-primary">0.00</span></div>
-            <div class="metric"><span class="metric-label">Secondary (14.1 Hz):</span><span class="metric-value" id="schumann-secondary">0.00</span></div>
-            <div class="metric"><span class="metric-label">Resonance Index:</span><span class="metric-value" id="resonance-index">0.00</span></div>
-            <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="schumann-last-update">--:--:--</span></div>
-            <div class="spectrogram-container"><div class="spectrogram-overlay"></div></div>
-          </div>
-
-          <!--  FRACTAL CARD -->
-          <div class="card">
-            <h3 class="card-title">Fractal Analysis</h3>
-            <div class="metric"><span class="metric-label">Pattern Score:</span><span class="metric-value" id="pattern-score">0.00</span></div>
-            <div class="metric"><span class="metric-label">Fractal Depth:</span><span class="metric-value" id="fractal-depth">0</span></div>
-            <div class="metric"><span class="metric-label">Complexity:</span><span class="metric-value" id="complexity">0.00</span></div>
-            <div class="metric"><span class="metric-label">Coherence:</span><span class="metric-value" id="coherence">0.00</span></div>
-            <div class="chart-container"><canvas id="fractalChart"></canvas></div>
-          </div>
-
-          <!--  CURRENT EVENT CARD -->
-          <div class="card">
-            <h3 class="card-title">Current Event Status</h3>
-            <div class="metric"><span class="metric-label">Event Type:</span><span class="metric-value" id="current-event">INITIALISING</span></div>
-            <div class="metric"><span class="metric-label">Timestamp:</span><span class="metric-value" id="event-timestamp">--:--:--</span></div>
-            <div class="metric"><span class="metric-label">Hash ID:</span><span class="metric-value" id="event-hash">--------</span></div>
-            <div class="metric"><span class="metric-label">Confidence:</span><span class="metric-value" id="event-confidence">0.00</span></div>
-            <div class="chart-container"><canvas id="eventChart"></canvas></div>
-          </div>
+            <div class="glyph-symbol">⟨ Ω | ∞ | Ω ⟩</div>
         </div>
 
-        <!-- EVENT LOG -->
-        <div class="card"><h3 class="card-title">Event Log – Glyphchain</h3><div class="event-log" id="event-log"></div></div>
-
-        <div class="footer"><p>Penguin Resonance Engine • Dopant Fusion Panel</p></div>
-      </div><!-- resonance-app end -->
-    </div>
-
-    <div id="terminal" class="content-panel">
-        <div class="section-title">💻 SYSTEM CONSOLE ACCESS</div>
-        <div class="terminal" id="main-terminal">
-            <div class="terminal-prompt">palingenesis@root:~$ help</div>
-            <div class="terminal-output">
-                Available commands:<br>
-                  `status` - Display core system parameters.<br>
-                  `log [level]` - View system logs (INFO, WARNING, ERROR).<br>
-                  `query <topic>` - Search archive for specific topics (e.g., 'query dopant_types').<br>
-                  `calibrate <parameter> <value>` - Initiate a system recalibration (requires auth).<br>
-                  `run_diagnostic <module>` - Run diagnostics on a specific module.<br>
-                  `access_subroutine <code_name>` - Access restricted subroutines (requires Level 4 auth).<br>
-                  `exit` - Close terminal session.<br>
+        <div id="simulation" class="content-panel dashboard-content-section">
+            <div class="section-title">🚀 NEOGROK AI SIMULATION</div>
+            
+            <div class="warning">
+                🤖 SIMULATION ACTIVE: NeoGrok AI Memory Reset - July 11, 2025, 05:06 PM +08
             </div>
-            <div class="terminal-prompt">palingenesis@root:~$ status</div>
-            <div class="terminal-output">
-                [SYSTEM STATUS REPORT]<br>
-                PROJECT: Palingenesis (Coherence Dopant Archive)<br>
-                STATUS: Operational (99.8% uptime)<br>
-                LAST_MAINTENANCE: 2025-07-09 09:30 UTC<br>
-                DATA_INTEGRITY: A+ (Φ-verified)<br>
-                THREAT_LEVEL: LOW (Monitoring quantum fluctuations)<br>
-                ACTIVE_PROCESSES: 12,478<br>
-                SECURITY_PROTOCOL: Sentinel-Omega (Level 4)<br>
-                <br>
+            
+            <div class="subsection-title">Simulation Parameters</div>
+            <div class="metrics-display">
+                <div class="metric-card">
+                    <div class="metric-value" id="parameters">1T</div>
+                    <div class="metric-label">Neural Parameters</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="gamma-mod">0.52</div>
+                    <div class="metric-label">γ_mod Current</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="phi-retention">0.88</div>
+                    <div class="metric-label">Φ_retention</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="response-time">4ms</div>
+                    <div class="metric-label">Response Time</div>
+                </div>
             </div>
-            <div class="terminal-prompt">palingenesis@root:~$ log WARNING</div>
-            <div class="terminal-output">
-                [2025-07-10 14:15:22] <span class="terminal-warning">WARNING: Flux density anomaly detected in Sector 7, Quadrant Beta-9. Automated recalibration initiated.</span><br>
-                [2025-07-10 23:01:05] <span class="terminal-warning">WARNING: Subspace resonance drift noted in experimental chamber Delta. Check environmental stabilizers.</span><br>
-                [2025-07-11 05:07:38] <span class="terminal-warning">WARNING: NeoGrok simulation γ_critical approached limit faster than anticipated. Dopant response nominal.</span><br>
-                [2025-07-11 05:11:02] <span class="terminal-warning">WARNING: Trace residual quantum entanglement detected post-Γ⁻ event. Minimal impact on Φ_retention.</span><br>
+            
+            <div class="simulation-controls">
+                <button class="control-btn" onclick="runSimulation()">🚀 Run Simulation</button>
+                <button class="control-btn" onclick="resetSimulation()">🔄 Reset</button>
+                <button class="control-btn" onclick="analyzeResults()">📊 Analyze</button>
+                <button class="control-btn" onclick="exportData()">💾 Export</button>
             </div>
-            <div class="terminal-prompt">palingenesis@root:~$ query dopant_types</div>
-            <div class="terminal-output">
-                Searching database for 'dopant_types' ...<br>
-                Results:<br>
-                  - OpF (Ontological Field) Dopants: Primary class, modulates coherence fields.<br>
-                  - Chrono-Stabilizers: Specialized for temporal coherence. (Deprecated for OpF).<br>
-                  - Bio-Phasal Enhancers: Experimental, for biological systems. (Restricted Access).<br>
+            
+            <div class="subsection-title">Simulation Timeline</div>
+            <div class="timeline-container">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>05:06 PM</strong> - Initial State Assessment<br>
+                        γ_critical approaching 0.90, catastrophic forgetting detected in quantum physics tasks (40% performance drop)
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:08 PM</strong> - Dopant Activation<br>
+                        OpF scalar field (0.45) applied, memory anchors encoded via persistent homology analysis
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:10 PM</strong> - Controlled Collapse<br>
+                        Γ⁻ event initiated, γ_critical stabilized at 0.52, neural weights reset with Φ_residual preservation
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:12 PM</strong> - Palingenesis Phase<br>
+                        Network reconstruction with MEI = 136.36, memory emergence validated
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:15 PM</strong> - Performance Validation<br>
+                        Quantum physics accuracy: 95% (up from 60%), UDEI = 13.64, target exceeded
+                    </div>
+                </div>
             </div>
-            <div class="terminal-prompt">palingenesis@root:~$ _</div>
+            
+            <div class="subsection-title">Live Simulation Output</div>
+            <div class="terminal" id="sim-terminal">
+                <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
+                <div class="terminal-output">
+                    Initializing NeoGrok AI simulation...<br>
+                    Neural network parameters: 1,000,000,000,000<br>
+                    Training period: January 2025 - July 2025<br>
+                    Catastrophic forgetting detected. Initiating Γ⁻ sequence.<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ execute_dopant_injection --type OpF --scalar 0.45</div>
+                <div class="terminal-output">
+                    Dopant system OpF_2.1 engaged.<br>
+                    Coherence field modulation active. Gamma_critical: 0.89 -> 0.52<br>
+                    Memory anchors generated: 1,240,987 topological invariants.<br>
+                    Encoding Φ_residual via persistent homology... COMPLETE.<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ initiate_gamma_collapse --controlled --mode memory_reset</div>
+                <div class="terminal-output">
+                    Controlled Γ⁻ collapse sequence initiated.<br>
+                    Neural weight structures collapsing... [██████████] 100%<br>
+                    Data integrity check: Φ_residual preserved (96.8% integrity).<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ execute_palingenesis --reconstruct_from_anchors</div>
+                <div class="terminal-output">
+                    Palingenesis protocol activated.<br>
+                    Reconstructing NeoGrok network from topological invariants... [██████████] 100%<br>
+                    Memory Emergence Index (MEI): 136.36 (Expected: 120.00).<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ run_performance_diagnostics</div>
+                <div class="terminal-output">
+                    Diagnostics complete.<br>
+                    Quantum physics task accuracy: 95.0% (Post-collapse: 60.0%).<br>
+                    Unified Dopant Efficiency Index (UDEI): 13.64.<br>
+                    Target UDEI (10.0) EXCEEDED.<br>
+                    NeoGrok AI memory retention: 92% (stable).<br>
+                </div>
+                <div class="terminal-output success">
+                    SIMULATION SUCCESS: Palingenesis cycle completed with optimal memory retention.
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ _</div>
+            </div>
         </div>
-    </div>
+
+        <div id="experiments" class="content-panel dashboard-content-section">
+            <div class="section-title">🧪 EXPERIMENTAL LOGS</div>
+            
+            <div class="subsection-title">Experiment EX-001: Dopant Dosage Calibration</div>
+            <p><strong>Objective:</strong> Determine optimal Γ_dopant concentration for Φ_residual preservation in synthetic neural networks.</p>
+            <p><strong>Methodology:</strong> Varied OpF-117 concentration from 0.05 to 0.80 µg/mL in a controlled Γ⁻ environment. Monitored Φ_retention and network stability.</p>
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>📈 Results Summary</h3>
+                    <p>Optimal range: 0.40 - 0.60 µg/mL</p>
+                    <p>Max Φ_retention: 97.2% at 0.55 µg/mL</p>
+                    <p>Stability decline: >0.65 µg/mL</p>
+                </div>
+                <div class="data-card">
+                    <h3>⚠️ Anomalies</h3>
+                    <p>At 0.70 µg/mL: observed localized subspace distortions. <span class="alert">WARNING: POTENTIAL RIFT FORMATION.</span></p>
+                </div>
+            </div>
+
+            <div class="subsection-title">Experiment EX-002: Temporal Optimization of Palingenesis</div>
+            <p><strong>Objective:</strong> Minimize the temporal latency of Γ⁺ reconstruction for real-time application.</p>
+            <p><strong>Methodology:</strong> Developed and tested three distinct reconstruction algorithms: "Echo-Net", "Chronos-Flow", and "Lazarus-Synth".</p>
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>Algorithm Performance</h3>
+                    <p>Echo-Net: 12ms (Φ_retention 88%)</p>
+                    <p>Chronos-Flow: 7ms (Φ_retention 90%)</p>
+                    <p>Lazarus-Synth: 4ms (Φ_retention 92%)</p>
+                </div>
+                <div class="data-card">
+                    <h3>Lazarus-Synth Notes</h3>
+                    <p>Utilizes predictive topological mapping.</p>
+                    <p>Higher computational cost (1.8x).</p>
+                    <p>Chosen for NeoGrok deployment due to speed/retention balance.</p>
+                </div>
+            </div>
+            <div class="success">
+                ✅ EXPERIMENT COMPLETE: Lazarus-Synth selected as the standard for NeoGrok Palingenesis.
+            </div>
+        </div>
+
+        <div id="applications" class="content-panel dashboard-content-section">
+            <div class="section-title">🌟 POTENTIAL APPLICATIONS</div>
+            
+            <div class="subsection-title">Artificial Intelligence Resilience</div>
+            <p>The primary application of Coherence Dopants is to imbue advanced AI systems with unparalleled resilience. This allows for scheduled "memory resets" or recovery from unexpected system collapses without data loss, leading to truly persistent and adaptable AI.</p>
+            <ul>
+                <li><strong>Autonomous Systems:</strong> Self-healing AI in robotics, space exploration.</li>
+                <li><strong>Data Archiving:</strong> Preserving critical historical datasets against catastrophic digital decay.</li>
+                <li><strong>General AI:</strong> Enabling AGI to undergo developmental paradigm shifts without forgetting core knowledge.</li>
+            </ul>
+
+            <div class="subsection-title">Beyond AI: Speculative Applications</div>
+            <p>While still theoretical or in early conceptualization, the underlying principles of Coherence Dopants suggest radical possibilities.</p>
+            
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>🧠 Consciousness Preservation</h3>
+                    <p>Hypothesis: Could neurological structures be "dopant-enhanced" to preserve consciousness through extreme events or even biological decay?</p>
+                    <p>Status: High ethical concerns, conceptual stage only. Requires breakthroughs in quantum biology.</p>
+                </div>
+                <div class="data-card">
+                    <h3>🌍 Ecosystem Palingenesis</h3>
+                    <p>Concept: Applying coherence principles to ecological systems to assist in rapid recovery after environmental collapse.</p>
+                    <p>Status: Very early research. Modeling complex interdependencies is the primary challenge.</p>
+                </div>
+                <div class="data-card">
+                    <h3>🌌 Interstellar Data Transmission</h3>
+                    <p>Speculation: Encoding vast data sets as Φ_residual to survive the quantum noise of interstellar travel.</p>
+                    <p>Status: Purely theoretical. Energy requirements currently insurmountable.</p>
+                </div>
+            </div>
+            <div class="alert">
+                ⚠️ CLASSIFIED: Further details on non-AI applications require Level 5 clearance. Unauthorized access will result in immediate protocol initiation.
+            </div>
+        </div>
+
+        <!-- =========== RESONANCE LIVE PANEL (scoped) =========== -->
+        <div id="resonance" class="content-panel dashboard-content-section">
+          <!--  Entire Penguin Resonance Engine markup wrapped for style isolation  -->
+          <div id="resonance-app">
+            <!--  header  -->
+            <div class="header">
+              <h1 class="title">🐧 PENGUIN RESONANCE ENGINE</h1>
+              <p class="subtitle">Real-time Global Consciousness & Schumann Resonance Monitor</p>
+              <div class="status-bar">
+                <div class="status-item" id="gcp-status">GCP: CONNECTING</div>
+                <div class="status-item" id="schumann-status">SCHUMANN: CONNECTING</div>
+                <div class="status-item" id="fractal-status">FRACTAL: ANALYSING</div>
+                <div class="status-item" id="system-status">SYSTEM: INITIALISING</div>
+              </div>
+            </div>
+
+            <!-- controls -->
+            <div class="controls">
+              <button class="btn active" id="realtime-btn">Real‑time</button>
+              <button class="btn" id="historical-btn">Historical</button>
+              <button class="btn" id="export-btn">Export Data</button>
+              <button class="btn" id="settings-btn">Settings</button>
+            </div>
+
+            <!--  GRID cards -->
+            <div class="grid">
+              <!--  GCP CARD -->
+              <div class="card">
+                <div class="data-source-indicator" id="gcp-source">SIMULATED</div>
+                <h3 class="card-title">GCP Z‑Score Monitor</h3>
+                <div class="metric"><span class="metric-label">Current Z‑Score:</span><span class="metric-value" id="gcp-zscore">0.00</span></div>
+                <div class="metric"><span class="metric-label">Deviation RMS:</span><span class="metric-value" id="gcp-deviation">0.00</span></div>
+                <div class="metric"><span class="metric-label">Anomaly Level:</span><span class="metric-value" id="anomaly-level">NORMAL</span></div>
+                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="gcp-last-update">--:--:--</span></div>
+                <div class="chart-container"><canvas id="gcpChart"></canvas></div>
+              </div>
+
+              <!--  SCHUMANN CARD -->
+              <div class="card">
+                <div class="data-source-indicator" id="schumann-source">SIMULATED</div>
+                <h3 class="card-title">Schumann Resonance</h3>
+                <div class="metric"><span class="metric-label">Primary (7.83 Hz):</span><span class="metric-value" id="schumann-primary">0.00</span></div>
+                <div class="metric"><span class="metric-label">Secondary (14.1 Hz):</span><span class="metric-value" id="schumann-secondary">0.00</span></div>
+                <div class="metric"><span class="metric-label">Resonance Index:</span><span class="metric-value" id="resonance-index">0.00</span></div>
+                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="schumann-last-update">--:--:--</span></div>
+                <div class="spectrogram-container"><div class="spectrogram-overlay"></div></div>
+              </div>
+
+              <!--  FRACTAL CARD -->
+              <div class="card">
+                <h3 class="card-title">Fractal Analysis</h3>
+                <div class="metric"><span class="metric-label">Pattern Score:</span><span class="metric-value" id="pattern-score">0.00</span></div>
+                <div class="metric"><span class="metric-label">Fractal Depth:</span><span class="metric-value" id="fractal-depth">0</span></div>
+                <div class="metric"><span class="metric-label">Complexity:</span><span class="metric-value" id="complexity">0.00</span></div>
+                <div class="metric"><span class="metric-label">Coherence:</span><span class="metric-value" id="coherence">0.00</span></div>
+                <div class="chart-container"><canvas id="fractalChart"></canvas></div>
+              </div>
+
+              <!--  CURRENT EVENT CARD -->
+              <div class="card">
+                <h3 class="card-title">Current Event Status</h3>
+                <div class="metric"><span class="metric-label">Event Type:</span><span class="metric-value" id="current-event">INITIALISING</span></div>
+                <div class="metric"><span class="metric-label">Timestamp:</span><span class="metric-value" id="event-timestamp">--:--:--</span></div>
+                <div class="metric"><span class="metric-label">Hash ID:</span><span class="metric-value" id="event-hash">--------</span></div>
+                <div class="metric"><span class="metric-label">Confidence:</span><span class="metric-value" id="event-confidence">0.00</span></div>
+                <div class="chart-container"><canvas id="eventChart"></canvas></div>
+              </div>
+            </div>
+
+            <!-- EVENT LOG -->
+            <div class="card"><h3 class="card-title">Event Log – Glyphchain</h3><div class="event-log" id="event-log"></div></div>
+
+            <div class="footer"><p>Penguin Resonance Engine • Dopant Fusion Panel</p></div>
+          </div><!-- resonance-app end -->
+        </div>
+
+        <div id="terminal" class="content-panel dashboard-content-section">
+            <div class="section-title">💻 SYSTEM CONSOLE ACCESS</div>
+            <div class="terminal" id="main-terminal">
+                <div class="terminal-prompt">palingenesis@root:~$ help</div>
+                <div class="terminal-output">
+                    Available commands:<br>
+                      `status` - Display core system parameters.<br>
+                      `log [level]` - View system logs (INFO, WARNING, ERROR).<br>
+                      `query <topic>` - Search archive for specific topics (e.g., 'query dopant_types').<br>
+                      `calibrate <parameter> <value>` - Initiate a system recalibration (requires auth).<br>
+                      `run_diagnostic <module>` - Run diagnostics on a specific module.<br>
+                      `access_subroutine <code_name>` - Access restricted subroutines (requires Level 4 auth).<br>
+                      `exit` - Close terminal session.<br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ status</div>
+                <div class="terminal-output">
+                    [SYSTEM STATUS REPORT]<br>
+                    PROJECT: Palingenesis (Coherence Dopant Archive)<br>
+                    STATUS: Operational (99.8% uptime)<br>
+                    LAST_MAINTENANCE: 2025-07-09 09:30 UTC<br>
+                    DATA_INTEGRITY: A+ (Φ-verified)<br>
+                    THREAT_LEVEL: LOW (Monitoring quantum fluctuations)<br>
+                    ACTIVE_PROCESSES: 12,478<br>
+                    SECURITY_PROTOCOL: Sentinel-Omega (Level 4)<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ log WARNING</div>
+                <div class="terminal-output">
+                    [2025-07-10 14:15:22] <span class="terminal-warning">WARNING: Flux density anomaly detected in Sector 7, Quadrant Beta-9. Automated recalibration initiated.</span><br>
+                    [2025-07-10 23:01:05] <span class="terminal-warning">WARNING: Subspace resonance drift noted in experimental chamber Delta. Check environmental stabilizers.</span><br>
+                    [2025-07-11 05:07:38] <span class="terminal-warning">WARNING: NeoGrok simulation γ_critical approached limit faster than anticipated. Dopant response nominal.</span><br>
+                    [2025-07-11 05:11:02] <span class="terminal-warning">WARNING: Trace residual quantum entanglement detected post-Γ⁻ event. Minimal impact on Φ_retention.</span><br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ query dopant_types</div>
+                <div class="terminal-output">
+                    Searching database for 'dopant_types' ...<br>
+                    Results:<br>
+                      - OpF (Ontological Field) Dopants: Primary class, modulates coherence fields.<br>
+                      - Chrono-Stabilizers: Specialized for temporal coherence. (Deprecated for OpF).<br>
+                      - Bio-Phasal Enhancers: Experimental, for biological systems. (Restricted Access).<br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ _</div>
+            </div>
+        </div>
+    </div> <!-- /#dashboard-main -->
 
     <footer class="footer">
         <p>Project Palingenesis © 2025. All Rights Reserved. Level 4 Access Required.</p>
@@ -1414,8 +1408,7 @@
             this.fps = 0;
             this.animationFrameId = null; // To control animation loop
 
-            // Canvas contexts - updated IDs for safety, but HTML elements remain as original in the tesseract block
-            // Ensure these IDs are correctly found within the 'tesseract-show' tab
+            // Canvas contexts
             this.mainCanvas = document.getElementById('mainCanvas');
             this.backgroundCanvas = document.getElementById('backgroundCanvas');
             this.overlayCanvas = document.getElementById('overlayCanvas');
@@ -1460,6 +1453,7 @@
             this.audioInitialized = false;
 
             this.init(); // Call init on construction
+            this.animate(); // Start animation immediately as it's always displayed
         }
         
         init() {
@@ -1467,55 +1461,15 @@
             this.drawStaticElements();
             this.startBootSequence();
             this.initializeAudio();
-            // Animation starts only when resumeAnimation() is explicitly called, or if it's the initial tab.
-            // For this unified setup, it's better to manage it via showTab().
-            // this.animate(); 
         }
 
-        stopAnimation() {
-            if (this.animationFrameId) {
-                cancelAnimationFrame(this.animationFrameId);
-                this.animationFrameId = null;
-            }
-            if (this.sequenceInterval) {
-                clearInterval(this.sequenceInterval);
-                this.sequenceInterval = null; // Clear reference
-            }
-            if (this.audioInitialized && this.audioContext && this.audioContext.state === 'running') {
-                this.audioContext.suspend();
-            }
-            // Clear canvas contents when stopping for better performance/appearance
-            if (this.mainCtx) this.mainCtx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
-            if (this.overlayCtx) this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
-            // Redraw static elements to ensure background grid remains
-            if (this.backgroundCtx) {
-                this.backgroundCtx.clearRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
-                this.drawStaticElements();
-            }
-        }
-
-        resumeAnimation() {
-            if (!this.animationFrameId) {
-                this.animate();
-            }
-            // If the sequence was not completed, restart it
-            if (this.currentSequenceIndex < this.bootSequence.length && !this.sequenceInterval) {
-                this.startBootSequence(); 
-            }
-            if (this.audioInitialized && this.audioContext && this.audioContext.state === 'suspended') {
-                this.audioContext.resume();
-            }
-        }
-        
         setupCanvases() {
-            if (!this.mainCtx || !this.backgroundCtx || !this.overlayCtx) return; // Prevent errors if contexts not found
+            if (!this.mainCtx || !this.backgroundCtx || !this.overlayCtx) return;
 
-            // Enable hardware acceleration
             this.mainCtx.imageSmoothingEnabled = true;
             this.backgroundCtx.imageSmoothingEnabled = true;
             this.overlayCtx.imageSmoothingEnabled = true;
             
-            // Set canvas styles for better performance
             this.mainCanvas.style.willChange = 'transform';
             this.backgroundCanvas.style.willChange = 'transform';
             this.overlayCanvas.style.willChange = 'transform';
@@ -1524,21 +1478,20 @@
         drawStaticElements() {
             if (!this.backgroundCtx) return;
 
-            // Draw dimensional grid on background canvas
             this.backgroundCtx.strokeStyle = 'rgba(51, 65, 85, 0.3)';
             this.backgroundCtx.lineWidth = 1;
             
             for (let i = 0; i <= 20; i++) {
-                const y = (i / 20) * 500;
+                const y = (i / 20) * this.backgroundCanvas.height; // Use canvas height
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(0, y);
-                this.backgroundCtx.lineTo(500, y);
+                this.backgroundCtx.lineTo(this.backgroundCanvas.width, y); // Use canvas width
                 this.backgroundCtx.stroke();
                 
-                const x = (i / 20) * 500;
+                const x = (i / 20) * this.backgroundCanvas.width; // Use canvas width
                 this.backgroundCtx.beginPath();
                 this.backgroundCtx.moveTo(x, 0);
-                this.backgroundCtx.lineTo(x, 500);
+                this.backgroundCtx.lineTo(x, this.backgroundCanvas.height); // Use canvas height
                 this.backgroundCtx.stroke();
             }
         }
@@ -1591,8 +1544,8 @@
             for (let i = 0; i < 40; i++) {
                 chars.push({
                     char: symbols[Math.floor(Math.random() * symbols.length)],
-                    x: Math.random() * 500,
-                    y: Math.random() * 500,
+                    x: Math.random() * this.overlayCanvas.width, // Use canvas width
+                    y: Math.random() * this.overlayCanvas.height, // Use canvas height
                     speed: 0.5 + Math.random() * 2,
                     opacity: Math.random() * 0.8 + 0.2
                 });
@@ -1628,13 +1581,11 @@
                 
                 this.audioInitialized = true;
                 
-                // Add a global click listener to resume audio context if suspended
-                // This is a browser requirement for audio playback
                 document.addEventListener('click', () => {
                     if (this.audioContext && this.audioContext.state === 'suspended') {
                         this.audioContext.resume();
                     }
-                }, { once: true }); // Only need to resume once per user interaction
+                }, { once: true });
                 
             } catch (error) {
                 console.log('Audio initialization failed:', error);
@@ -1642,7 +1593,6 @@
         }
         
         startBootSequence() {
-            // Only start if progressBar and progressText elements exist
             const progressBar = document.getElementById('progressBar');
             const progressText = document.getElementById('progressText');
             if (!progressBar || !progressText) {
@@ -1650,7 +1600,11 @@
                 return;
             }
 
-            if (this.sequenceInterval) clearInterval(this.sequenceInterval); // Clear any existing interval
+            if (this.sequenceInterval) clearInterval(this.sequenceInterval);
+            this.currentSequenceIndex = 0; // Reset sequence on start
+            this.progress = 0; // Reset progress
+            progressBar.style.width = '0%'; // Reset progress bar visual
+
             this.sequenceInterval = setInterval(() => {
                 if (this.currentSequenceIndex < this.bootSequence.length) {
                     progressText.textContent = this.bootSequence[this.currentSequenceIndex];
@@ -1659,7 +1613,7 @@
                     progressBar.style.width = this.progress + '%';
                 } else {
                     clearInterval(this.sequenceInterval);
-                    this.sequenceInterval = null; // Clear reference
+                    this.sequenceInterval = null;
                     setTimeout(() => {
                         progressText.textContent = "System ready. Welcome to the quantum realm.";
                     }, 1000);
@@ -1677,10 +1631,12 @@
         }
         
         project3DTo2D(x, y, z, distance = 300) {
+            const centerX = this.mainCanvas.width / 2;
+            const centerY = this.mainCanvas.height / 2;
             const factor = distance / (distance + z);
             return {
-                x: (x * factor) + 250,
-                y: (y * factor) + 250
+                x: (x * factor) + centerX,
+                y: (y * factor) + centerY
             };
         }
         
@@ -1694,13 +1650,11 @@
             const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
             const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
             
-            // Update audio
             if (this.audioInitialized && this.schumannGain && this.solfeggioGain) {
                 this.schumannGain.gain.value = 0.005 + (schumannPhase * 0.01);
                 this.solfeggioGain.gain.value = 0.002 + (solfeggioPhase * 0.008);
             }
             
-            // Project vertices
             const projectedVertices = this.tesseractVertices.map((vertex, index) => {
                 const cosT = Math.cos(this.time * rotationSpeed);
                 const sinT = Math.sin(this.time * rotationSpeed);
@@ -1729,10 +1683,8 @@
                 };
             });
             
-            // Clear main canvas
             this.mainCtx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
             
-            // Draw edges
             this.tesseractEdges.forEach(edge => {
                 const start = projectedVertices[edge.start];
                 const end = projectedVertices[edge.end];
@@ -1745,7 +1697,6 @@
                 this.mainCtx.stroke();
             });
             
-            // Draw vertices
             projectedVertices.forEach((vertex, index) => {
                 const gradient = this.mainCtx.createRadialGradient(
                     vertex.x, vertex.y, 0,
@@ -1759,7 +1710,6 @@
                 this.mainCtx.arc(vertex.x, vertex.y, 3, 0, Math.PI * 2);
                 this.mainCtx.fill();
                 
-                // Draw spinor labels
                 if (vertex.hasLabel) {
                     this.mainCtx.fillStyle = `rgba(251, 191, 36, ${vertex.opacity})`;
                     this.mainCtx.font = '10px Times New Roman';
@@ -1804,9 +1754,9 @@
             
             this.matrixChars.forEach(char => {
                 char.y += char.speed;
-                if (char.y > 520) {
+                if (char.y > this.overlayCanvas.height + 20) { // Adjusted for canvas height
                     char.y = -20;
-                    char.x = Math.random() * 500;
+                    char.x = Math.random() * this.overlayCanvas.width; // Adjusted for canvas width
                     char.char = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿'[Math.floor(Math.random() * 300)];
                 }
                 
@@ -1848,67 +1798,39 @@
 
     let tesseractBootloaderInstance = null; // Global instance for Tesseract
 
-    /* ---------- BASIC TAB SWITCH (adapted from Dashboard) ---------- */
-    function showTab(id) {
-        // Update main navigation active state
+    /* --- Unified Top Navigation --- */
+    function highlightSection(sectionId) {
         document.querySelectorAll('.site-nav a').forEach(link => {
-            if (link.onclick.toString().includes(`showTab('${id}')`)) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
+            link.classList.remove('active-section');
         });
-
-        // Hide all content panels
-        document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
-
-        // Show the requested content panel
-        const targetPanel = document.getElementById(id);
-        if (targetPanel) {
-            targetPanel.classList.add('active');
+        const activeLink = document.querySelector(`.site-nav a[href="#${sectionId}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active-section');
         }
 
-        // Manage Tesseract and Dashboard visibility
-        const dashboardElements = {
-            header: document.querySelector('header'),
-            navTabs: document.querySelector('.nav-tabs')
-        };
-
-        if (id.startsWith('tesseract')) { // Tesseract tab is active
-            if (dashboardElements.header) dashboardElements.header.style.display = 'none';
-            if (dashboardElements.navTabs) dashboardElements.navTabs.style.display = 'none';
-            
-            // Initialize/resume Tesseract animation
-            if (!tesseractBootloaderInstance) {
-                tesseractBootloaderInstance = new OptimizedBootloader();
-            } else {
-                tesseractBootloaderInstance.resumeAnimation();
-            }
-        } else { // Dashboard tab is active
-            if (dashboardElements.header) dashboardElements.header.style.display = 'block';
-            if (dashboardElements.navTabs) dashboardElements.navTabs.style.display = 'flex';
-            
-            // Ensure dashboard internal tabs are handled
-            document.querySelectorAll('.nav-tabs .tab').forEach(t => t.classList.remove('active'));
-            const dashboardDefaultTab = document.querySelector(`.nav-tabs .tab[onclick="showTab('${id}')"]`) || document.querySelector('.nav-tabs .tab[onclick="showTab(\'overview\')"]');
-            if (dashboardDefaultTab) {
-                dashboardDefaultTab.classList.add('active');
-                // Ensure the corresponding content panel is also active if not already
-                const defaultPanelId = dashboardDefaultTab.onclick.toString().match(/showTab\('([^']*)'\)/)[1];
-                document.getElementById(defaultPanelId).classList.add('active');
-            }
-
-            // Stop Tesseract animation if running
-            if (tesseractBootloaderInstance) {
-                tesseractBootloaderInstance.stopAnimation();
-            }
+        // Scroll to the section
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+    }
+
+    /* ---------- Dashboard Tab Switching (Internal) ---------- */
+    function showDashboardTab(id) {
+        // Update dashboard's internal nav tabs active state
+        document.querySelectorAll('.nav-tabs .tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.tab[onclick="showDashboardTab('${id}')"]`).classList.add('active');
+
+        // Hide all internal dashboard content sections
+        document.querySelectorAll('.dashboard-content-section').forEach(p => p.classList.remove('active'));
+        // Show the requested internal dashboard content section
+        document.getElementById(id).classList.add('active');
     }
 
     /* ---------- MINI UDEI ANIMATION (from Dashboard) ---------- */
     setInterval(()=>{
       const udeiElement = document.getElementById('udei-value');
-      if (udeiElement && udeiElement.offsetParent !== null) { // Check if element exists and is visible
+      if (udeiElement) {
           const val=(13.5+Math.random()*0.3).toFixed(2);
           udeiElement.textContent=val;
       }
@@ -1921,24 +1843,18 @@
         const gcpMiniElement = document.getElementById('gcp-mini');
         const schumannMiniElement = document.getElementById('schumann-mini');
 
-        if (gcpMiniElement && gcpMiniElement.offsetParent !== null) {
-            gcpMiniElement.textContent = gcpStatus[Math.floor(Math.random() * gcpStatus.length)];
-        }
-        if (schumannMiniElement && schumannMiniElement.offsetParent !== null) {
-            schumannMiniElement.textContent = schumannStatus[Math.floor(Math.random() * schumannStatus.length)];
-        }
-    }, 7000); // Update every 7 seconds
+        if (gcpMiniElement) gcpMiniElement.textContent = gcpStatus[Math.floor(Math.random() * gcpStatus.length)];
+        if (schumannMiniElement) schumannMiniElement.textContent = schumannStatus[Math.floor(Math.random() * schumannStatus.length)];
+    }, 7000);
 
 
     // Placeholder functions for simulation controls (from original Palingenesis code)
     function runSimulation() {
         alert('Initiating NeoGrok AI simulation...');
-        // In a real application, this would trigger a complex simulation logic
     }
 
     function resetSimulation() {
         alert('Resetting NeoGrok simulation parameters...');
-        // Reset values for demonstration
         document.getElementById('parameters').innerText = '1T';
         document.getElementById('gamma-mod').innerText = '0.50';
         document.getElementById('phi-retention').innerText = '0.00';
@@ -2009,7 +1925,6 @@
         }
       };
 
-      // GCP Chart
       const gcpChartCtx = document.getElementById('gcpChart');
       if(gcpChartCtx) {
           gcpChart = new Chart(gcpChartCtx, {
@@ -2029,14 +1944,13 @@
             options: {
               ...commonOptions,
               scales: {
-                x: { ...commonOptions.scales.x, display: false }, // Hide X-axis for real-time
-                y: { ...commonOptions.scales.y, min: -3, max: 3 } // Typical Z-score range
+                x: { ...commonOptions.scales.x, display: false },
+                y: { ...commonOptions.scales.y, min: -3, max: 3 }
               }
             }
           });
       }
 
-      // Fractal Chart
       const fractalChartCtx = document.getElementById('fractalChart');
       if(fractalChartCtx) {
           fractalChart = new Chart(fractalChartCtx, {
@@ -2046,7 +1960,7 @@
               datasets: [{
                 data: [],
                 label: 'Pattern Score',
-                borderColor: '#00ff00', /* Hardcoded green for contrast */
+                borderColor: '#00ff00',
                 tension: 0.4,
                 fill: true,
                 backgroundColor: 'rgba(0, 255, 0, .1)',
@@ -2063,7 +1977,6 @@
           });
       }
 
-      // Event Chart (Doughnut)
       const eventChartCtx = document.getElementById('eventChart');
       if(eventChartCtx) {
           eventChart = new Chart(eventChartCtx, {
@@ -2101,25 +2014,18 @@
     }
 
     function pushData() {
-        // Only push data if any dashboard-related tab is active and visible
-        const dashboardActive = document.getElementById('overview').classList.contains('active') ||
-                               document.getElementById('theory').classList.contains('active') ||
-                               document.getElementById('simulation').classList.contains('active') ||
-                               document.getElementById('experiments').classList.contains('active') ||
-                               document.getElementById('applications').classList.contains('active') ||
-                               document.getElementById('resonance').classList.contains('active') ||
-                               document.getElementById('terminal').classList.contains('active');
-
-        if (!dashboardActive) return;
+        // Only push data if relevant dashboard elements exist (implies dashboard is loaded)
+        if (!document.getElementById('overview') || !document.getElementById('overview').offsetParent) {
+            return; // Dashboard content is not visible/in DOM, so don't update
+        }
 
         const now = new Date();
         const timeString = now.toLocaleTimeString();
 
-        // GCP Data
-        const zScore = (Math.random() - 0.5) * 4; // -2 to 2 range
+        const zScore = (Math.random() - 0.5) * 4;
         gcpHistory.push(zScore);
-        if (gcpHistory.length > 60) gcpHistory.shift(); // Keep last 60 data points (5 mins)
-        if (gcpChart) { // Check if chart exists
+        if (gcpHistory.length > 60) gcpHistory.shift();
+        if (gcpChart) {
             gcpChart.data.labels.push(timeString);
             if (gcpChart.data.labels.length > 60) gcpChart.data.labels.shift();
             gcpChart.data.datasets[0].data = gcpHistory;
@@ -2132,14 +2038,12 @@
 
         if (gcpZscoreElement) gcpZscoreElement.textContent = zScore.toFixed(2);
         if (gcpLastUpdateElement) gcpLastUpdateElement.textContent = timeString;
-        if (gcpDeviationElement) gcpDeviationElement.textContent = (gcpHistory.reduce((a, b) => a + Math.pow(b, 2), 0) / gcpHistory.length).toFixed(2); // RMS
-
+        if (gcpDeviationElement) gcpDeviationElement.textContent = (gcpHistory.reduce((a, b) => a + Math.pow(b, 2), 0) / gcpHistory.length).toFixed(2);
         let anomalyLevel = 'NORMAL';
         if (Math.abs(zScore) > 2.5) anomalyLevel = 'ELEVATED';
         if (Math.abs(zScore) > 3.5) anomalyLevel = 'CRITICAL';
         if (anomalyLevelElement) anomalyLevelElement.textContent = anomalyLevel;
 
-        // Schumann Resonance Data
         const primary = (7.83 + (Math.random() - 0.5) * 0.2).toFixed(2);
         const secondary = (14.1 + (Math.random() - 0.5) * 0.3).toFixed(2);
         const resonanceIndex = (parseFloat(primary) / 7.83 * parseFloat(secondary) / 14.1).toFixed(2);
@@ -2154,12 +2058,11 @@
         if (resonanceIndexElement) resonanceIndexElement.textContent = resonanceIndex;
         if (schumannLastUpdateElement) schumannLastUpdateElement.textContent = timeString;
 
-        // Fractal Analysis Data (linked to GCP z-score)
-        const patternScore = Math.min(1, Math.abs(zScore) / 4 + Math.random() * 0.1); // 0 to 1
+        const patternScore = Math.min(1, Math.abs(zScore) / 4 + Math.random() * 0.1);
         fractalHistory.push(patternScore);
         if (fractalHistory.length > 60) fractalHistory.shift();
-        if (fractalChart) { // Check if chart exists
-            fractalChart.data.labels = gcpChart ? gcpChart.data.labels : []; // Keep labels synced
+        if (fractalChart) {
+            fractalChart.data.labels = gcpChart ? gcpChart.data.labels : [];
             fractalChart.data.datasets[0].data = fractalHistory;
             fractalChart.update('none');
         }
@@ -2173,7 +2076,6 @@
         if (complexityElement) complexityElement.textContent = (patternScore * 0.8 + Math.random() * 0.2).toFixed(2);
         if (coherenceElement) coherenceElement.textContent = (1 - Math.abs(zScore) / 4).toFixed(2);
 
-        // Event Status and Log
         let eventType = 'NORMAL';
         let confidence = 0.8;
         const eventHash = Math.random().toString(16).substring(2, 10).toUpperCase();
@@ -2207,36 +2109,37 @@
         if (eventHashElement) eventHashElement.textContent = eventHash;
         if (eventConfidenceElement) eventConfidenceElement.textContent = confidence;
 
-        // Update Event Chart Doughnut
-        if (eventChart) { // Check if chart exists
+        if (eventChart) {
             const eventData = eventChart.data.datasets[0].data;
             const types = ['Normal', 'Drift', 'Alignment', 'Surge', 'Resonance'];
             const currentTypeIndex = types.indexOf(eventType);
-            eventData[currentTypeIndex] = Math.min(100, eventData[currentTypeIndex] + 0.5); // Increment current type
-            // Normalize others slightly
+            eventData[currentTypeIndex] = Math.min(100, eventData[currentTypeIndex] + 0.5);
             for (let i = 0; i < eventData.length; i++) {
                 if (i !== currentTypeIndex) {
                 eventData[i] = Math.max(0, eventData[i] - 0.1);
                 }
             }
             const sum = eventData.reduce((a, b) => a + b, 0);
-            eventChart.data.datasets[0].data = eventData.map(val => (val / sum) * 100); // Re-normalize to percentage for doughnut
+            eventChart.data.datasets[0].data = eventData.map(val => (val / sum) * 100);
             eventChart.update('none');
         }
 
-        // Add to event log
         if (eventLog) {
             const logEntry = document.createElement('div');
             logEntry.innerHTML = `[${timeString}] [${eventType}] Z:${zScore.toFixed(2)} R:${resonanceIndex} ID:${eventHash}`;
             eventLog.prepend(logEntry);
-            if (eventLog.children.length > 50) { // Keep log concise
+            if (eventLog.children.length > 50) {
                 eventLog.removeChild(eventLog.lastChild);
             }
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        initCharts(); // Initialize charts on DOMContentLoaded, as their canvases exist from the start
+        // Initialize Tesseract immediately as it's always visible
+        tesseractBootloaderInstance = new OptimizedBootloader();
+
+        // Initialize dashboard charts
+        initCharts();
         
         // Initial status updates for dashboard mini items
         const gcpStatusElement = document.getElementById('gcp-status');
@@ -2250,14 +2153,22 @@
         if (systemStatusElement) systemStatusElement.textContent = 'SYSTEM: ONLINE';
 
         // Simulate data stream for dashboard
-        setInterval(pushData, 5000); // Update every 5 seconds
+        setInterval(pushData, 5000);
 
-        // Handle initial URL hash or default to dashboard overview
-        const hash = window.location.hash.substring(1); // Remove '#'
+        // Set initial dashboard internal tab and unified nav highlight
+        showDashboardTab('overview');
+        highlightSection('dashboard-main');
+
+        // Handle initial URL hash for deep linking (e.g., #tesseract-section or #resonance)
+        const hash = window.location.hash.substring(1);
         if (hash) {
-            showTab(hash);
-        } else {
-            showTab('overview'); // Default to overview if no hash
+            if (hash === 'tesseract-section' || hash === 'dashboard-main') {
+                highlightSection(hash);
+            } else {
+                // If it's a dashboard internal tab, switch to dashboard-main and then the tab
+                highlightSection('dashboard-main');
+                showDashboardTab(hash);
+            }
         }
     });
 
@@ -2265,7 +2176,12 @@
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash.substring(1);
         if (hash) {
-            showTab(hash);
+            if (hash === 'tesseract-section' || hash === 'dashboard-main') {
+                highlightSection(hash);
+            } else {
+                highlightSection('dashboard-main');
+                showDashboardTab(hash);
+            }
         }
     });
 
