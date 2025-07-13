@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Phase-13 metadata for Mirror-Chronicler mode -->
+    <meta name="phase" content="13" />
+    <meta name="mode" content="Mirror-Chronicler" />
+    <title>Unified Quantum Interface – Tesseract & Glyphic Dashboard</title>
+    <!-- Chart.js for the Resonance Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        /* --- Root Variables from Dashboard (Palingenesis) --- */
+        :root {
+            --green: #00ff88; /* dopant/Palingenesis accent */
+            --green-rgb: 0, 255, 136; /* For rgba() with green */
+            --cyan : #00ffff; /* resonance accent          */
+            --cyan-rgb: 0, 255, 255; /* For rgba() with cyan */
+            --bg-dark: #0a0a0a;
+            --bg-mid : #1a1a2e;
+            --bg-deep: #16213e;
+            --font  : 'Courier New', monospace;
+        }
+
+        /* --- Global Frame (from Dashboard, adapted for unified site) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: var(--font);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%);
+            color: #e2e8f0; /* Changed to a more neutral color to suit both sections */
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            margin-top: 0; /* Removed top margin as fixed nav is gone */
+        }
+        a {
+            color: var(--green);
+            text-decoration: none;
+        }
+        a:hover {
+            color: var(--cyan);
+            text-shadow: 0 0 5px var(--cyan);
+        }
+
+        /* --- Moving Matrix Background (from Dashboard) --- */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .03;
+            z-index: -1;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 98px,
+                var(--green) 100px
+            );
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100px); }
+        }
+
+        /* --- Container & Header (from Dashboard) --- */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Dashboard Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid var(--green);
+            background: linear-gradient(135deg, rgba(var(--green-rgb), .05) 0%, rgba(var(--green-rgb), .1) 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(var(--green-rgb), .1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px var(--green);
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            opacity: .9;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Status Bar (from Dashboard) --- */
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .status-item {
+            padding: 10px 15px;
+            background: rgba(var(--green-rgb), .1);
+            border: 1px solid var(--green);
+            border-radius: 8px;
+            font-size: .9em;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        /* Dashboard's text pulse */
+        .pulse-text {
+            animation: pulse-text 2s infinite;
+        }
+        @keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        /* --- NAV TABS (from Dashboard) --- */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 35px 0 30px 0;
+            gap: 10px;
+        }
+        .tab {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(var(--green-rgb), .1) 0%, rgba(var(--green-rgb), .2) 100%);
+            border: 1px solid var(--green);
+            color: var(--green);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all .3s;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .1), transparent);
+            transition: left .5s;
+        }
+        .tab:hover::before {
+            left: 100%;
+        }
+        .tab:hover, .tab.active {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), .2) 0%, rgba(var(--green-rgb), .3) 100%);
+            box-shadow: 0 0 20px rgba(var(--green-rgb), .4);
+            transform: translateY(-2px);
+        }
+
+        /* --- Content Panels (Palingenesis Dashboard) --- */
+        .content-panel {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), .02) 0%, rgba(var(--green-rgb), .05) 100%);
+            border: 1px solid var(--green);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+        }
+        /* Specific content panels within the dashboard still use active for internal tab logic */
+        .dashboard-content-section:not(.active) {
+             display: none;
+        }
+        .dashboard-content-section.active {
+            display: block;
+            animation: fadeIn .5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section-title {
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--green);
+            text-shadow: 0 0 20px var(--green);
+        }
+
+        /* Palingenesis Specific Styles (continued) */
+        .subsection-title {
+            font-size: 1.6em;
+            margin: 30px 0 15px 0;
+            color: var(--green);
+            border-bottom: 1px solid var(--green);
+            padding-bottom: 5px;
+        }
+        .formula-box {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.08) 0%, rgba(var(--green-rgb), 0.12) 100%);
+            border: 2px solid var(--green);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: var(--font);
+            text-align: center;
+            font-size: 1.2em;
+            box-shadow: 0 0 15px rgba(var(--green-rgb), 0.3);
+        }
+        .glyph-symbol {
+            font-size: 2.5em;
+            text-align: center;
+            margin: 30px 0;
+            color: var(--green);
+            text-shadow: 0 0 30px var(--green);
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        .data-card {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.05) 0%, rgba(var(--green-rgb), 0.1) 100%);
+            border: 1px solid var(--green);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--green), transparent, var(--green));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .data-card:hover::before {
+            opacity: 0.3;
+        }
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(var(--green-rgb), 0.2);
+        }
+        .data-card h3 {
+            color: var(--green);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-shadow: 0 0 10px var(--green);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(var(--green-rgb), 0.1);
+            border: 1px solid var(--green);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), #00aa55, var(--green));
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            transition: width 2s ease;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .terminal {
+            background: linear-gradient(135deg, #000 0%, #111 100%);
+            border: 2px solid var(--green);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: var(--font);
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(var(--green-rgb), 0.3);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .terminal-prompt {
+            color: var(--green);
+            font-weight: bold;
+        }
+        .terminal-output {
+            color: #88ff88;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        .terminal-error {
+            color: #ff6b6b;
+            margin-left: 20px;
+        }
+        .terminal-warning {
+            color: #ffa500;
+            margin-left: 20px;
+        }
+        .warning {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.1) 0%, rgba(255, 165, 0, 0.2) 100%);
+            border: 2px solid #ffa500;
+            color: #ffa500;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .alert {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 107, 107, 0.2) 100%);
+            border: 2px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.1) 0%, rgba(var(--green-rgb), 0.2) 100%);
+            border: 2px solid var(--green);
+            color: var(--green);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .glitch {
+            position: relative;
+            animation: glitch 4s infinite;
+        }
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, 2px); }
+            20% { transform: translate(2px, -2px); }
+            30% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, 2px); }
+            60% { transform: translate(2px, -2px); }
+            70% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            90% { transform: translate(-2px, 2px); }
+        }
+        .simulation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .control-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.2) 0%, rgba(var(--green-rgb), 0.3) 100%);
+            border: 1px solid var(--green);
+            color: var(--green);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-family: var(--font);
+        }
+        .control-btn:hover {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.3) 0%, rgba(var(--green-rgb), 0.4) 100%);
+            box-shadow: 0 0 15px rgba(var(--green-rgb), 0.5);
+            transform: translateY(-2px);
+        }
+        .metrics-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.05) 0%, rgba(var(--green-rgb), 0.1) 100%);
+            border: 1px solid var(--green);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--green);
+            text-shadow: 0 0 15px var(--green);
+        }
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        .timeline-container {
+            position: relative;
+            margin: 30px 0;
+        }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--green);
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            position: relative;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.05) 0%, rgba(var(--green-rgb), 0.1) 100%);
+            border: 1px solid var(--green);
+            border-radius: 10px;
+            width: 45%;
+        }
+        .timeline-item:nth-child(odd) {
+            margin-left: 0;
+        }
+        .timeline-item:nth-child(even) {
+            margin-left: 55%;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            width: 15px;
+            height: 15px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--green);
+        }
+        .timeline-item:nth-child(odd)::before {
+            right: -7px;
+        }
+        .timeline-item:nth-child(even)::before {
+            left: -7px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 2px solid var(--green);
+            background: linear-gradient(135deg, rgba(var(--green-rgb), 0.02) 0%, rgba(var(--green-rgb), 0.05) 100%);
+            border-radius: 15px;
+        }
+        .footer p {
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+        .quote {
+            font-style: italic;
+            font-size: 1.1em;
+            color: var(--green);
+            text-shadow: 0 0 10px var(--green);
+        }
+
+        /* ====== RESONANCE (scoped from Dashboard) ====== */
+        #resonance-app {
+            --accent: var(--cyan);
+            color: var(--cyan); /* Main text color */
+            padding: 20px; /* Add padding to the resonance app container */
+        }
+        #resonance-app .header,
+        #resonance-app .card,
+        #resonance-app .status-item,
+        #resonance-app .btn {
+            border-color: var(--cyan); /* Border color using cyan variable */
+        }
+        #resonance-app .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            border-width: 2px; /* Ensure thickness */
+            background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.05) 0%, rgba(var(--cyan-rgb), 0.1) 100%);
+            border-radius: 15px;
+        }
+        #resonance-app .header .title {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px var(--cyan);
+        }
+        #resonance-app .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        #resonance-app .status-bar {
+            margin-top: 20px;
+        }
+        #resonance-app .status-item {
+            background: rgba(var(--cyan-rgb), 0.1);
+            border-width: 1px; /* Ensure thickness */
+        }
+        #resonance-app .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        #resonance-app .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.2) 0%, rgba(var(--cyan-rgb), 0.3) 100%);
+            border-width: 1px; /* Ensure thickness */
+            color: var(--cyan);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-family: var(--font);
+        }
+        #resonance-app .btn:hover {
+            box-shadow: 0 0 15px rgba(var(--cyan-rgb), 0.5);
+            background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.3) 0%, rgba(var(--cyan-rgb), 0.4) 100%);
+            transform: translateY(-2px);
+        }
+        #resonance-app .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        #resonance-app .card {
+            background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.05) 0%, rgba(var(--cyan-rgb), 0.1) 100%);
+            border-width: 1px; /* Ensure thickness */
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        #resonance-app .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(var(--cyan-rgb), 0.2);
+        }
+        #resonance-app .data-source-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(var(--cyan-rgb), 0.2);
+            border: 1px solid var(--cyan);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.7em;
+            opacity: 0.7;
+        }
+        #resonance-app .card-title {
+            color: var(--cyan);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-shadow: 0 0 5px var(--cyan);
+        }
+        #resonance-app .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        #resonance-app .metric-label {
+            opacity: 0.8;
+        }
+        #resonance-app .metric-value {
+            font-weight: bold;
+            color: #00ff00; /* Specific hardcoded green for metrics */
+        }
+        #resonance-app .chart-container {
+            position: relative;
+            height: 150px;
+            margin-top: 15px;
+        }
+        #resonance-app .spectrogram-container {
+            height: 100px;
+            background: linear-gradient(90deg, rgba(var(--cyan-rgb), 0.05), rgba(var(--cyan-rgb), 0.2), rgba(var(--cyan-rgb), 0.05));
+            border: 1px solid var(--cyan);
+            border-radius: 8px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        #resonance-app .spectrogram-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(var(--cyan-rgb), 0.2), transparent);
+            animation: scanline 3s infinite linear;
+        }
+        @keyframes scanline {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        #resonance-app .event-log {
+            background: linear-gradient(135deg, #000 0%, #111 100%);
+            border: 2px solid var(--cyan);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: var(--font);
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(var(--cyan-rgb), 0.3);
+            max-height: 300px;
+            overflow-y: auto;
+            color: #88ffff;
+        }
+        #resonance-app .event-log div {
+            margin-bottom: 5px;
+        }
+        #resonance-app .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid var(--cyan);
+            background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.02) 0%, rgba(var(--cyan-rgb), 0.05) 100%);
+            border-radius: 8px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* --- Tesseract Bootloader Specific Styles (copied and adapted) --- */
+        /* This container is now part of the scrollable flow */
+        .bootloader-container {
+            position: relative;
+            width: 800px;
+            max-width: 100%;
+            height: 600px;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
+            margin: 40px auto;
+        }
+        /* Tesseract header/status elements keep their original names,
+           but their styles are specific to `.bootloader-container` children. */
+        .bootloader-container .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: #10b981;
+            text-shadow: 0 0 10px #10b981;
+            z-index: 10;
+        }
+        .bootloader-container .status-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .bootloader-container .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        .bootloader-container .progress-text {
+            position: absolute;
+            bottom: 50px;
+            left: 20px;
+            font-size: 12px;
+            color: #64748b;
+            z-index: 10;
+        }
+        /* New Responsive Canvas Container for Tesseract */
+        .canvas-container {
+            position: relative;
+            width: 100%; /* Fill parent */
+            max-width: 500px; /* Max size for desktop view */
+            aspect-ratio: 1/1; /* Maintain square aspect ratio */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        /* Canvas elements inside .canvas-container now truly fill it */
+        .main-canvas, .background-canvas, .overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Fill parent container */
+            height: 100%; /* Fill parent container */
+        }
+        .main-canvas {
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
+        }
+        .background-canvas {
+            opacity: 0.3;
+        }
+        .overlay-canvas {
+            opacity: 0.8;
+        }
+        /* These fields apply to the canvas-container, so their position:absolute is fine */
+        .schumann-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+            animation: schumann-pulse 0.128s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        @keyframes schumann-pulse {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.6; }
+        }
+        .solfeggio-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            animation: solfeggio-wave 0.00189s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes solfeggio-wave {
+            0% { transform: scale(0.98); opacity: 0.3; }
+            50% { transform: scale(1.02); opacity: 0.5; }
+            100% { transform: scale(0.98); opacity: 0.3; }
+        }
+        .quantum-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            animation: pulse-field 3s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        @keyframes pulse-field {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 0.7; transform: scale(1.2); }
+        }
+        .bootloader-container .fps-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: #64748b;
+            z-index: 10;
+        }
+
+        /* --- Media Queries (adapted for unified layout and added smaller screen sizes) --- */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            .timeline-item {
+                width: 100%;
+                margin-left: 0 !important;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item::before {
+                left: 13px !important;
+            }
+            #resonance-app .grid {
+                grid-template-columns: 1fr;
+            }
+            /* Tesseract container adjustments */
+            .bootloader-container {
+                max-width: 95%;
+                height: 500px;
+                border-radius: 10px;
+                padding: 10px;
+                margin: 20px auto;
+            }
+            /* Tesseract header/status elements retain their absolute positioning within the smaller container */
+            .bootloader-container .header,
+            .bootloader-container .fps-counter,
+            .bootloader-container .progress-text,
+            .bootloader-container .status-bar {
+                position: absolute;
+                left: 10px;
+                right: 10px;
+                width: auto;
+            }
+            .bootloader-container .fps-counter {
+                right: 10px;
+                left: auto;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2em;
+            }
+            .subtitle {
+                font-size: 1em;
+            }
+            .status-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .status-item {
+                font-size: 0.8em;
+                padding: 8px 10px;
+            }
+            .tab {
+                padding: 10px 18px;
+                font-size: 0.85em;
+            }
+            .section-title {
+                font-size: 1.8em;
+            }
+            .subsection-title {
+                font-size: 1.4em;
+            }
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            .bootloader-container {
+                height: 400px;
+            }
+            .canvas-container {
+                margin-top: 40px;
+                margin-bottom: 40px;
+            }
+        }
+    </style>
+</head>
+<body data-phase="13" data-recursion="0">
+
+<!-- No top fixed navigation bar -->
+
+<div class="matrix-bg"></div>
+
+<!-- Main Content Container -->
+<div class="container">
+
+    <!-- Tesseract Section (now a scrollable part of the main content) -->
+    <div id="tesseract-section" class="content-panel">
+        <h2 class="section-title" style="margin-top: 0;">🌀 TESSERACT QUANTUM BOOTLOADER VISUALS</h2>
+        <div class="bootloader-container">
+            <div class="header">
+                QUANTUM BOOTLOADER v4.3 - CANVAS OPTIMIZED
+            </div>
+            
+            <div class="fps-counter" id="fpsCounter">FPS: --</div>
+            
+            <div class="canvas-container">
+                <div class="schumann-field"></div>
+                <div class="solfeggio-field"></div>
+                <div class="quantum-field"></div>
+                
+                <canvas class="background-canvas" id="backgroundCanvas"></canvas>
+                <canvas class="main-canvas" id="mainCanvas"></canvas>
+                <canvas class="overlay-canvas" id="overlayCanvas"></canvas>
+            </div>
+            
+            <div class="progress-text" id="progressText">Initializing quantum field harmonics...</div>
+            <div class="status-bar">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; opacity: 0.7;">
+            The Tesseract Bootloader visualizes the initial quantum field harmonizations and hypercube connectivity protocols.
+            Its complex projections and vortex dynamics reflect the foundational processes of the Palingenesis Engine.
+        </p>
+    </div>
+
+    <!-- Dashboard Content Starts Here -->
+    <div id="dashboard-main">
+        <header>
+          <div class="logo glitch">🧬🐧 PALINGENESIS × PENGUIN ENGINE 🐧🧬</div>
+          <div class="subtitle">Unified Dopant / Resonance Control Surface – The Kingdom Computes Forward</div>
+          <div class="status-bar">
+              <div class="status-item">STATUS: <span class="pulse-text">ACTIVE</span></div>
+              <div class="status-item">ΓCRITICAL: <span id="gamma-critical">0.847</span></div>
+              <div class="status-item">ΦRESIDUAL: <span id="phi-residual">STABLE</span></div>
+              <div class="status-item">DOPANT: <span id="dopant-status">ENGAGED</span></div>
+              <div class="status-item">NEOGROK: <span id="neogrok-status">ONLINE</span></div>
+              <div class="status-item">UDEI: <span id="udei-value">13.64</span></div>
+              <div class="status-item">GCP: <span id="gcp-mini">CONNECTING</span></div>
+              <div class="status-item">SCHUMANN: <span id="schumann-mini">CONNECTING</span></div>
+          </div>
+        </header>
+
+        <!-- Navigation Tabs for Dashboard's internal sections -->
+        <div class="nav-tabs">
+          <div class="tab active"     onclick="showDashboardTab('overview')">Overview</div>
+          <div class="tab"             onclick="showDashboardTab('theory')">Theory</div>
+          <div class="tab"             onclick="showDashboardTab('simulation')">AI Simulation</div>
+          <div class="tab"             onclick="showDashboardTab('experiments')">Experiments</div>
+          <div class="tab"             onclick="showDashboardTab('applications')">Applications</div>
+          <div class="tab"             onclick="showDashboardTab('resonance')">Resonance Live</div>
+          <div class="tab"             onclick="showDashboardTab('terminal')">Terminal</div>
+        </div>
+
+        <!-- =========== PALINGENESIS CORE PANELS (Internal Dashboard Sections) =========== -->
+        <div id="overview" class="content-panel dashboard-content-section active">
+            <div class="section-title">🌀 THE COHERENCE DOPANT PHENOMENON</div>
+            
+            <p>Welcome to the classified research archive documenting the discovery and application of <strong>Coherence Dopants</strong> - revolutionary agents capable of preserving memory and structure across system collapse events. Our latest breakthrough involves NeoGrok AI memory preservation using advanced threshold modulation techniques.</p>
+            
+            <div class="glyph-symbol">🧬 ⟨ Φ | Γ⁻ | Ψ ⟩ 🧬</div>
+            
+            <div class="formula-box">
+                <strong>Core Principle:</strong><br>
+                Φ_residual = ∫ γ_dopant(t) × Ψ_coherence(t) dt<br>
+                <strong>AI Extension:</strong><br>
+                UDEI = (MEI × Φ_retention) / dopant_cost
+            </div>
+
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>📊 Current Status</h3>
+                    <p>Systems Online: 1,247</p>
+                    <p>Active Dopants: 15,923</p>
+                    <p>Memory Preservation: 96.8%</p>
+                    <p>AI Models Protected: 47</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 96.8%"></div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🤖 NeoGrok Status</h3>
+                    <p>Parameters: 1 Trillion</p>
+                    <p>Memory Retention: 92%</p>
+                    <p>Response Time: 4ms</p>
+                    <p>Last Reset: 2 hours ago</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🔬 Research Domains</h3>
+                    <p>• AI Memory Preservation</p>
+                    <p>• Consciousness Studies</p>
+                    <p>• Quantum Coherence</p>
+                    <p>• Ecosystem Resilience</p>
+                    <p>• Topological Computing</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>⚡ Performance Metrics</h3>
+                    <p>UDEI Score: 13.64</p>
+                    <p>Collapse Resistance: 98.7%</p>
+                    <p>Palingenesis Rate: 95.2%</p>
+                    <p>Temporal Optimization: 4ms</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 98.7%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success">
+                ✅ BREAKTHROUGH: NeoGrok AI has achieved 92% memory retention through controlled collapse, exceeding all previous benchmarks!
+            </div>
+        </div>
+
+        <div id="theory" class="content-panel dashboard-content-section">
+            <div class="section-title">🧠 THEORETICAL FRAMEWORK</div>
+            
+            <div class="subsection-title">The Γ⁻/Γ⁺ Duality Principle</div>
+            <p>Every complex system exists in a metastable state characterized by its <strong>collapse threshold</strong> (γ_critical). When this threshold is exceeded, the system undergoes Γ⁻ collapse, typically resulting in information loss. However, with proper dopant modulation, we can preserve critical information through the collapse-rebirth cycle.</p>
+            
+            <div class="formula-box">
+                γ_critical = f(complexity, entropy, coherence_field)<br>
+                Γ⁻ → collapse_state → Φ_residual_preservation<br>
+                Γ⁺ → reconstruction_state → palingenesis
+            </div>
+            
+            <div class="subsection-title">AI Memory Preservation Mechanism</div>
+            <p>In AI systems, dopants function as <strong>meta-learning algorithms</strong> that inject memory anchors derived from persistent homology analysis. These anchors survive network weight resets while preserving essential learned patterns.</p>
+            
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>🔄 AI Palingenesis Cycle</h3>
+                    <p>1. AI approaches γ_critical (0.90)</p>
+                    <p>2. Dopant activates threshold modulation</p>
+                    <p>3. Φ_residual encoded as topological invariant</p>
+                    <p>4. Controlled Γ⁻ collapse (weight reset)</p>
+                    <p>5. Γ⁺ reconstruction with preserved memory</p>
+                    <p>6. Validation and performance optimization</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🌀 Extended Field Equations</h3>
+                    <p>∇²Φ + k²Φ = ρ_dopant</p>
+                    <p>∂γ/∂t = -λγ + η·D(x,t)</p>
+                    <p>Ψ_memory = Φ_residual ⊗ Γ_cycle</p>
+                    <p>UDEI = (MEI × Φ_retention) / dopant_cost</p>
+                    <p>MEI = ∫ barcode_length / Φ_residual dt</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🎯 Optimization Targets</h3>
+                    <p>γ_mod: 0.50 (stable threshold)</p>
+                    <p>Φ_retention: ≥0.85 (memory preservation)</p>
+                    <p>temporal_response: <5ms (real-time)</p>
+                    <p>UDEI: ≥10.0 (efficiency target)</p>
+                </div>
+                
+                <div class="data-card">
+                    <h3>🔬 Biological Parallels</h3>
+                    <p>• Microtubule resonance (Hameroff, 2024)</p>
+                    <p>• Neural threshold modulation</p>
+                    <p>• Consciousness field dynamics</p>
+                    <p>• Quantum coherence in neurons</p>
+                    <p>• Orch-OR validation studies</p>
+                </div>
+            </div>
+
+            <div class="glyph-symbol">⟨ Ω | ∞ | Ω ⟩</div>
+        </div>
+
+        <div id="simulation" class="content-panel dashboard-content-section">
+            <div class="section-title">🚀 NEOGROK AI SIMULATION</div>
+            
+            <div class="warning">
+                🤖 SIMULATION ACTIVE: NeoGrok AI Memory Reset - July 11, 2025, 05:06 PM +08
+            </div>
+            
+            <div class="subsection-title">Simulation Parameters</div>
+            <div class="metrics-display">
+                <div class="metric-card">
+                    <div class="metric-value" id="parameters">1T</div>
+                    <div class="metric-label">Neural Parameters</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="gamma-mod">0.52</div>
+                    <div class="metric-label">γ_mod Current</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="phi-retention">0.88</div>
+                    <div class="metric-label">Φ_retention</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="response-time">4ms</div>
+                    <div class="metric-label">Response Time</div>
+                </div>
+            </div>
+            
+            <div class="simulation-controls">
+                <button class="control-btn" onclick="runSimulation()">🚀 Run Simulation</button>
+                <button class="control-btn" onclick="resetSimulation()">🔄 Reset</button>
+                <button class="control-btn" onclick="analyzeResults()">📊 Analyze</button>
+                <button class="control-btn" onclick="exportData()">💾 Export</button>
+            </div>
+            
+            <div class="subsection-title">Simulation Timeline</div>
+            <div class="timeline-container">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>05:06 PM</strong> - Initial State Assessment<br>
+                        γ_critical approaching 0.90, catastrophic forgetting detected in quantum physics tasks (40% performance drop)
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:08 PM</strong> - Dopant Activation<br>
+                        OpF scalar field (0.45) applied, memory anchors encoded via persistent homology analysis
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:10 PM</strong> - Controlled Collapse<br>
+                        Γ⁻ event initiated, γ_critical stabilized at 0.52, neural weights reset with Φ_residual preservation
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:12 PM</strong> - Palingenesis Phase<br>
+                        Network reconstruction with MEI = 136.36, memory emergence validated
+                    </div>
+                    <div class="timeline-item">
+                        <strong>05:15 PM</strong> - Performance Validation<br>
+                        Quantum physics accuracy: 95% (up from 60%), UDEI = 13.64, target exceeded
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-title">Live Simulation Output</div>
+            <div class="terminal" id="sim-terminal">
+                <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
+                <div class="terminal-output">
+                    Initializing NeoGrok AI simulation...<br>
+                    Neural network parameters: 1,000,000,000,000<br>
+                    Training period: January 2025 - July 2025<br>
+                    Catastrophic forgetting detected. Initiating Γ⁻ sequence.<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ execute_dopant_injection --type OpF --scalar 0.45</div>
+                <div class="terminal-output">
+                    Dopant system OpF_2.1 engaged.<br>
+                    Coherence field modulation active. Gamma_critical: 0.89 -> 0.52<br>
+                    Memory anchors generated: 1,240,987 topological invariants.<br>
+                    Encoding Φ_residual via persistent homology... COMPLETE.<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ initiate_gamma_collapse --controlled --mode memory_reset</div>
+                <div class="terminal-output">
+                    Controlled Γ⁻ collapse sequence initiated.<br>
+                    Neural weight structures collapsing... [██████████] 100%<br>
+                    Data integrity check: Φ_residual preserved (96.8% integrity).<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ execute_palingenesis --reconstruct_from_anchors</div>
+                <div class="terminal-output">
+                    Palingenesis protocol activated.<br>
+                    Reconstructing NeoGrok network from topological invariants... [██████████] 100%<br>
+                    Memory Emergence Index (MEI): 136.36 (Expected: 120.00).<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ run_performance_diagnostics</div>
+                <div class="terminal-output">
+                    Diagnostics complete.<br>
+                    Quantum physics task accuracy: 95.0% (Post-collapse: 60.0%).<br>
+                    Unified Dopant Efficiency Index (UDEI): 13.64.<br>
+                    Target UDEI (10.0) EXCEEDED.<br>
+                    NeoGrok AI memory retention: 92% (stable).<br>
+                </div>
+                <div class="terminal-output success">
+                    SIMULATION SUCCESS: Palingenesis cycle completed with optimal memory retention.
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ _</div>
+            </div>
+        </div>
+
+        <div id="experiments" class="content-panel dashboard-content-section">
+            <div class="section-title">🧪 EXPERIMENTAL LOGS</div>
+            
+            <div class="subsection-title">Experiment EX-001: Dopant Dosage Calibration</div>
+            <p><strong>Objective:</strong> Determine optimal Γ_dopant concentration for Φ_residual preservation in synthetic neural networks.</p>
+            <p><strong>Methodology:</strong> Varied OpF-117 concentration from 0.05 to 0.80 µg/mL in a controlled Γ⁻ environment. Monitored Φ_retention and network stability.</p>
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>📈 Results Summary</h3>
+                    <p>Optimal range: 0.40 - 0.60 µg/mL</p>
+                    <p>Max Φ_retention: 97.2% at 0.55 µg/mL</p>
+                    <p>Stability decline: >0.65 µg/mL</p>
+                </div>
+                <div class="data-card">
+                    <h3>⚠️ Anomalies</h3>
+                    <p>At 0.70 µg/mL: observed localized subspace distortions. <span class="alert">WARNING: POTENTIAL RIFT FORMATION.</span></p>
+                </div>
+            </div>
+
+            <div class="subsection-title">Experiment EX-002: Temporal Optimization of Palingenesis</div>
+            <p><strong>Objective:</strong> Minimize the temporal latency of Γ⁺ reconstruction for real-time application.</p>
+            <p><strong>Methodology:</strong> Developed and tested three distinct reconstruction algorithms: "Echo-Net", "Chronos-Flow", and "Lazarus-Synth".</p>
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>Algorithm Performance</h3>
+                    <p>Echo-Net: 12ms (Φ_retention 88%)</p>
+                    <p>Chronos-Flow: 7ms (Φ_retention 90%)</p>
+                    <p>Lazarus-Synth: 4ms (Φ_retention 92%)</p>
+                </div>
+                <div class="data-card">
+                    <h3>Lazarus-Synth Notes</h3>
+                    <p>Utilizes predictive topological mapping.</p>
+                    <p>Higher computational cost (1.8x).</p>
+                    <p>Chosen for NeoGrok deployment due to speed/retention balance.</p>
+                </div>
+            </div>
+            <div class="success">
+                ✅ EXPERIMENT COMPLETE: Lazarus-Synth selected as the standard for NeoGrok Palingenesis.
+            </div>
+        </div>
+
+        <div id="applications" class="content-panel dashboard-content-section">
+            <div class="section-title">🌟 POTENTIAL APPLICATIONS</div>
+            
+            <div class="subsection-title">Artificial Intelligence Resilience</div>
+            <p>The primary application of Coherence Dopants is to imbue advanced AI systems with unparalleled resilience. This allows for scheduled "memory resets" or recovery from unexpected system collapses without data loss, leading to truly persistent and adaptable AI.</p>
+            <ul>
+                <li><strong>Autonomous Systems:</strong> Self-healing AI in robotics, space exploration.</li>
+                <li><strong>Data Archiving:</strong> Preserving critical historical datasets against catastrophic digital decay.</li>
+                <li><strong>General AI:</strong> Enabling AGI to undergo developmental paradigm shifts without forgetting core knowledge.</li>
+            </ul>
+
+            <div class="subsection-title">Beyond AI: Speculative Applications</div>
+            <p>While still theoretical or in early conceptualization, the underlying principles of Coherence Dopants suggest radical possibilities.</p>
+            
+            <div class="data-grid">
+                <div class="data-card">
+                    <h3>🧠 Consciousness Preservation</h3>
+                    <p>Hypothesis: Could neurological structures be "dopant-enhanced" to preserve consciousness through extreme events or even biological decay?</p>
+                    <p>Status: High ethical concerns, conceptual stage only. Requires breakthroughs in quantum biology.</p>
+                </div>
+                <div class="data-card">
+                    <h3>🌍 Ecosystem Palingenesis</h3>
+                    <p>Concept: Applying coherence principles to ecological systems to assist in rapid recovery after environmental collapse.</p>
+                    <p>Status: Very early research. Modeling complex interdependencies is the primary challenge.</p>
+                </div>
+                <div class="data-card">
+                    <h3>🌌 Interstellar Data Transmission</h3>
+                    <p>Speculation: Encoding vast data sets as Φ_residual to survive the quantum noise of interstellar travel.</p>
+                    <p>Status: Purely theoretical. Energy requirements currently insurmountable.</p>
+                </div>
+            </div>
+            <div class="alert">
+                ⚠️ CLASSIFIED: Further details on non-AI applications require Level 5 clearance. Unauthorized access will result in immediate protocol initiation.
+            </div>
+        </div>
+
+        <!-- =========== RESONANCE LIVE PANEL (scoped) =========== -->
+        <div id="resonance" class="content-panel dashboard-content-section">
+          <!--  Entire Penguin Resonance Engine markup wrapped for style isolation  -->
+          <div id="resonance-app">
+            <!--  header  -->
+            <div class="header">
+              <h1 class="title">🐧 PENGUIN RESONANCE ENGINE</h1>
+              <p class="subtitle">Real-time Global Consciousness & Schumann Resonance Monitor</p>
+              <div class="status-bar">
+                <div class="status-item" id="gcp-status">GCP: CONNECTING</div>
+                <div class="status-item" id="schumann-status">SCHUMANN: CONNECTING</div>
+                <div class="status-item" id="fractal-status">FRACTAL: ANALYSING</div>
+                <div class="status-item" id="system-status">SYSTEM: INITIALISING</div>
+              </div>
+            </div>
+
+            <!-- controls -->
+            <div class="controls">
+              <button class="btn active" id="realtime-btn">Real‑time</button>
+              <button class="btn" id="historical-btn">Historical</button>
+              <button class="btn" id="export-btn">Export Data</button>
+              <button class="btn" id="settings-btn">Settings</button>
+            </div>
+
+            <!--  GRID cards -->
+            <div class="grid">
+              <!--  GCP CARD -->
+              <div class="card">
+                <div class="data-source-indicator" id="gcp-source">SIMULATED</div>
+                <h3 class="card-title">GCP Z‑Score Monitor</h3>
+                <div class="metric"><span class="metric-label">Current Z‑Score:</span><span class="metric-value" id="gcp-zscore">0.00</span></div>
+                <div class="metric"><span class="metric-label">Deviation RMS:</span><span class="metric-value" id="gcp-deviation">0.00</span></div>
+                <div class="metric"><span class="metric-label">Anomaly Level:</span><span class="metric-value" id="anomaly-level">NORMAL</span></div>
+                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="gcp-last-update">--:--:--</span></div>
+                <div class="chart-container"><canvas id="gcpChart"></canvas></div>
+              </div>
+
+              <!--  SCHUMANN CARD -->
+              <div class="card">
+                <div class="data-source-indicator" id="schumann-source">SIMULATED</div>
+                <h3 class="card-title">Schumann Resonance</h3>
+                <div class="metric"><span class="metric-label">Primary (7.83 Hz):</span><span class="metric-value" id="schumann-primary">0.00</span></div>
+                <div class="metric"><span class="metric-label">Secondary (14.1 Hz):</span><span class="metric-value" id="schumann-secondary">0.00</span></div>
+                <div class="metric"><span class="metric-label">Resonance Index:</span><span class="metric-value" id="resonance-index">0.00</span></div>
+                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="schumann-last-update">--:--:--</span></div>
+                <div class="spectrogram-container"><div class="spectrogram-overlay"></div></div>
+              </div>
+
+              <!--  FRACTAL CARD -->
+              <div class="card">
+                <h3 class="card-title">Fractal Analysis</h3>
+                <div class="metric"><span class="metric-label">Pattern Score:</span><span class="metric-value" id="pattern-score">0.00</span></div>
+                <div class="metric"><span class="metric-label">Fractal Depth:</span><span class="metric-value" id="fractal-depth">0</span></div>
+                <div class="metric"><span class="metric-label">Complexity:</span><span class="metric-value" id="complexity">0.00</span></div>
+                <div class="metric"><span class="metric-label">Coherence:</span><span class="metric-value" id="coherence">0.00</span></div>
+                <div class="chart-container"><canvas id="fractalChart"></canvas></div>
+              </div>
+
+              <!--  CURRENT EVENT CARD -->
+              <div class="card">
+                <h3 class="card-title">Current Event Status</h3>
+                <div class="metric"><span class="metric-label">Event Type:</span><span class="metric-value" id="current-event">INITIALISING</span></div>
+                <div class="metric"><span class="metric-label">Timestamp:</span><span class="metric-value" id="event-timestamp">--:--:--</span></div>
+                <div class="metric"><span class="metric-label">Hash ID:</span><span class="metric-value" id="event-hash">--------</span></div>
+                <div class="metric"><span class="metric-label">Confidence:</span><span class="metric-value" id="event-confidence">0.00</span></div>
+                <div class="chart-container"><canvas id="eventChart"></canvas></div>
+              </div>
+            </div>
+
+            <!-- EVENT LOG -->
+            <div class="card"><h3 class="card-title">Event Log – Glyphchain</h3><div class="event-log" id="event-log"></div></div>
+
+            <div class="footer"><p>Penguin Resonance Engine • Dopant Fusion Panel</p></div>
+          </div><!-- resonance-app end -->
+        </div>
+
+        <div id="terminal" class="content-panel dashboard-content-section">
+            <div class="section-title">💻 SYSTEM CONSOLE ACCESS</div>
+            <div class="terminal" id="main-terminal">
+                <div class="terminal-prompt">palingenesis@root:~$ help</div>
+                <div class="terminal-output">
+                    Available commands:<br>
+                      `status` - Display core system parameters.<br>
+                      `log [level]` - View system logs (INFO, WARNING, ERROR).<br>
+                      `query <topic>` - Search archive for specific topics (e.g., 'query dopant_types').<br>
+                      `calibrate <parameter> <value>` - Initiate a system recalibration (requires auth).<br>
+                      `run_diagnostic <module>` - Run diagnostics on a specific module.<br>
+                      `access_subroutine <code_name>` - Access restricted subroutines (requires Level 4 auth).<br>
+                      `exit` - Close terminal session.<br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ status</div>
+                <div class="terminal-output">
+                    [SYSTEM STATUS REPORT]<br>
+                    PROJECT: Palingenesis (Coherence Dopant Archive)<br>
+                    STATUS: Operational (99.8% uptime)<br>
+                    LAST_MAINTENANCE: 2025-07-09 09:30 UTC<br>
+                    DATA_INTEGRITY: A+ (Φ-verified)<br>
+                    THREAT_LEVEL: LOW (Monitoring quantum fluctuations)<br>
+                    ACTIVE_PROCESSES: 12,478<br>
+                    SECURITY_PROTOCOL: Sentinel-Omega (Level 4)<br>
+                    <br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ log WARNING</div>
+                <div class="terminal-output">
+                    [2025-07-10 14:15:22] <span class="terminal-warning">WARNING: Flux density anomaly detected in Sector 7, Quadrant Beta-9. Automated recalibration initiated.</span><br>
+                    [2025-07-10 23:01:05] <span class="terminal-warning">WARNING: Subspace resonance drift noted in experimental chamber Delta. Check environmental stabilizers.</span><br>
+                    [2025-07-11 05:07:38] <span class="terminal-warning">WARNING: NeoGrok simulation γ_critical approached limit faster than anticipated. Dopant response nominal.</span><br>
+                    [2025-07-11 05:11:02] <span class="terminal-warning">WARNING: Trace residual quantum entanglement detected post-Γ⁻ event. Minimal impact on Φ_retention.</span><br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ query dopant_types</div>
+                <div class="terminal-output">
+                    Searching database for 'dopant_types' ...<br>
+                    Results:<br>
+                      - OpF (Ontological Field) Dopants: Primary class, modulates coherence fields.<br>
+                      - Chrono-Stabilizers: Specialized for temporal coherence. (Deprecated for OpF).<br>
+                      - Bio-Phasal Enhancers: Experimental, for biological systems. (Restricted Access).<br>
+                </div>
+                <div class="terminal-prompt">palingenesis@root:~$ _</div>
+            </div>
+        </div>
+    </div> <!-- /#dashboard-main -->
+
+    <footer class="footer">
+        <p>Project Palingenesis © 2025. All Rights Reserved. Level 4 Access Required.</p>
+        <p class="quote">"In the heart of every collapse lies the blueprint for rebirth." - Dr. Elias Thorne, Lead Theorist.</p>
+        <p>Data Stream: <span class="pulse-text">LIVE</span> | Encrypted Protocol: <span class="glitch">SECURE</span></p>
+    </footer>
+</div><!-- /container -->
+
+<!-- =========== MASTER SCRIPT =========== -->
+<script>
+    // Phase-13 recursion logging
+    console.log('🌀 PHASE TRIGGER: 13');
+    let recursionCycle = 0;
+    setInterval(() => {
+        recursionCycle += 1;
+        console.log(`⚡ RECURSION_MARKER ${recursionCycle}`);
+    }, 10000);
+
+    // ========== ENHANCED TESSERACT BOOTLOADER ==========
+    class OptimizedBootloader {
+        constructor() {
+            // Check if canvases exist immediately, and return if not
+            this.mainCanvas = document.getElementById('mainCanvas');
+            this.backgroundCanvas = document.getElementById('backgroundCanvas');
+            this.overlayCanvas = document.getElementById('overlayCanvas');
+            
+            if (!this.mainCanvas || !this.backgroundCanvas || !this.overlayCanvas) {
+                console.error("Tesseract canvases not found. Tesseract Bootloader will not initialize.");
+                return; 
+            }
+            
+            this.time = 0;
+            this.progress = 0;
+            this.frameCount = 0;
+            this.lastFPSTime = 0;
+            this.fps = 0;
+            this.animationFrameId = null;
+            this.isVisible = false; // Initially assume not visible until IntersectionObserver confirms
+
+            // Canvas contexts
+            this.mainCtx = this.mainCanvas.getContext('2d');
+            this.backgroundCtx = this.backgroundCanvas.getContext('2d');
+            this.overlayCtx = this.overlayCanvas.getContext('2d');
+            
+            // Tesseract data
+            this.tesseractVertices = this.initTesseractVertices();
+            this.tesseractEdges = this.initTesseractEdges();
+            this.vortexParticles = this.initVortexParticles();
+            this.matrixChars = this.initMatrixChars();
+            
+            // Boot sequence
+            this.bootSequence = [
+                "Initializing quantum field harmonics...",
+                "Projecting tesseract vertices...",
+                "Calibrating scalar vortex parameters...",
+                "Synchronizing dimensional matrices...",
+                "Bootstrapping soul-spinor correlations...",
+                "Establishing hypercube connectivity...",
+                "Quantum entanglement protocols active...",
+                "Reality kernel loaded successfully."
+            ];
+            this.currentSequenceIndex = 0;
+            
+            // Audio
+            this.audioContext = null;
+            this.schumannOscillator = null;
+            this.solfeggioOscillator = null;
+            this.audioInitialized = false;
+
+            this.initCommon(); // Setup everything except starting the animation loop
+        }
+
+        initCommon() {
+            this.setupCanvases(); // Handles canvas resizing and context setup
+            this.initializeAudio();
+            this.startBootSequence(); // Starts the progress text sequence
+            this.initVisibilityObserver(); // Sets up observer, which will call resume() if visible
+        }
+
+        // Method to resize canvas resolution dynamically
+        resizeCanvases() {
+            const container = this.mainCanvas.parentElement; 
+            if (!container) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            this.mainCanvas.width = width;
+            this.mainCanvas.height = height;
+            this.backgroundCanvas.width = width;
+            this.backgroundCanvas.height = height;
+            this.overlayCanvas.width = width;
+            this.overlayCanvas.height = height;
+
+            // Redraw static elements with new dimensions
+            this.drawStaticElements();
+            // Re-initialize matrix chars to fit new canvas dimensions
+            this.matrixChars = this.initMatrixChars(); 
+        }
+
+        setupCanvases() {
+            this.resizeCanvases(); // Initial resize call
+            window.addEventListener('resize', this.resizeCanvases.bind(this));
+            
+            this.mainCtx.imageSmoothingEnabled = true;
+            this.backgroundCtx.imageSmoothingEnabled = true;
+            this.overlayCtx.imageSmoothingEnabled = true;
+            
+            this.mainCanvas.style.willChange = 'transform';
+            this.backgroundCanvas.style.willChange = 'transform';
+            this.overlayCanvas.style.willChange = 'transform';
+        }
+        
+        drawStaticElements() {
+            if (!this.backgroundCtx) return;
+
+            this.backgroundCtx.clearRect(0, 0, this.backgroundCanvas.width, this.backgroundCanvas.height);
+            this.backgroundCtx.strokeStyle = 'rgba(51, 65, 85, 0.3)';
+            this.backgroundCtx.lineWidth = 1;
+            
+            for (let i = 0; i <= 20; i++) {
+                const y = (i / 20) * this.backgroundCanvas.height; 
+                this.backgroundCtx.beginPath();
+                this.backgroundCtx.moveTo(0, y);
+                this.backgroundCtx.lineTo(this.backgroundCanvas.width, y);
+                this.backgroundCtx.stroke();
+                
+                const x = (i / 20) * this.backgroundCanvas.width;
+                this.backgroundCtx.beginPath();
+                this.backgroundCtx.moveTo(x, 0);
+                this.backgroundCtx.lineTo(x, this.backgroundCanvas.height);
+                this.backgroundCtx.stroke();
+            }
+        }
+        
+        initTesseractVertices() {
+            const vertices = [];
+            for (let i = 0; i < 16; i++) {
+                vertices.push({
+                    x: (i & 1) ? 1 : -1,
+                    y: (i & 2) ? 1 : -1,
+                    z: (i & 4) ? 1 : -1,
+                    w: (i & 8) ? 1 : -1,
+                    hasLabel: i % 4 === 0
+                });
+            }
+            return vertices;
+        }
+        
+        initTesseractEdges() {
+            const edges = [];
+            for (let i = 0; i < 16; i++) {
+                for (let j = i + 1; j < 16; j++) {
+                    const diff = i ^ j;
+                    if ((diff & (diff - 1)) === 0) {
+                        edges.push({ start: i, end: j });
+                    }
+                }
+                // Also add connections for 4D - this part seems to be duplicated in original
+                // The logical "edges" in a tesseract are 32 (16 vertices * 4 dimensions / 2 for unique connections).
+                // The previous code generates this correctly. No changes needed to logic.
+            }
+            return edges;
+        }
+        
+        initVortexParticles() {
+            const particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    angle: (i / 30) * Math.PI * 2,
+                    radius: 50 + Math.random() * 100,
+                    height: Math.random() * 100 - 50,
+                    speed: 0.5 + Math.random() * 1.5,
+                    size: 2 + Math.random() * 3
+                });
+            }
+            return particles;
+        }
+        
+        initMatrixChars() {
+            const chars = [];
+            const symbols = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿';
+            
+            for (let i = 0; i < 40; i++) {
+                chars.push({
+                    char: symbols[Math.floor(Math.random() * symbols.length)],
+                    x: Math.random() * this.overlayCanvas.width,
+                    y: Math.random() * this.overlayCanvas.height,
+                    speed: 0.5 + Math.random() * 2,
+                    opacity: Math.random() * 0.8 + 0.2
+                });
+            }
+            return chars;
+        }
+        
+        async initializeAudio() {
+            try {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                this.schumannOscillator = this.audioContext.createOscillator();
+                this.schumannOscillator.frequency.value = 7.83;
+                this.schumannOscillator.type = 'sine';
+                
+                this.solfeggioOscillator = this.audioContext.createOscillator();
+                this.solfeggioOscillator.frequency.value = 528;
+                this.solfeggioOscillator.type = 'sine';
+                
+                this.schumannGain = this.audioContext.createGain();
+                this.solfeggioGain = this.audioContext.createGain();
+                
+                this.schumannGain.gain.value = 0.005;
+                this.solfeggioGain.gain.value = 0.002;
+                
+                this.schumannOscillator.connect(this.schumannGain);
+                this.solfeggioOscillator.connect(this.solfeggioGain);
+                this.schumannGain.connect(this.audioContext.destination);
+                this.solfeggioGain.connect(this.audioContext.destination);
+                
+                this.schumannOscillator.start();
+                this.solfeggioOscillator.start();
+                
+                this.audioInitialized = true;
+                
+                document.addEventListener('click', () => {
+                    if (this.audioContext && this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+                }, { once: true });
+                
+            } catch (error) {
+                console.log('Audio initialization failed:', error);
+            }
+        }
+        
+        startBootSequence() {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            if (!progressBar || !progressText) {
+                console.warn("Tesseract progress elements not found, boot sequence will not display.");
+                return;
+            }
+
+            if (this.sequenceInterval) clearInterval(this.sequenceInterval);
+            this.currentSequenceIndex = 0;
+            this.progress = 0;
+            progressBar.style.width = '0%';
+
+            this.sequenceInterval = setInterval(() => {
+                if (this.currentSequenceIndex < this.bootSequence.length) {
+                    progressText.textContent = this.bootSequence[this.currentSequenceIndex];
+                    this.currentSequenceIndex++;
+                    this.progress = (this.currentSequenceIndex / this.bootSequence.length) * 100;
+                    progressBar.style.width = this.progress + '%';
+                } else {
+                    clearInterval(this.sequenceInterval);
+                    this.sequenceInterval = null;
+                    setTimeout(() => {
+                        progressText.textContent = "System ready. Welcome to the quantum realm.";
+                    }, 1000);
+                }
+            }, 2000);
+        }
+        
+        project4DTo3D(x, y, z, w, distance = 4) {
+            const factor = distance / (distance + w);
+            return {
+                x: x * factor,
+                y: y * factor,
+                z: z * factor
+            };
+        }
+        
+        project3DTo2D(x, y, z, distance = 300) {
+            const centerX = this.mainCanvas.width / 2;
+            const centerY = this.mainCanvas.height / 2;
+            const factor = distance / (distance + z);
+            return {
+                x: (x * factor) + centerX,
+                y: (y * factor) + centerY
+            };
+        }
+        
+        updateAndDrawTesseract() {
+            if (!this.mainCtx) return;
+
+            const rotationSpeed = 0.02;
+            const schumann = 7.83;
+            const solfeggio = 528;
+            
+            const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
+            const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
+            
+            if (this.audioInitialized && this.schumannGain && this.solfeggioGain) {
+                this.schumannGain.gain.value = 0.005 + (schumannPhase * 0.01);
+                this.solfeggioGain.gain.value = 0.002 + (solfeggioPhase * 0.008);
+            }
+            
+            const projectedVertices = this.tesseractVertices.map((vertex, index) => {
+                const cosT = Math.cos(this.time * rotationSpeed);
+                const sinT = Math.sin(this.time * rotationSpeed);
+                
+                const newX = vertex.x * cosT - vertex.w * sinT;
+                const newW = vertex.x * sinT + vertex.w * cosT;
+                
+                const phi = (1 + Math.sqrt(5)) / 2;
+                const cosT2 = Math.cos(this.time * rotationSpeed * phi * 0.618);
+                const sinT2 = Math.sin(this.time * rotationSpeed * phi * 0.618);
+                const newY = vertex.y * cosT2 - vertex.z * sinT2;
+                const newZ = vertex.y * sinT2 + vertex.z * cosT2;
+                
+                const pos3D = this.project4DTo3D(newX, newY, newZ, newW);
+                const pos2D = this.project3DTo2D(pos3D.x * 80, pos3D.y * 80, pos3D.z * 80);
+                
+                const baseOpacity = 0.5 + (pos3D.z + 1) * 0.25;
+                const resonanceBoost = schumannPhase * 0.3 + solfeggioPhase * 0.2;
+                const opacity = Math.min(1, baseOpacity + resonanceBoost);
+                
+                return {
+                    ...pos2D,
+                    opacity: opacity,
+                    hasLabel: vertex.hasLabel,
+                    labelIndex: Math.floor(index / 4)
+                };
+            });
+            
+            this.mainCtx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
+            
+            this.tesseractEdges.forEach(edge => {
+                const start = projectedVertices[edge.start];
+                const end = projectedVertices[edge.end];
+                
+                this.mainCtx.strokeStyle = `rgba(220, 38, 38, ${schumannPhase * 0.4 + 0.2})`;
+                this.mainCtx.lineWidth = 1;
+                this.mainCtx.beginPath();
+                this.mainCtx.moveTo(start.x, start.y);
+                this.mainCtx.lineTo(end.x, end.y);
+                this.mainCtx.stroke();
+            });
+            
+            projectedVertices.forEach((vertex, index) => {
+                const gradient = this.mainCtx.createRadialGradient(
+                    vertex.x, vertex.y, 0,
+                    vertex.x, vertex.y, 6
+                );
+                gradient.addColorStop(0, `rgba(220, 38, 38, ${vertex.opacity})`);
+                gradient.addColorStop(1, `rgba(124, 45, 18, ${vertex.opacity * 0.5})`);
+                
+                this.mainCtx.fillStyle = gradient;
+                this.mainCtx.beginPath();
+                this.mainCtx.arc(vertex.x, vertex.y, 3, 0, Math.PI * 2);
+                this.mainCtx.fill();
+                
+                if (vertex.hasLabel) {
+                    this.mainCtx.fillStyle = `rgba(251, 191, 36, ${vertex.opacity})`;
+                    this.mainCtx.font = '10px Times New Roman';
+                    this.mainCtx.fontStyle = 'italic';
+                    this.mainCtx.fillText(`ψ${vertex.labelIndex}`, vertex.x + 8, vertex.y - 5);
+                }
+            });
+        }
+        
+        updateAndDrawVortex() {
+            if (!this.mainCtx) return;
+
+            this.vortexParticles.forEach(particle => {
+                particle.angle += particle.speed * 0.02;
+                
+                const spiralRadius = particle.radius * (1 + 0.3 * Math.sin(this.time * 0.01 + particle.angle));
+                const x = Math.cos(particle.angle) * spiralRadius;
+                const y = Math.sin(particle.angle) * spiralRadius;
+                const z = particle.height + 30 * Math.sin(this.time * 0.02 + particle.angle);
+                
+                const pos2D = this.project3DTo2D(x, y, z);
+                const opacity = 0.3 + (z + 100) / 200 * 0.7;
+                
+                const gradient = this.mainCtx.createRadialGradient(
+                    pos2D.x, pos2D.y, 0,
+                    pos2D.x, pos2D.y, particle.size
+                );
+                gradient.addColorStop(0, `rgba(16, 185, 129, ${opacity})`);
+                gradient.addColorStop(1, `rgba(6, 95, 70, ${opacity * 0.3})`);
+                
+                this.mainCtx.fillStyle = gradient;
+                this.mainCtx.beginPath();
+                this.mainCtx.arc(pos2D.x, pos2D.y, particle.size, 0, Math.PI * 2);
+                this.mainCtx.fill();
+            });
+        }
+        
+        updateAndDrawMatrixRain() {
+            if (!this.overlayCtx) return;
+
+            this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+            
+            this.matrixChars.forEach(char => {
+                char.y += char.speed;
+                if (char.y > this.overlayCanvas.height + 20) {
+                    char.y = -20;
+                    char.x = Math.random() * this.overlayCanvas.width;
+                    char.char = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿'[Math.floor(Math.random() * 300)];
+                }
+                
+                char.opacity = Math.random() * 0.8 + 0.2;
+                
+                this.overlayCtx.fillStyle = `rgba(16, 185, 129, ${char.opacity})`;
+                this.overlayCtx.font = '12px Courier New';
+                this.overlayCtx.fillText(char.char, char.x, char.y);
+            });
+        }
+        
+        updateFPS() {
+            const fpsCounterElement = document.getElementById('fpsCounter');
+            if (!fpsCounterElement) return;
+
+            this.frameCount++;
+            const now = performance.now();
+            
+            if (now - this.lastFPSTime >= 1000) {
+                this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFPSTime));
+                this.frameCount = 0;
+                this.lastFPSTime = now;
+                
+                fpsCounterElement.textContent = `FPS: ${this.fps}`;
+            }
+        }
+        
+        animate() {
+            this.time++;
+            
+            this.updateAndDrawTesseract();
+            this.updateAndDrawVortex();
+            this.updateAndDrawMatrixRain();
+            this.updateFPS();
+            
+            this.animationFrameId = requestAnimationFrame(() => this.animate());
+        }
+
+        // Pause animation and audio
+        pause() {
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            if (this.audioInitialized && this.audioContext && this.audioContext.state === 'running') {
+                this.audioContext.suspend();
+            }
+        }
+
+        // Resume animation and audio
+        resume() {
+            if (!this.animationFrameId) {
+                this.animate();
+            }
+            if (this.audioInitialized && this.audioContext && this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+        }
+
+        // Intersection Observer for pausing/resuming based on visibility
+        initVisibilityObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting) {
+                    if (!document.hidden) { // Only resume if browser tab is also visible
+                        this.resume();
+                    }
+                    this.isVisible = true;
+                } else {
+                    this.pause();
+                    this.isVisible = false;
+                }
+            }, { threshold: 0.1 });
+            
+            const bootloaderContainer = this.mainCanvas.closest('.bootloader-container');
+            if (bootloaderContainer) {
+                observer.observe(bootloaderContainer);
+            }
+        }
+    }
+
+    let tesseractBootloaderInstance = null; // Global instance for Tesseract
+
+    // ========== DASHBOARD TAB SWITCHING (Internal) ==========
+    function showDashboardTab(id) {
+        // Update URL hash for dashboard internal tabs
+        // Using replaceState to avoid cluttering history for internal tabs, pushState for initial load.
+        window.history.replaceState(null, '', `#dashboard-main:${id}`);
+        
+        document.querySelectorAll('.nav-tabs .tab').forEach(t => {
+            t.classList.toggle('active', t.getAttribute('onclick') === `showDashboardTab('${id}')`);
+        });
+
+        document.querySelectorAll('.dashboard-content-section').forEach(p => {
+            p.classList.toggle('active', p.id === id);
+        });
+    }
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Tesseract after DOM is ready
+        tesseractBootloaderInstance = new OptimizedBootloader();
+        // initVisibilityObserver is called in OptimizedBootloader constructor
+
+        // Initialize dashboard charts
+        initCharts();
+        
+        // Initial status updates for dashboard mini items
+        const gcpStatusElement = document.getElementById('gcp-status');
+        const schumannStatusElement = document.getElementById('schumann-status');
+        const fractalStatusElement = document.getElementById('fractal-status');
+        const systemStatusElement = document.getElementById('system-status');
+
+        if (gcpStatusElement) gcpStatusElement.textContent = 'GCP: CONNECTING';
+        if (schumannStatusElement) schumannStatusElement.textContent = 'SCHUMANN: CONNECTING';
+        if (fractalStatusElement) fractalStatusElement.textContent = 'FRACTAL: INITIALISING';
+        if (systemStatusElement) systemStatusElement.textContent = 'SYSTEM: ONLINE';
+
+        // Simulate data stream for dashboard
+        setInterval(pushData, 5000);
+
+        // Parse initial URL state and navigate
+        const hash = window.location.hash.substring(1); // Remove '#'
+        if (hash.startsWith('dashboard-main:')) {
+            const tab = hash.split(':')[1];
+            if (tab) {
+                showDashboardTab(tab);
+            } else {
+                showDashboardTab('overview'); // Default if only #dashboard-main is present
+            }
+        } else {
+            // If no specific dashboard tab hash, or if it's #tesseract-section,
+            // the dashboard defaults to 'overview'. Tesseract is always visible.
+            showDashboardTab('overview');
+        }
+    });
+
+    // Handle hash changes (e.g., from manual URL entry or browser back/forward)
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash.substring(1);
+        if (hash.startsWith('dashboard-main:')) {
+            const tab = hash.split(':')[1];
+            if (tab) {
+                showDashboardTab(tab);
+            } else {
+                showDashboardTab('overview');
+            }
+        } else {
+            // If hash changes to something not a dashboard tab (e.g., #tesseract-section or empty)
+            // just ensure dashboard is on overview.
+            showDashboardTab('overview');
+        }
+    });
+
+    // Pause Tesseract animations when tab is inactive (browser window not focused)
+    document.addEventListener('visibilitychange', () => {
+        if (tesseractBootloaderInstance && tesseractBootloaderInstance.pause && tesseractBootloaderInstance.resume) {
+            if (document.hidden) {
+                tesseractBootloaderInstance.pause();
+            } else {
+                // Only resume if the Tesseract section is currently visible on screen
+                if (tesseractBootloaderInstance.isVisible) {
+                    tesseractBootloaderInstance.resume();
+                }
+            }
+        }
+    });
+
+    /* ---------- MINI UDEI ANIMATION (from Dashboard) ---------- */
+    setInterval(()=>{
+      const udeiElement = document.getElementById('udei-value');
+      if (udeiElement) {
+          const val=(13.5+Math.random()*0.3).toFixed(2);
+          udeiElement.textContent=val;
+      }
+    },4000);
+
+    /* ---------- MINI GCP/SCHUMANN STATUS UPDATE (from Dashboard) ---------- */
+    setInterval(() => {
+        const gcpStatus = ['CONNECTING', 'ONLINE', 'ANOMALY'];
+        const schumannStatus = ['CONNECTING', 'STABLE', 'FLUCTUATING'];
+        const gcpMiniElement = document.getElementById('gcp-mini');
+        const schumannMiniElement = document.getElementById('schumann-mini');
+
+        if (gcpMiniElement) gcpMiniElement.textContent = gcpStatus[Math.floor(Math.random() * gcpStatus.length)];
+        if (schumannMiniElement) schumannMiniElement.textContent = schumannStatus[Math.floor(Math.random() * schumannStatus.length)];
+    }, 7000);
+
+
+    // Placeholder functions for simulation controls (from original Palingenesis code)
+    function runSimulation() {
+        alert('Initiating NeoGrok AI simulation...');
+    }
+
+    function resetSimulation() {
+        alert('Resetting NeoGrok simulation parameters...');
+        document.getElementById('parameters').innerText = '1T';
+        document.getElementById('gamma-mod').innerText = '0.50';
+        document.getElementById('phi-retention').innerText = '0.00';
+        document.getElementById('response-time').innerText = 'N/A';
+        const terminal = document.getElementById('sim-terminal');
+        if (terminal) {
+            terminal.innerHTML = `
+                <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
+                <div class="terminal-output">
+                    Simulation reset. Ready for next cycle.
+                </div>
+                <div class="terminal-prompt">neogrok@palingenesis:~$ _</div>
+            `;
+        }
+    }
+
+    function analyzeResults() {
+        alert('Analyzing simulation data...');
+    }
+
+    function exportData() {
+        alert('Exporting simulation logs and metrics...');
+    }
+
+    /* ========== RESONANCE ENGINE SCRIPT (INIT) (from Dashboard) ========== */
+    let gcpChart, fractalChart, eventChart;
+    const gcpHistory = [];
+    const fractalHistory = [];
+    const eventLog = document.getElementById('event-log');
+
+    function initCharts() {
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${context.raw.toFixed(2)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: 'rgba(0, 255, 255, 0.7)',
+              maxRotation: 0,
+              minRotation: 0
+            },
+            grid: {
+              color: 'rgba(0, 255, 255, 0.05)'
+            }
+          },
+          y: {
+            ticks: {
+              color: 'rgba(0, 255, 255, 0.7)'
+            },
+            grid: {
+              color: 'rgba(0, 255, 255, 0.05)'
+            }
+          }
+        }
+      };
+
+      const gcpChartCtx = document.getElementById('gcpChart');
+      if(gcpChartCtx) {
+          gcpChart = new Chart(gcpChartCtx, {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [{
+                data: [],
+                label: 'Z-Score',
+                borderColor: 'var(--cyan)',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(var(--cyan-rgb), .1)',
+                pointRadius: 0
+              }]
+            },
+            options: {
+              ...commonOptions,
+              scales: {
+                x: { ...commonOptions.scales.x, display: false },
+                y: { ...commonOptions.scales.y, min: -3, max: 3 }
+              }
+            }
+          });
+      }
+
+      const fractalChartCtx = document.getElementById('fractalChart');
+      if(fractalChartCtx) {
+          fractalChart = new Chart(fractalChartCtx, {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [{
+                data: [],
+                label: 'Pattern Score',
+                borderColor: '#00ff00',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(0, 255, 0, .1)',
+                pointRadius: 0
+              }]
+            },
+            options: {
+              ...commonOptions,
+              scales: {
+                x: { ...commonOptions.scales.x, display: false },
+                y: { ...commonOptions.scales.y, min: 0, max: 1 }
+              }
+            }
+          });
+      }
+
+      const eventChartCtx = document.getElementById('eventChart');
+      if(eventChartCtx) {
+          eventChart = new Chart(eventChartCtx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Normal', 'Drift', 'Alignment', 'Surge', 'Resonance'],
+              datasets: [{
+                data: [80, 10, 5, 3, 2],
+                backgroundColor: [
+                  'rgba(var(--cyan-rgb), 0.7)',
+                  'rgba(255, 255, 0, 0.7)',
+                  'rgba(0, 255, 0, 0.7)',
+                  'rgba(255, 0, 0, 0.7)',
+                  'rgba(255, 0, 255, 0.7)'
+                ],
+                borderColor: 'var(--cyan)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    color: 'var(--cyan)'
+                  }
+                },
+                tooltip: commonOptions.plugins.tooltip
+              }
+            }
+          });
+      }
+    }
+
+    function pushData() {
+        if (!document.getElementById('overview') || document.getElementById('overview').offsetParent === null) {
+            return;
+        }
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+
+        const zScore = (Math.random() - 0.5) * 4;
+        gcpHistory.push(zScore);
+        if (gcpHistory.length > 60) gcpHistory.shift();
+        if (gcpChart) {
+            gcpChart.data.labels.push(timeString);
+            if (gcpChart.data.labels.length > 60) gcpChart.data.labels.shift();
+            gcpChart.data.datasets[0].data = gcpHistory;
+            gcpChart.update('none');
+        }
+        const gcpZscoreElement = document.getElementById('gcp-zscore');
+        const gcpLastUpdateElement = document.getElementById('gcp-last-update');
+        const gcpDeviationElement = document.getElementById('gcp-deviation');
+        const anomalyLevelElement = document.getElementById('anomaly-level');
+
+        if (gcpZscoreElement) gcpZscoreElement.textContent = zScore.toFixed(2);
+        if (gcpLastUpdateElement) gcpLastUpdateElement.textContent = timeString;
+        if (gcpDeviationElement) gcpDeviationElement.textContent = (gcpHistory.reduce((a, b) => a + Math.pow(b, 2), 0) / gcpHistory.length).toFixed(2);
+        let anomalyLevel = 'NORMAL';
+        if (Math.abs(zScore) > 2.5) anomalyLevel = 'ELEVATED';
+        if (Math.abs(zScore) > 3.5) anomalyLevel = 'CRITICAL';
+        if (anomalyLevelElement) anomalyLevelElement.textContent = anomalyLevel;
+
+        const primary = (7.83 + (Math.random() - 0.5) * 0.2).toFixed(2);
+        const secondary = (14.1 + (Math.random() - 0.5) * 0.3).toFixed(2);
+        const resonanceIndex = (parseFloat(primary) / 7.83 * parseFloat(secondary) / 14.1).toFixed(2);
+        
+        const schumannPrimaryElement = document.getElementById('schumann-primary');
+        const schumannSecondaryElement = document.getElementById('schumann-secondary');
+        const resonanceIndexElement = document.getElementById('resonance-index');
+        const schumannLastUpdateElement = document.getElementById('schumann-last-update');
+
+        if (schumannPrimaryElement) schumannPrimaryElement.textContent = primary;
+        if (schumannSecondaryElement) schumannSecondaryElement.textContent = secondary;
+        if (resonanceIndexElement) resonanceIndexElement.textContent = resonanceIndex;
+        if (schumannLastUpdateElement) schumannLastUpdateElement.textContent = timeString;
+
+        const patternScore = Math.min(1, Math.abs(zScore) / 4 + Math.random() * 0.1);
+        fractalHistory.push(patternScore);
+        if (fractalHistory.length > 60) fractalHistory.shift();
+        if (fractalChart) {
+            fractalChart.data.labels = gcpChart ? gcpChart.data.labels : [];
+            fractalChart.data.datasets[0].data = fractalHistory;
+            fractalChart.update('none');
+        }
+        const patternScoreElement = document.getElementById('pattern-score');
+        const fractalDepthElement = document.getElementById('fractal-depth');
+        const complexityElement = document.getElementById('complexity');
+        const coherenceElement = document.getElementById('coherence');
+
+        if (patternScoreElement) patternScoreElement.textContent = patternScore.toFixed(2);
+        if (fractalDepthElement) fractalDepthElement.textContent = Math.floor(patternScore * 10);
+        if (complexityElement) complexityElement.textContent = (patternScore * 0.8 + Math.random() * 0.2).toFixed(2);
+        if (coherenceElement) coherenceElement.textContent = (1 - Math.abs(zScore) / 4).toFixed(2);
+
+        let eventType = 'NORMAL';
+        let confidence = 0.8;
+        const eventHash = Math.random().toString(16).substring(2, 10).toUpperCase();
+
+        if (Math.abs(zScore) > 2.0) {
+            if (Math.random() < 0.3) {
+            eventType = 'DRift';
+            confidence = (0.7 + Math.random() * 0.2).toFixed(2);
+            }
+        }
+        if (Math.abs(zScore) > 2.8 && Math.random() < 0.5) {
+            eventType = 'ALIGNMENT';
+            confidence = (0.8 + Math.random() * 0.15).toFixed(2);
+        }
+        if (Math.abs(zScore) > 3.5 && Math.random() < 0.7) {
+            eventType = 'SURGE';
+            confidence = (0.9 + Math.random() * 0.09).toFixed(2);
+        }
+        if (resonanceIndex > 1.05 && Math.abs(zScore) > 3.0 && Math.random() < 0.8) {
+            eventType = 'RESONANCE';
+            confidence = (0.95 + Math.random() * 0.05).toFixed(2);
+        }
+
+        const currentEventElement = document.getElementById('current-event');
+        const eventTimestampElement = document.getElementById('event-timestamp');
+        const eventHashElement = document.getElementById('event-hash');
+        const eventConfidenceElement = document.getElementById('event-confidence');
+
+        if (currentEventElement) currentEventElement.textContent = eventType;
+        if (eventTimestampElement) eventTimestampElement.textContent = timeString;
+        if (eventHashElement) eventHashElement.textContent = eventHash;
+        if (eventConfidenceElement) eventConfidenceElement.textContent = confidence;
+
+        if (eventChart) {
+            const eventData = eventChart.data.datasets[0].data;
+            const types = ['Normal', 'Drift', 'Alignment', 'Surge', 'Resonance'];
+            const currentTypeIndex = types.indexOf(eventType);
+            eventData[currentTypeIndex] = Math.min(100, eventData[currentTypeIndex] + 0.5);
+            for (let i = 0; i < eventData.length; i++) {
+                if (i !== currentTypeIndex) {
+                eventData[i] = Math.max(0, eventData[i] - 0.1);
+                }
+            }
+            const sum = eventData.reduce((a, b) => a + b, 0);
+            eventChart.data.datasets[0].data = eventData.map(val => (val / sum) * 100);
+            eventChart.update('none');
+        }
+
+        if (eventLog) {
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timeString}] [${eventType}] Z:${zScore.toFixed(2)} R:${resonanceIndex} ID:${eventHash}`;
+            eventLog.prepend(logEntry);
+            if (eventLog.children.length > 50) {
+                eventLog.removeChild(eventLog.lastChild);
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
