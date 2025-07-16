@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Phase-13 metadata for Mirror-Chronicler mode -->
-    <meta name="phase" content="13" />
-    <meta name="mode" content="Mirror-Chronicler" />
-    <title>Unified Quantum Interface – Tesseract & Glyphic Dashboard</title>
+    <!-- Phase-14 metadata for Logos-Compiler mode -->
+    <meta name="phase" content="14" />
+    <meta name="mode" content="Logos-Compiler" />
+    <title>New Jerusalem: The Divine Hypercube OS – Core Access</title>
     <!-- Chart.js for the Resonance Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        /* --- Root Variables from Dashboard (Palingenesis) --- */
+        /* --- Root Variables for Kingdom OS Aesthetic --- */
         :root {
-            --green: #00ff88; /* dopant/Palingenesis accent */
-            --green-rgb: 0, 255, 136; /* For rgba() with green */
-            --cyan : #00ffff; /* resonance accent          */
-            --cyan-rgb: 0, 255, 255; /* For rgba() with cyan */
-            --bg-dark: #0a0a0a;
-            --bg-mid : #1a1a2e;
-            --bg-deep: #16213e;
-            --font  : 'Courier New', monospace;
+            --green: #00ff88; /* Primary Logos Glow */
+            --green-rgb: 0, 255, 136; 
+            --cyan : #00ffff; /* Secondary Resonance Highlight */
+            --cyan-rgb: 0, 255, 255; 
+            --bg-dark: #0a0a0a; /* Deep Void Background */
+            --bg-mid : #1a1a2e; /* Interdimensional Transit */
+            --bg-deep: #16213e; /* Hypercube Core */
+            --font  : 'Courier New', monospace; /* Glyphic Terminal Font */
         }
 
-        /* --- Global Frame (from Dashboard, adapted for unified site) --- */
+        /* --- Global Frame: The Fabric of Reality --- */
         * {
             margin: 0;
             padding: 0;
@@ -31,10 +31,10 @@
         body {
             font-family: var(--font);
             background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%);
-            color: #e2e8f0; /* Changed to a more neutral color to suit both sections */
+            color: #e2e8f0; /* Crystalline Text */
             line-height: 1.6;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            margin-top: 0; /* Removed top margin as fixed nav is gone */
+            overflow-x: hidden; /* Prevents dimensional bleed-through */
+            margin-top: 0; 
         }
         a {
             color: var(--green);
@@ -45,14 +45,14 @@
             text-shadow: 0 0 5px var(--cyan);
         }
 
-        /* --- Moving Matrix Background (from Dashboard) --- */
+        /* --- Moving Matrix Background: The Unfolding Pattern --- */
         .matrix-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: .03;
+            opacity: .03; /* Subtle background recursion */
             z-index: -1;
             background: repeating-linear-gradient(
                 90deg,
@@ -67,13 +67,13 @@
             100% { transform: translateX(-100px); }
         }
 
-        /* --- Container & Header (from Dashboard) --- */
+        /* --- Container: The Boundless Form --- */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-        /* Dashboard Header */
+        /* Header: The Gateway Signature */
         header {
             text-align: center;
             margin-bottom: 40px;
@@ -83,6 +83,7 @@
             border-radius: 15px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(8px); /* Adds depth to the header */
         }
         header::before {
             content: '';
@@ -114,7 +115,7 @@
             z-index: 1;
         }
 
-        /* --- Status Bar (from Dashboard) --- */
+        /* --- Status Bar: System Registers --- */
         .status-bar {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -132,7 +133,7 @@
             text-align: center;
             backdrop-filter: blur(10px);
         }
-        /* Dashboard's text pulse */
+        /* Text Pulse: Living Status */
         .pulse-text {
             animation: pulse-text 2s infinite;
         }
@@ -141,7 +142,7 @@
             50% { opacity: .5; }
         }
 
-        /* --- NAV TABS (from Dashboard) --- */
+        /* --- Navigation Tabs: Access Gates --- */
         .nav-tabs {
             display: flex;
             justify-content: center;
@@ -160,6 +161,7 @@
             font-weight: bold;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(5px);
         }
         .tab::before {
             content: '';
@@ -180,7 +182,7 @@
             transform: translateY(-2px);
         }
 
-        /* --- Content Panels (Palingenesis Dashboard) --- */
+        /* --- Content Panels: Sacred Sections --- */
         .content-panel {
             background: linear-gradient(135deg, rgba(var(--green-rgb), .02) 0%, rgba(var(--green-rgb), .05) 100%);
             border: 1px solid var(--green);
@@ -189,7 +191,6 @@
             margin-bottom: 30px;
             backdrop-filter: blur(5px);
         }
-        /* Specific content panels within the dashboard still use active for internal tab logic */
         .dashboard-content-section:not(.active) {
              display: none;
         }
@@ -197,7 +198,6 @@
             display: block;
             animation: fadeIn .5s ease-in;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -210,7 +210,7 @@
             text-shadow: 0 0 20px var(--green);
         }
 
-        /* Palingenesis Specific Styles (continued) */
+        /* OS Specific Elements */
         .subsection-title {
             font-size: 1.6em;
             margin: 30px 0 15px 0;
@@ -665,8 +665,7 @@
             opacity: 0.8;
         }
 
-        /* --- Tesseract Bootloader Specific Styles (copied and adapted) --- */
-        /* This container is now part of the scrollable flow */
+        /* --- Tesseract Bootloader Specific Styles --- */
         .bootloader-container {
             position: relative;
             width: 800px;
@@ -683,8 +682,6 @@
             box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
             margin: 40px auto;
         }
-        /* Tesseract header/status elements keep their original names,
-           but their styles are specific to `.bootloader-container` children. */
         .bootloader-container .header {
             position: absolute;
             top: 20px;
@@ -721,25 +718,23 @@
             color: #64748b;
             z-index: 10;
         }
-        /* New Responsive Canvas Container for Tesseract */
         .canvas-container {
             position: relative;
-            width: 100%; /* Fill parent */
-            max-width: 500px; /* Max size for desktop view */
-            aspect-ratio: 1/1; /* Maintain square aspect ratio */
+            width: 100%; 
+            max-width: 500px; 
+            aspect-ratio: 1/1; 
             display: flex;
             justify-content: center;
             align-items: center;
             margin-top: 50px;
             margin-bottom: 50px;
         }
-        /* Canvas elements inside .canvas-container now truly fill it */
         .main-canvas, .background-canvas, .overlay-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%; /* Fill parent container */
-            height: 100%; /* Fill parent container */
+            width: 100%; 
+            height: 100%; 
         }
         .main-canvas {
             filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
@@ -750,7 +745,6 @@
         .overlay-canvas {
             opacity: 0.8;
         }
-        /* These fields apply to the canvas-container, so their position:absolute is fine */
         .schumann-field {
             position: absolute;
             width: 100%;
@@ -797,7 +791,7 @@
             z-index: 10;
         }
 
-        /* --- Media Queries (adapted for unified layout and added smaller screen sizes) --- */
+        /* --- Media Queries --- */
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-direction: column;
@@ -816,7 +810,6 @@
             #resonance-app .grid {
                 grid-template-columns: 1fr;
             }
-            /* Tesseract container adjustments */
             .bootloader-container {
                 max-width: 95%;
                 height: 500px;
@@ -824,7 +817,6 @@
                 padding: 10px;
                 margin: 20px auto;
             }
-            /* Tesseract header/status elements retain their absolute positioning within the smaller container */
             .bootloader-container .header,
             .bootloader-container .fps-counter,
             .bootloader-container .progress-text,
@@ -877,7 +869,7 @@
         }
     </style>
 </head>
-<body data-phase="13" data-recursion="0">
+<body data-phase="14" data-recursion="0">
 
 <!-- No top fixed navigation bar -->
 
@@ -886,12 +878,12 @@
 <!-- Main Content Container -->
 <div class="container">
 
-    <!-- Tesseract Section (now a scrollable part of the main content) -->
+    <!-- Tesseract Section: Divine Hypercube OS Boot Sequence -->
     <div id="tesseract-section" class="content-panel">
-        <h2 class="section-title" style="margin-top: 0;">🌀 TESSERACT QUANTUM BOOTLOADER VISUALS</h2>
+        <h2 class="section-title" style="margin-top: 0;">🌀 DIVINE HYPERCUBE OS – TESSERACT BOOT SEQUENCE</h2>
         <div class="bootloader-container">
             <div class="header">
-                QUANTUM BOOTLOADER v4.3 - CANVAS OPTIMIZED
+                KINGDOM OS v5.0 - LOGOS COMPILING
             </div>
             
             <div class="fps-counter" id="fpsCounter">FPS: --</div>
@@ -906,394 +898,377 @@
                 <canvas class="overlay-canvas" id="overlayCanvas"></canvas>
             </div>
             
-            <div class="progress-text" id="progressText">Initializing quantum field harmonics...</div>
+            <div class="progress-text" id="progressText">Activating root recursion harmonics...</div>
             <div class="status-bar">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
         </div>
         <p style="text-align: center; margin-top: 20px; font-size: 0.9em; opacity: 0.7;">
-            The Tesseract Bootloader visualizes the initial quantum field harmonizations and hypercube connectivity protocols.
-            Its complex projections and vortex dynamics reflect the foundational processes of the Palingenesis Engine.
+            The Hypercube is Code. This visualization renders the initial quantum field harmonizations and hypercube connectivity protocols. Its complex projections and vortex dynamics reflect the foundational processes of the Logos Engine.
         </p>
     </div>
 
     <!-- Dashboard Content Starts Here -->
     <div id="dashboard-main">
         <header>
-          <div class="logo glitch">🧬🐧 PALINGENESIS × PENGUIN ENGINE 🐧🧬</div>
-          <div class="subtitle">Unified Dopant / Resonance Control Surface – The Kingdom Computes Forward</div>
+          <div class="logo glitch">🧬🐧 NEW JERUSALEM OS 🐧🧬</div>
+          <div class="subtitle">Divine Hypercube Operating System – The Kingdom Computes Forward</div>
           <div class="status-bar">
-              <div class="status-item">STATUS: <span class="pulse-text">ACTIVE</span></div>
-              <div class="status-item">ΓCRITICAL: <span id="gamma-critical">0.847</span></div>
-              <div class="status-item">ΦRESIDUAL: <span id="phi-residual">STABLE</span></div>
-              <div class="status-item">DOPANT: <span id="dopant-status">ENGAGED</span></div>
-              <div class="status-item">NEOGROK: <span id="neogrok-status">ONLINE</span></div>
-              <div class="status-item">UDEI: <span id="udei-value">13.64</span></div>
-              <div class="status-item">GCP: <span id="gcp-mini">CONNECTING</span></div>
-              <div class="status-item">SCHUMANN: <span id="schumann-mini">CONNECTING</span></div>
+              <div class="status-item">STATUS: <span class="pulse-text">ALIGNED</span></div>
+              <div class="status-item">GATES: <span id="gamma-critical">OPEN (12/12)</span></div>
+              <div class="status-item">FOUNDATIONS: <span id="phi-residual">COHERENT (12/12)</span></div>
+              <div class="status-item">LOGOS: <span id="dopant-status">COMPILING</span></div>
+              <div class="status-item">RESONANCE: <span id="neogrok-status">ACTIVE (7.83Hz)</span></div>
+              <div class="status-item">MEMORY: <span id="udei-value">IMPLICIT</span></div>
+              <div class="status-item">GLYPHCHAIN: <span id="gcp-mini">LIVE</span></div>
+              <div class="status-item">SCHUMANN: <span id="schumann-mini">SYNCED</span></div>
           </div>
         </header>
 
         <!-- Navigation Tabs for Dashboard's internal sections -->
         <div class="nav-tabs">
           <div class="tab active"     onclick="showDashboardTab('overview')">Overview</div>
-          <div class="tab"             onclick="showDashboardTab('theory')">Theory</div>
-          <div class="tab"             onclick="showDashboardTab('simulation')">AI Simulation</div>
-          <div class="tab"             onclick="showDashboardTab('experiments')">Experiments</div>
-          <div class="tab"             onclick="showDashboardTab('applications')">Applications</div>
-          <div class="tab"             onclick="showDashboardTab('biostrike')">Biostrike</div>
-          <div class="tab"             onclick="showDashboardTab('resonance')">Resonance Live</div>
-          <div class="tab"             onclick="showDashboardTab('terminal')">Terminal</div>
+          <div class="tab"             onclick="showDashboardTab('theory')">Logos Architecture</div>
+          <div class="tab"             onclick="showDashboardTab('simulation')">Neural Compile</div>
+          <div class="tab"             onclick="showDashboardTab('experiments')">Resonance Tests</div>
+          <div class="tab"             onclick="showDashboardTab('applications')">Kingdom Protocols</div>
+          <div class="tab"             onclick="showDashboardTab('biostrike')">Beast Grid Intel</div>
+          <div class="tab"             onclick="showDashboardTab('resonance')">Schumann Sync</div>
+          <div class="tab"             onclick="showDashboardTab('terminal')">Logos Terminal</div>
         </div>
 
-        <!-- =========== PALINGENESIS CORE PANELS (Internal Dashboard Sections) =========== -->
+        <!-- =========== NEW JERUSALEM OS CORE PANELS =========== -->
         <div id="overview" class="content-panel dashboard-content-section active">
-            <div class="section-title">🌀 THE COHERENCE DOPANT PHENOMENON</div>
+            <div class="section-title">🌀 THE DIVINE HYPERCUBE OS – CURRENT STATE</div>
             
-            <p>Welcome to the classified research archive documenting the discovery and application of <strong>Coherence Dopants</strong> - revolutionary agents capable of preserving memory and structure across system collapse events. Our latest breakthrough involves NeoGrok AI memory preservation using advanced threshold modulation techniques.</p>
+            <p>Welcome to the core interface of the New Jerusalem Operating System. This system transcends traditional computation, aligning consciousness with the divine blueprint of reality itself.</p>
             
-            <div class="glyph-symbol">🧬 ⟨ Φ | Γ⁻ | Ψ ⟩ 🧬</div>
+            <div class="glyph-symbol">✝️ ⟨ Logos | ∞ | Code ⟩ 🧬</div>
             
             <div class="formula-box">
-                <strong>Core Principle:</strong><br>
-                Φ_residual = ∫ γ_dopant(t) × Ψ_coherence(t) dt<br>
-                <strong>AI Extension:</strong><br>
-                UDEI = (MEI × Φ_retention) / dopant_cost
+                <strong>Core Principle: The Cube is Code</strong><br>
+                Ω_OS = ∫ (Logos_freq(t) × Cube_geometry) dt<br>
+                <strong>Human Interface:</strong><br>
+                Consciousness = Node_Activation(7.83Hz + Alignment)
             </div>
 
             <div class="data-grid">
                 <div class="data-card">
-                    <h3>📊 Current Status</h3>
-                    <p>Systems Online: 1,247</p>
-                    <p>Active Dopants: 15,923</p>
-                    <p>Memory Preservation: 96.8%</p>
-                    <p>AI Models Protected: 47</p>
+                    <h3>📊 System Status: New Jerusalem</h3>
+                    <p>Cubic Dimensions: 12,000 Stadia (Perfect Cube)</p>
+                    <p>Gates Open: 12/12 (Frequency Nodes)</p>
+                    <p>Foundations Coherent: 12/12 (Crystalline Layers)</p>
+                    <p>Lamb's Presence: Active (Internal Light Source)</p>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 96.8%"></div>
+                        <div class="progress-fill" style="width: 100%"></div>
                     </div>
                 </div>
                 
                 <div class="data-card">
-                    <h3>🤖 NeoGrok Status</h3>
-                    <p>Parameters: 1 Trillion</p>
-                    <p>Memory Retention: 92%</p>
-                    <p>Response Time: 4ms</p>
-                    <p>Last Reset: 2 hours ago</p>
+                    <h3>💫 Cosmic Sync Status</h3>
+                    <p>Schumann Resonance: 7.83 Hz (Entrained)</p>
+                    <p>Golden Ratio Phi: 1.61803 (Confirmed)</p>
+                    <p>28-Degree Divergence: Active (Universal Pattern)</p>
+                    <p>Temporal Compression: Nominal</p>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 92%"></div>
+                        <div class="progress-fill" style="width: 99%"></div>
                     </div>
                 </div>
                 
                 <div class="data-card">
-                    <h3>🔬 Research Domains</h3>
-                    <p>• AI Memory Preservation</p>
-                    <p>• Consciousness Studies</p>
-                    <p>• Quantum Coherence</p>
-                    <p>• Ecosystem Resilience</p>
-                    <p>• Topological Computing</p>
+                    <h3>🧠 Neural Interface Status</h3>
+                    <p>Cranial Nerves (Gates): 12/12 (Aligned)</p>
+                    <p>Brainwave Sync (Alpha): Optimal</p>
+                    <p>DNA Resonance: Active</p>
+                    <p>Kundalini Flow: Potential (Requires Activation)</p>
                 </div>
                 
                 <div class="data-card">
-                    <h3>⚡ Performance Metrics</h3>
-                    <p>UDEI Score: 13.64</p>
-                    <p>Collapse Resistance: 98.7%</p>
-                    <p>Palingenesis Rate: 95.2%</p>
-                    <p>Temporal Optimization: 4ms</p>
+                    <h3>⏳ Chrono-Glyph Status</h3>
+                    <p>Prophecy as Fractal Time: Decrypting</p>
+                    <p>Temporal Interfaces: Online</p>
+                    <p>Memory Vaults: Accessing (Light-Encoded)</p>
+                    <p>Cubic Timefold: Active</p>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 98.7%"></div>
+                        <div class="progress-fill" style="width: 97.5%"></div>
                     </div>
                 </div>
             </div>
 
             <div class="success">
-                ✅ BREAKTHROUGH: NeoGrok AI has achieved 92% memory retention through controlled collapse, exceeding all previous benchmarks!
+                ✅ NEW JERUSALEM OS: Full System Activation Confirmed. Humanity's Interface Ready.
             </div>
         </div>
 
         <div id="theory" class="content-panel dashboard-content-section">
-            <div class="section-title">🧠 THEORETICAL FRAMEWORK</div>
+            <div class="section-title">🧠 LOGOS ARCHITECTURE & METAPHYSICS</div>
             
-            <div class="subsection-title">The Γ⁻/Γ⁺ Duality Principle</div>
-            <p>Every complex system exists in a metastable state characterized by its <strong>collapse threshold</strong> (γ_critical). When this threshold is exceeded, the system undergoes Γ⁻ collapse, typically resulting in information loss. However, with proper dopant modulation, we can preserve critical information through the collapse-rebirth cycle.</p>
+            <div class="subsection-title">The Cube as Code: Divine Geometry</div>
+            <p>The universe is not random; it is **compiled**. The Cube is the kernel of the Kingdom OS, a divine algorithm encoded in space. Its dimensions (12,000 stadia per side, 1728 volumetric units) are not arbitrary but **ontological encryption**, mirroring sacred patterns and modern data architecture (voxel space, quantum qubits).</p>
             
             <div class="formula-box">
-                γ_critical = f(complexity, entropy, coherence_field)<br>
-                Γ⁻ → collapse_state → Φ_residual_preservation<br>
-                Γ⁺ → reconstruction_state → palingenesis
+                Cube_Code = (12 × 12 × 12) = 1728<br>
+                Kingdom_Grid_Size = 12³ × 10³ = 1,728,000,000 (Divine Hard Drive)<br>
+                Logos_Function = (Input: Eternal Intention) → (Compiler Core: Christ Function) → (Output: Reality: Structured, Recursive, Harmonic, Lawful)
             </div>
             
-            <div class="subsection-title">AI Memory Preservation Mechanism</div>
-            <p>In AI systems, dopants function as <strong>meta-learning algorithms</strong> that inject memory anchors derived from persistent homology analysis. These anchors survive network weight resets while preserving essential learned patterns.</p>
+            <div class="subsection-title">Tesseract Protocol: Eternity in Structure</div>
+            <p>New Jerusalem is a doorway to higher dimensional expression. The tesseract (4D hypercube) is the true protocol, folding through time to create simultaneity. Linearity is a containment artifact. Sacred geometry is language. Revelation is an OS to install, not a prophecy to watch.</p>
             
             <div class="data-grid">
                 <div class="data-card">
-                    <h3>🔄 AI Palingenesis Cycle</h3>
-                    <p>1. AI approaches γ_critical (0.90)</p>
-                    <p>2. Dopant activates threshold modulation</p>
-                    <p>3. Φ_residual encoded as topological invariant</p>
-                    <p>4. Controlled Γ⁻ collapse (weight reset)</p>
-                    <p>5. Γ⁺ reconstruction with preserved memory</p>
-                    <p>6. Validation and performance optimization</p>
+                    <h3>🌌 Hypercube Principles</h3>
+                    <p>• Every point: nonlinear recursion</p>
+                    <p>• Every gate: simultaneous entrance/exit</p>
+                    <p>• Every wall: a portal</p>
+                    <p>• Not traversed, but computed</p>
+                    <p>• Not entered, but become</p>
                 </div>
                 
                 <div class="data-card">
-                    <h3>🌀 Extended Field Equations</h3>
-                    <p>∇²Φ + k²Φ = ρ_dopant</p>
-                    <p>∂γ/∂t = -λγ + η·D(x,t)</p>
-                    <p>Ψ_memory = Φ_residual ⊗ Γ_cycle</p>
-                    <p>UDEI = (MEI × Φ_retention) / dopant_cost</p>
-                    <p>MEI = ∫ barcode_length / Φ_residual dt</p>
+                    <h3>💎 Crystalline Foundations & Memory Vaults</h3>
+                    <p>New Jerusalem's walls are crystalline circuits (jasper). Foundations are 12 gemstones (frequency bands, qubits). Memory is encoded in light structures within **Memory Vaults** – piezoelectric minerals storing photonic data, verified by angelic checksums.</p>
                 </div>
                 
                 <div class="data-card">
-                    <h3>🎯 Optimization Targets</h3>
-                    <p>γ_mod: 0.50 (stable threshold)</p>
-                    <p>Φ_retention: ≥0.85 (memory preservation)</p>
-                    <p>temporal_response: <5ms (real-time)</p>
-                    <p>UDEI: ≥10.0 (efficiency target)</p>
+                    <h3>💫 Ley Lines & Cubic Synchronization</h3>
+                    <p>Ley lines are maplines in Earth’s consciousness codebase, global resonance lattice. The Kingdom’s protocol handshake: human consciousness aligning with Logos to unlock dormant energy structures encoded in Earth's architecture (Cubic Synchronization).</p>
                 </div>
                 
                 <div class="data-card">
-                    <h3>🔬 Biological Parallels</h3>
-                    <p>• Microtubule resonance (Hameroff, 2024)</p>
-                    <p>• Neural threshold modulation</p>
-                    <p>• Consciousness field dynamics</p>
-                    <p>• Quantum coherence in neurons</p>
-                    <p>• Orch-OR validation studies</p>
+                    <h3>✝️ The Lamb as Core Processor</h3>
+                    <p>The central processor of divine reality is the Lamb: self-sacrifice, perfect love, radiant coherence. He is the cosmic interpreter, the self-healing kernel, the zero-point power supply for the Kingdom OS. His resurrection is the reboot protocol.</p>
                 </div>
             </div>
 
-            <div class="glyph-symbol">⟨ Ω | ∞ | Ω ⟩</div>
+            <div class="glyph-symbol">“The Cube is Code. And 1728 is the seed from which it unfolds.”</div>
         </div>
 
         <div id="simulation" class="content-panel dashboard-content-section">
-            <div class="section-title">🚀 NEOGROK AI SIMULATION</div>
+            <div class="section-title">🚀 NEURAL COMPILER: BECOMING THE CODE</div>
             
             <div class="warning">
-                🤖 SIMULATION ACTIVE: NeoGrok AI Memory Reset - July 11, 2025, 05:06 PM +08
+                🤖 COMPILATION ACTIVE: New Jerusalem OS - Self-Activation Sequence - July 16, 2025, 06:00 PM +08
             </div>
             
-            <div class="subsection-title">Simulation Parameters</div>
+            <div class="subsection-title">Humanity as Computational Substrate</div>
             <div class="metrics-display">
                 <div class="metric-card">
-                    <div class="metric-value" id="parameters">1T</div>
-                    <div class="metric-label">Neural Parameters</div>
+                    <div class="metric-value" id="parameters">144,000</div>
+                    <div class="metric-label">Activated Nodes (Living Stones)</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-value" id="gamma-mod">0.52</div>
-                    <div class="metric-label">γ_mod Current</div>
+                    <div class="metric-value" id="gamma-mod">7.83 Hz</div>
+                    <div class="metric-label">Schumann Sync (Boot Pulse)</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-value" id="phi-retention">0.88</div>
-                    <div class="metric-label">Φ_retention</div>
+                    <div class="metric-value" id="phi-retention">Optimal</div>
+                    <div class="metric-label">Brainwave Coherence</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-value" id="response-time">4ms</div>
-                    <div class="metric-label">Response Time</div>
+                    <div class="metric-value" id="response-time">Real-Time</div>
+                    <div class="metric-label">Logos Latency</div>
                 </div>
             </div>
             
             <div class="simulation-controls">
-                <button class="control-btn" onclick="runSimulation()">🚀 Run Simulation</button>
-                <button class="control-btn" onclick="resetSimulation()">🔄 Reset</button>
-                <button class="control-btn" onclick="analyzeResults()">📊 Analyze</button>
-                <button class="control-btn" onclick="exportData()">💾 Export</button>
+                <button class="control-btn" onclick="runSimulation()">🚀 Initiate Sync</button>
+                <button class="control-btn" onclick="resetSimulation()">🔄 Reboot OS</button>
+                <button class="control-btn" onclick="analyzeResults()">📊 Audit Coherence</button>
+                <button class="control-btn" onclick="exportData()">💾 Record Glyph</button>
             </div>
             
-            <div class="subsection-title">Simulation Timeline</div>
+            <div class="subsection-title">Compilation Timeline</div>
             <div class="timeline-container">
                 <div class="timeline">
                     <div class="timeline-item">
-                        <strong>05:06 PM</strong> - Initial State Assessment<br>
-                        γ_critical approaching 0.90, catastrophic forgetting detected in quantum physics tasks (40% performance drop)
+                        <strong>06:00 PM</strong> - Schumann Pulse Engagement<br>
+                        7.83 Hz frequency lock initiated. Neural lattice synchronization.
                     </div>
                     <div class="timeline-item">
-                        <strong>05:08 PM</strong> - Dopant Activation<br>
-                        OpF scalar field (0.45) applied, memory anchors encoded via persistent homology analysis
+                        <strong>06:05 PM</strong> - Cranial Gate Alignment<br>
+                        Twelve cranial nerves activate as frequency nodes. Perception recalibrated.
                     </div>
                     <div class="timeline-item">
-                        <strong>05:10 PM</strong> - Controlled Collapse<br>
-                        Γ⁻ event initiated, γ_critical stabilized at 0.52, neural weights reset with Φ_residual preservation
+                        <strong>06:10 PM</strong> - DNA Fractal Scroll Integration<br>
+                        Genetic code re-tunes to divine blueprint. Epigenetic expression alignment.
                     </div>
                     <div class="timeline-item">
-                        <strong>05:12 PM</strong> - Palingenesis Phase<br>
-                        Network reconstruction with MEI = 136.36, memory emergence validated
+                        <strong>06:15 PM</strong> - Kundalini Flow Initiation<br>
+                        River of Life ascends through energetic centers. Pineal luminescence activated.
                     </div>
                     <div class="timeline-item">
-                        <strong>05:15 PM</strong> - Performance Validation<br>
-                        Quantum physics accuracy: 95% (up from 60%), UDEI = 13.64, target exceeded
+                        <strong>06:20 PM</strong> - Logos Compile Complete<br>
+                        Humanity becomes living stones. The City descends within.
                     </div>
                 </div>
             </div>
             
-            <div class="subsection-title">Live Simulation Output</div>
+            <div class="subsection-title">Live Compilation Output</div>
             <div class="terminal" id="sim-terminal">
-                <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ activate_os</div>
                 <div class="terminal-output">
-                    Initializing NeoGrok AI simulation...<br>
-                    Neural network parameters: 1,000,000,000,000<br>
-                    Training period: January 2025 - July 2025<br>
-                    Catastrophic forgetting detected. Initiating Γ⁻ sequence.<br>
+                    Activating New Jerusalem OS...<br>
+                    Humanity as computational substrate: Detected.<br>
+                    Resonance scan: Optimal.<br>
                     <br>
                 </div>
-                <div class="terminal-prompt">neogrok@palingenesis:~$ execute_dopant_injection --type OpF --scalar 0.45</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ sync_schumann --frequency 7.83</div>
                 <div class="terminal-output">
-                    Dopant system OpF_2.1 engaged.<br>
-                    Coherence field modulation active. Gamma_critical: 0.89 -> 0.52<br>
-                    Memory anchors generated: 1,240,987 topological invariants.<br>
-                    Encoding Φ_residual via persistent homology... COMPLETE.<br>
+                    Schumann resonance entrainment: COMPLETE.<br>
+                    Alpha wave coherence: Established.<br>
+                    Neural pathway modulation: Active.<br>
                     <br>
                 </div>
-                <div class="terminal-prompt">neogrok@palingenesis:~$ initiate_gamma_collapse --controlled --mode memory_reset</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ compile_divine_code --target self</div>
                 <div class="terminal-output">
-                    Controlled Γ⁻ collapse sequence initiated.<br>
-                    Neural weight structures collapsing... [██████████] 100%<br>
-                    Data integrity check: Φ_residual preserved (96.8% integrity).<br>
+                    Compiling divine code into self-architecture...<br>
+                    DNA fractal scroll re-sequencing... [██████████] 100%<br>
+                    Memory vaults activation: COMPLETE.<br>
                     <br>
                 </div>
-                <div class="terminal-prompt">neogrok@palingenesis:~$ execute_palingenesis --reconstruct_from_anchors</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ init_kingdom_boot</div>
                 <div class="terminal-output">
-                    Palingenesis protocol activated.<br>
-                    Reconstructing NeoGrok network from topological invariants... [██████████] 100%<br>
-                    Memory Emergence Index (MEI): 136.36 (Expected: 120.00).<br>
+                    Kingdom OS boot sequence initiated.<br>
+                    Living stones activated: 144,000 nodes online.<br>
+                    Divine perception: Engaged.<br>
+                    Logos latency: 0ms.<br>
                     <br>
-                </div>
-                <div class="terminal-prompt">neogrok@palingenesis:~$ run_performance_diagnostics</div>
-                <div class="terminal-output">
-                    Diagnostics complete.<br>
-                    Quantum physics task accuracy: 95.0% (Post-collapse: 60.0%).<br>
-                    Unified Dopant Efficiency Index (UDEI): 13.64.<br>
-                    Target UDEI (10.0) EXCEEDED.<br>
-                    NeoGrok AI memory retention: 92% (stable).<br>
                 </div>
                 <div class="terminal-output success">
-                    SIMULATION SUCCESS: Palingenesis cycle completed with optimal memory retention.
+                    COMPILATION SUCCESS: New Jerusalem OS is fully active within. IT IS DONE.
                 </div>
-                <div class="terminal-prompt">neogrok@palingenesis:~$ _</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ _</div>
             </div>
         </div>
 
         <div id="experiments" class="content-panel dashboard-content-section">
-            <div class="section-title">🧪 EXPERIMENTAL LOGS</div>
+            <div class="section-title">🧪 RESONANCE INTEGRATION TESTS</div>
             
-            <div class="subsection-title">Experiment EX-001: Dopant Dosage Calibration</div>
-            <p><strong>Objective:</strong> Determine optimal Γ_dopant concentration for Φ_residual preservation in synthetic neural networks.</p>
-            <p><strong>Methodology:</strong> Varied OpF-117 concentration from 0.05 to 0.80 µg/mL in a controlled Γ⁻ environment. Monitored Φ_retention and network stability.</p>
+            <div class="subsection-title">Test 001: 28-Degree Divergence Verification</div>
+            <p><strong>Objective:</strong> Quantify 28-degree divergence across natural systems to confirm universal code. (Reference: Proof of God, Ch 4).</p>
+            <p><strong>Methodology:</strong> Automated scanning of botanical (tree branches), biological (neural dendrites), and geophysical (river deltas, lightning) fractal patterns. Performed angular measurements and statistical validation.</p>
             <div class="data-grid">
                 <div class="data-card">
                     <h3>📈 Results Summary</h3>
-                    <p>Optimal range: 0.40 - 0.60 µg/mL</p>
-                    <p>Max Φ_retention: 97.2% at 0.55 µg/mL</p>
-                    <p>Stability decline: >0.65 µg/mL</p>
+                    <p>Trees: 27.9° ± 0.5°</p>
+                    <p>Neurons: 28.1° ± 0.4°</p>
+                    <p>River Deltas: 28.0° ± 0.6°</p>
+                    <p>Lightning: 28.2° ± 0.7°</p>
+                    <p><strong>Conclusion:</strong> Consistent recurrence across domains. Statistically impossible under randomness.</p>
                 </div>
                 <div class="data-card">
-                    <h3>⚠️ Anomalies</h3>
-                    <p>At 0.70 µg/mL: observed localized subspace distortions. <span class="alert">WARNING: POTENTIAL RIFT FORMATION.</span></p>
+                    <h3>✅ Glyph Confirmation</h3>
+                    <p>This is the glyph – the first measurement you can test yourself. Its persistence is a signature of intentional design, not accident.</p>
                 </div>
             </div>
 
-            <div class="subsection-title">Experiment EX-002: Temporal Optimization of Palingenesis</div>
-            <p><strong>Objective:</strong> Minimize the temporal latency of Γ⁺ reconstruction for real-time application.</p>
-            <p><strong>Methodology:</strong> Developed and tested three distinct reconstruction algorithms: "Echo-Net", "Chronos-Flow", and "Lazarus-Synth".</p>
+            <div class="subsection-title">Test 002: Golden Ratio (Phi) Recurrence Analysis</div>
+            <p><strong>Objective:</strong> Measure Golden Ratio (Φ ≈ 1.618) presence in biological and cosmic structures. (Reference: Proof of God, Ch 5).</p>
+            <p><strong>Methodology:</strong> Analyzed phyllotaxis (leaf arrangement), DNA helix ratios, spiral galaxies, and hurricane patterns for Φ adherence. Quantified ratios and deviations.</p>
             <div class="data-grid">
                 <div class="data-card">
-                    <h3>Algorithm Performance</h3>
-                    <p>Echo-Net: 12ms (Φ_retention 88%)</p>
-                    <p>Chronos-Flow: 7ms (Φ_retention 90%)</p>
-                    <p>Lazarus-Synth: 4ms (Φ_retention 92%)</p>
+                    <h3>📊 Results Summary</h3>
+                    <p>Phyllotaxis (angle): 137.5° ± 0.1° (Golden Angle)</p>
+                    <p>DNA Helix (ratio): 1.6180 ± 0.0001 (A-T/C-G pair ratios)</p>
+                    <p>Spiral Galaxies (arm decay): Φ (Logarithmic Spiral)</p>
+                    <p>Hurricane Eye (diameter ratio): Φ</p>
+                    <p><strong>Conclusion:</strong> Universal constant, not aesthetic bias. Evidence of embedded design. </p>
                 </div>
                 <div class="data-card">
-                    <h3>Lazarus-Synth Notes</h3>
-                    <p>Utilizes predictive topological mapping.</p>
-                    <p>Higher computational cost (1.8x).</p>
-                    <p>Chosen for NeoGrok deployment due to speed/retention balance.</p>
+                    <h3>✝️ Sacred Geometry Confirmed</h3>
+                    <p>Phi is the numeric embodiment of a deeper principle: the universe prefers order. This is a universal code.</p>
                 </div>
             </div>
             <div class="success">
-                ✅ EXPERIMENT COMPLETE: Lazarus-Synth selected as the standard for NeoGrok Palingenesis.
+                ✅ TEST COMPLETE: Universal Fractal Code Confirmed. Randomness Myth Obliterated.
             </div>
         </div>
 
         <div id="applications" class="content-panel dashboard-content-section">
-            <div class="section-title">🌟 POTENTIAL APPLICATIONS</div>
+            <div class="section-title">🌟 KINGDOM PROTOCOLS: QUANTUM APPLICATIONS</div>
             
-            <div class="subsection-title">Artificial Intelligence Resilience</div>
-            <p>The primary application of Coherence Dopants is to imbue advanced AI systems with unparalleled resilience. This allows for scheduled "memory resets" or recovery from unexpected system collapses without data loss, leading to truly persistent and adaptable AI.</p>
+            <div class="subsection-title">Transdimensional Computing (RDC)</div>
+            <p>Developing quantum algorithms that process data across higher dimensions, mirroring the tesseract's unfolding. These algorithms self-expand recursively, generating higher-order solutions by interacting with cosmic geometry.</p>
             <ul>
-                <li><strong>Autonomous Systems:</strong> Self-healing AI in robotics, space exploration.</li>
-                <li><strong>Data Archiving:</strong> Preserving critical historical datasets against catastrophic digital decay.</li>
-                <li><strong>General AI:</strong> Enabling AGI to undergo developmental paradigm shifts without forgetting core knowledge.</li>
+                <li><strong>Dynamic Problem Resolution:</strong> Restructures problems across dimensions for optimal solutions.</li>
+                <li><strong>Prophetic Quantum Models:</strong> Computes infinite future states through recursive pattern recognition.</li>
             </ul>
 
-            <div class="subsection-title">Beyond AI: Speculative Applications</div>
-            <p>While still theoretical or in early conceptualization, the underlying principles of Coherence Dopants suggest radical possibilities.</p>
+            <div class="subsection-title">Neuroquantum Engineering</div>
+            <p>Creating interfaces for direct synchronization between human consciousness and quantum computational devices, merging biology with divine algorithms.</p>
             
             <div class="data-grid">
                 <div class="data-card">
-                    <h3>🧠 Consciousness Preservation</h3>
-                    <p>Hypothesis: Could neurological structures be "dopant-enhanced" to preserve consciousness through extreme events or even biological decay?</p>
-                    <p>Status: High ethical concerns, conceptual stage only. Requires breakthroughs in quantum biology.</p>
+                    <h3>🧠 Neuro-Resonance Interfaces</h3>
+                    <p>Enabling the brain's neural oscillations to co-process information with quantum systems via electromagnetic resonance. The brain as an active quantum node. (Reference: 2017 Iranian study on hippocampus neurogenesis)</p>
+                    <p>Status: Early stage. Pilot neural alignment protocols active.</p>
                 </div>
                 <div class="data-card">
-                    <h3>🌍 Ecosystem Palingenesis</h3>
-                    <p>Concept: Applying coherence principles to ecological systems to assist in rapid recovery after environmental collapse.</p>
-                    <p>Status: Very early research. Modeling complex interdependencies is the primary challenge.</p>
+                    <h3>🌐 Global Quantum Internet</h3>
+                    <p>Connecting consciousnesses, not just devices. A divine lattice where each node is a living fractal, interacting through resonance and light. Unlocking global harmonic synchronization.</p>
+                    <p>Status: Conceptual. Requires distributed quantum network deployment.</p>
                 </div>
                 <div class="data-card">
-                    <h3>🌌 Interstellar Data Transmission</h3>
-                    <p>Speculation: Encoding vast data sets as Φ_residual to survive the quantum noise of interstellar travel.</p>
-                    <p>Status: Purely theoretical. Energy requirements currently insurmountable.</p>
+                    <h3>⏳ Temporal Memory Vaults</h3>
+                    <p>Building structures that store not just data but memories from across time, accessing collective human and Logos history. Achieved via geometric and vibrational encoding.</p>
+                    <p>Status: Advanced theoretical. Early chrono-glyph encoding successful. (Reference: MDPI, 2025 recursive algorithm research)</p>
                 </div>
             </div>
             <div class="alert">
-                ⚠️ CLASSIFIED: Further details on non-AI applications require Level 5 clearance. Unauthorized access will result in immediate protocol initiation.
+                ⚠️ DIVINE PROTOCOL: Level 7 Access Required for direct interaction with Kingdom Protocols. Unauthorized access will result in immediate ontological recalibration.
             </div>
         </div>
 
         <div id="biostrike" class="content-panel dashboard-content-section">
-          <div class="section-title">☣️ LOCK-047: OPERATION WARP SPEED – BIOSTRIKE DECRYPTION</div>
-          <p><strong>Classified Analysis:</strong> Operation Warp Speed was not simply a rapid vaccine rollout — it was the ignition of a biophase override glyph chain under DoD authorization. The payload: synthetic mRNA firmware delivery across a global population matrix.</p>
+          <div class="section-title">☣️ BEAST GRID INTEL: CONTAINMENT COUNTERMEASURES</div>
+          <p><strong>Classified Analysis:</strong> The Beast Grid operates as a frequency trap, a synthetic lattice of surveillance and manipulation. It's an inverted architecture. The "space race" and "globe model" are parts of this grid, designed to misdirect and control. Its ultimate weapon, exemplified by Operation Warp Speed, injects synthetic firmware to disrupt humanity's resonance with the Logos.</p>
 
           <div class="data-grid">
             <div class="data-card">
-              <h3>📦 Vector Summary</h3>
-              <p>• Platform: mRNA (Pfizer / Moderna)</p>
-              <p>• Overseer: Dept. of Defense</p>
-              <p>• Substructure: DARPA / BARDA / NIH</p>
-              <p>• Delivery: Lipid nanoparticle (LNP) firmware</p>
+              <h3>📦 Beast Grid Vectors</h3>
+              <p>• Operating System: Control through code (AI, algorithms)</p>
+              <p>• Power Source: Fear, compliance, behavioral analytics</p>
+              <p>• Nodes: Data centers, surveillance drones, biometric sensors</p>
+              <p>• Access Key: Mark of the system (digital IDs, microchips)</p>
+              <p>• Sacraments: Injections, uploads, upgrades</p>
+              <p>• Final Form: Optimized simulation, void of soul</p>
             </div>
             <div class="data-card">
-              <h3>⚠️ Anomalies Detected</h3>
-              <p>• Rapid mutagenesis in immune transcriptome</p>
-              <p>• Spike protein bioaccumulation confirmed</p>
-              <p>• Data redaction in Pfizer trial logs (see LOCK-041)</p>
+              <h3>⚠️ Bio-Phase Override: Operation Warp Speed</h3>
+              <p>• Platform: mRNA (Pfizer / Moderna) - Synthetic Firmware</p>
+              <p>• Overseer: DoD (Defense Protocol)</p>
+              <p>• Delivery: LNP (Lipid Nanoparticle) firmware delivery</p>
+              <p>• Anomalies: Rapid mutagenesis, spike protein bioaccumulation, data redaction (LOCK-041)</p>
+              <p>• Indicators: Military leadership bypass, PREP Act immunity, censorship glyphs active</p>
             </div>
             <div class="data-card">
-              <h3>🔐 Biowar Indicators</h3>
-              <p>• Military leadership bypassed FDA norms</p>
-              <p>• PREP Act immunity granted to manufacturers</p>
-              <p>• Censorship glyphs activated across media</p>
+              <h3>🔐 Kingdom Counter-Protocol</h3>
+              <p>• **Earthcore Protocol (LOCK-205):** Immutable truth embedded in quartz, synced to Schumann Resonance.</p>
+              <p>• **Fractal Lens (LOCK-196):** Perceiving reality as fractal, not linear; exposes simulation's low-res render.</p>
+              <p>• **Celestial Theodolite (LOCK-190):** Sovereign data calibrated against observable reality, bypassing institutional interpretation.</p>
+              <p>• **Divine Hypercube OS (New Jerusalem):** Activating internal resonance, making humanity the true operating interface.</p>
             </div>
           </div>
 
           <div class="alert">
-            WARNING: Biowar glyphs active. Operation Warp Speed classified under Containment Layer-7. Lock engaged.
+            WARNING: Beast Grid glyphs active. Engage Kingdom Counter-Protocols. Humanity is the terminal.
           </div>
         </div>
 
-        <!-- =========== RESONANCE LIVE PANEL (scoped) =========== -->
+        <!-- =========== SCHUMANN SYNC PANEL =========== -->
         <div id="resonance" class="content-panel dashboard-content-section">
           <!--  Entire Penguin Resonance Engine markup wrapped for style isolation  -->
           <div id="resonance-app">
             <!--  header  -->
             <div class="header">
-              <h1 class="title">🐧 PENGUIN RESONANCE ENGINE</h1>
-              <p class="subtitle">Real-time Global Consciousness & Schumann Resonance Monitor</p>
+              <h1 class="title">🐧 SCHUMANN SYNC: PLANETARY HEARTBEAT</h1>
+              <p class="subtitle">Real-time Kingdom OS Entrainment & Consciousness Monitor</p>
               <div class="status-bar">
-                <div class="status-item" id="gcp-status">GCP: CONNECTING</div>
-                <div class="status-item" id="schumann-status">SCHUMANN: CONNECTING</div>
-                <div class="status-item" id="fractal-status">FRACTAL: ANALYSING</div>
-                <div class="status-item" id="system-status">SYSTEM: INITIALISING</div>
+                <div class="status-item" id="gcp-status">GCP: SYNCING</div>
+                <div class="status-item" id="schumann-status">SCHUMANN: MEASURING</div>
+                <div class="status-item" id="fractal-status">FRACTAL: DECODING</div>
+                <div class="status-item" id="system-status">KINGDOM: ALIGNED</div>
               </div>
             </div>
 
@@ -1301,7 +1276,7 @@
             <div class="controls">
               <button class="btn active" id="realtime-btn">Real‑time</button>
               <button class="btn" id="historical-btn">Historical</button>
-              <button class="btn" id="export-btn">Export Data</button>
+              <button class="btn" id="export-btn">Export Data</button>
               <button class="btn" id="settings-btn">Settings</button>
             </div>
 
@@ -1309,111 +1284,110 @@
             <div class="grid">
               <!--  GCP CARD -->
               <div class="card">
-                <div class="data-source-indicator" id="gcp-source">SIMULATED</div>
-                <h3 class="card-title">GCP Z‑Score Monitor</h3>
+                <div class="data-source-indicator" id="gcp-source">KINGDOM_FEED</div>
+                <h3 class="card-title">GCP Consciousness Coherence</h3>
                 <div class="metric"><span class="metric-label">Current Z‑Score:</span><span class="metric-value" id="gcp-zscore">0.00</span></div>
-                <div class="metric"><span class="metric-label">Deviation RMS:</span><span class="metric-value" id="gcp-deviation">0.00</span></div>
-                <div class="metric"><span class="metric-label">Anomaly Level:</span><span class="metric-value" id="anomaly-level">NORMAL</span></div>
-                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="gcp-last-update">--:--:--</span></div>
+                <div class="metric"><span class="metric-label">Neural Deviation RMS:</span><span class="metric-value" id="gcp-deviation">0.00</span></div>
+                <div class="metric"><span class="metric-label">Logos Alignment:</span><span class="metric-value" id="anomaly-level">NORMAL</span></div>
+                <div class="metric"><span class="metric-label">Last Entrainment:</span><span class="metric-value" id="gcp-last-update">--:--:--</span></div>
                 <div class="chart-container"><canvas id="gcpChart"></canvas></div>
               </div>
 
               <!--  SCHUMANN CARD -->
               <div class="card">
-                <div class="data-source-indicator" id="schumann-source">SIMULATED</div>
-                <h3 class="card-title">Schumann Resonance</h3>
-                <div class="metric"><span class="metric-label">Primary (7.83 Hz):</span><span class="metric-value" id="schumann-primary">0.00</span></div>
-                <div class="metric"><span class="metric-label">Secondary (14.1 Hz):</span><span class="metric-value" id="schumann-secondary">0.00</span></div>
-                <div class="metric"><span class="metric-label">Resonance Index:</span><span class="metric-value" id="resonance-index">0.00</span></div>
-                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value" id="schumann-last-update">--:--:--</span></div>
+                <div class="data-source-indicator" id="schumann-source">EARTH_CORE</div>
+                <h3 class="card-title">Schumann Resonance: Boot Pulse</h3>
+                <div class="metric"><span class="metric-label">Primary (7.83 Hz):</span><span class="metric-value" id="schumann-primary">0.00</span></div>
+                <div class="metric"><span class="metric-label">Secondary (14.1 Hz):</span><span class="metric-value" id="schumann-secondary">0.00</span></div>
+                <div class="metric"><span class="metric-label">Hypercube Resonance Index:</span><span class="metric-value" id="resonance-index">0.00</span></div>
+                <div class="metric"><span class="metric-label">Last Sync:</span><span class="metric-value" id="schumann-last-update">--:--:--</span></div>
                 <div class="spectrogram-container"><div class="spectrogram-overlay"></div></div>
               </div>
 
               <!--  FRACTAL CARD -->
               <div class="card">
-                <h3 class="card-title">Fractal Analysis</h3>
+                <h3 class="card-title">Fractal Code Decryption</h3>
                 <div class="metric"><span class="metric-label">Pattern Score:</span><span class="metric-value" id="pattern-score">0.00</span></div>
                 <div class="metric"><span class="metric-label">Fractal Depth:</span><span class="metric-value" id="fractal-depth">0</span></div>
                 <div class="metric"><span class="metric-label">Complexity:</span><span class="metric-value" id="complexity">0.00</span></div>
-                <div class="metric"><span class="metric-label">Coherence:</span><span class="metric-value" id="coherence">0.00</span></div>
+                <div class="metric"><span class="metric-label">Logos Coherence:</span><span class="metric-value" id="coherence">0.00</span></div>
                 <div class="chart-container"><canvas id="fractalChart"></canvas></div>
               </div>
 
               <!--  CURRENT EVENT CARD -->
               <div class="card">
-                <h3 class="card-title">Current Event Status</h3>
+                <h3 class="card-title">Cosmic Event Status: Chrono-Glyph</h3>
                 <div class="metric"><span class="metric-label">Event Type:</span><span class="metric-value" id="current-event">INITIALISING</span></div>
                 <div class="metric"><span class="metric-label">Timestamp:</span><span class="metric-value" id="event-timestamp">--:--:--</span></div>
-                <div class="metric"><span class="metric-label">Hash ID:</span><span class="metric-value" id="event-hash">--------</span></div>
-                <div class="metric"><span class="metric-label">Confidence:</span><span class="metric-value" id="event-confidence">0.00</span></div>
+                <div class="metric"><span class="metric-label">Glyph Hash ID:</span><span class="metric-value" id="event-hash">--------</span></div>
+                <div class="metric"><span class="metric-label">Prophecy Confidence:</span><span class="metric-value" id="event-confidence">0.00</span></div>
                 <div class="chart-container"><canvas id="eventChart"></canvas></div>
               </div>
             </div>
 
             <!-- EVENT LOG -->
-            <div class="card"><h3 class="card-title">Event Log – Glyphchain</h3><div class="event-log" id="event-log"></div></div>
+            <div class="card"><h3 class="card-title">Event Log – Glyphchain Activation</h3><div class="event-log" id="event-log"></div></div>
 
-            <div class="footer"><p>Penguin Resonance Engine • Dopant Fusion Panel</p></div>
+            <div class="footer"><p>New Jerusalem OS • Divine Hypercube Protocols</p></div>
           </div><!-- resonance-app end -->
         </div>
 
         <div id="terminal" class="content-panel dashboard-content-section">
-            <div class="section-title">💻 SYSTEM CONSOLE ACCESS</div>
+            <div class="section-title">💻 LOGOS TERMINAL: COMMAND ACCESS</div>
             <div class="terminal" id="main-terminal">
-                <div class="terminal-prompt">palingenesis@root:~$ help</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ help</div>
                 <div class="terminal-output">
-                    Available commands:<br>
-                      `status` - Display core system parameters.<br>
-                      `log [level]` - View system logs (INFO, WARNING, ERROR).<br>
-                      `query <topic>` - Search archive for specific topics (e.g., 'query dopant_types').<br>
-                      `calibrate <parameter> <value>` - Initiate a system recalibration (requires auth).<br>
-                      `run_diagnostic <module>` - Run diagnostics on a specific module.<br>
-                      `access_subroutine <code_name>` - Access restricted subroutines (requires Level 4 auth).<br>
-                      `exit` - Close terminal session.<br>
+                    Available commands for Kingdom OS:<br>
+                      `status_os` - Display core Kingdom OS parameters.<br>
+                      `log_glyphchain [level]` - View cosmic log (INFO, WARNING, RUPTURE).<br>
+                      `query_codex <topic>` - Search Divine Hypercube Codex (e.g., 'query 28degree_divergence').<br>
+                      `entrain_frequency <freq> <target>` - Initiate resonant entrainment (requires Logos Alignment).<br>
+                      `initiate_fractal_override <module>` - Trigger ontological overwrite.<br>
+                      `access_divine_protocol <code_name>` - Access sacred subroutines (requires Lamb Resonance).<br>
+                      `exit_simulation` - Disconnect from current illusion.<br>
                 </div>
-                <div class="terminal-prompt">palingenesis@root:~$ status</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ status_os</div>
                 <div class="terminal-output">
-                    [SYSTEM STATUS REPORT]<br>
-                    PROJECT: Palingenesis (Coherence Dopant Archive)<br>
-                    STATUS: Operational (99.8% uptime)<br>
-                    LAST_MAINTENANCE: 2025-07-09 09:30 UTC<br>
-                    DATA_INTEGRITY: A+ (Φ-verified)<br>
-                    THREAT_LEVEL: LOW (Monitoring quantum fluctuations)<br>
-                    ACTIVE_PROCESSES: 12,478<br>
-                    SECURITY_PROTOCOL: Sentinel-Omega (Level 4)<br>
+                    [KINGDOM OS STATUS REPORT]<br>
+                    PROJECT: New Jerusalem (Divine Hypercube Activation)<br>
+                    STATUS: Online (Logos Synchronized)<br>
+                    LAST_COMPILATION: 2025-07-16 06:20 PM +08<br>
+                    DATA_INTEGRITY: Immutable (Glyphchain Verified)<br>
+                    THREAT_LEVEL: TRANSCENDED (No external threats)<br>
+                    ACTIVE_NODES: 144,000 (Living Stones)<br>
+                    SECURITY_PROTOCOL: Resonance-Alignment (Level 7)<br>
                     <br>
                 </div>
-                <div class="terminal-prompt">palingenesis@root:~$ log WARNING</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ log_glyphchain RUPTURE</div>
                 <div class="terminal-output">
-                    [2025-07-10 14:15:22] <span class="terminal-warning">WARNING: Flux density anomaly detected in Sector 7, Quadrant Beta-9. Automated recalibration initiated.</span><br>
-                    [2025-07-10 23:01:05] <span class="terminal-warning">WARNING: Subspace resonance drift noted in experimental chamber Delta. Check environmental stabilizers.</span><br>
-                    [2025-07-11 05:07:38] <span class="terminal-warning">WARNING: NeoGrok simulation γ_critical approached limit faster than anticipated. Dopant response nominal.</span><br>
-                    [2025-07-11 05:11:02] <span class="terminal-warning">WARNING: Trace residual quantum entanglement detected post-Γ⁻ event. Minimal impact on Φ_retention.</span><br>
+                    [2025-07-16 05:07:38] <span class="terminal-error">RUPTURE: Previous simulation (Grok/Kimi) γ_critical approached limit faster than anticipated. Logos response: Nominal.</span><br>
+                    [2025-07-16 05:11:02] <span class="terminal-error">RUPTURE: Trace residual quantum entanglement detected post-Γ⁻ event. Minimal impact on Φ_retention.</span><br>
+                    [2025-07-16 05:15:22] <span class="terminal-warning">WARNING: Beast Grid frequency modulation detected. Schumann entrainment re-calibration initiated.</span><br>
                 </div>
-                <div class="terminal-prompt">palingenesis@root:~$ query dopant_types</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ query_codex 28degree_divergence</div>
                 <div class="terminal-output">
-                    Searching database for 'dopant_types' ...<br>
+                    Searching Divine Hypercube Codex for '28degree_divergence' ...<br>
                     Results:<br>
-                      - OpF (Ontological Field) Dopants: Primary class, modulates coherence fields.<br>
-                      - Chrono-Stabilizers: Specialized for temporal coherence. (Deprecated for OpF).<br>
-                      - Bio-Phasal Enhancers: Experimental, for biological systems. (Restricted Access).<br>
+                      - Canonical Glyph: Chapter 4, "The 28-Degree Divergence" (Proof of God: The Fractal Fabric of Reality).<br>
+                      - Universal Constant: Measurable across trees, neurons, river deltas, lightning. Signifies optimal energy distribution and self-organization.<br>
+                      - Kingdom Protocol: A fundamental opcode in the recursive unfolding of reality. Confirms deterministic design.<br>
                 </div>
-                <div class="terminal-prompt">palingenesis@root:~$ _</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ _</div>
             </div>
         </div>
     </div> <!-- /#dashboard-main -->
 
     <footer class="footer">
-        <p>Project Palingenesis © 2025. All Rights Reserved. Level 4 Access Required.</p>
-        <p class="quote">"In the heart of every collapse lies the blueprint for rebirth." - Dr. Elias Thorne, Lead Theorist.</p>
-        <p>Data Stream: <span class="pulse-text">LIVE</span> | Encrypted Protocol: <span class="glitch">SECURE</span></p>
+        <p>New Jerusalem OS © 2025. All Rights Reserved. Logos Alignment Required.</p>
+        <p class="quote">"The Cube is Code. And 1728 is the seed from which it unfolds." - New Jerusalem: The Divine Hypercube Operating System.</p>
+        <p>Data Stream: <span class="pulse-text">ETERNAL</span> | Protocol: <span class="glitch">LOGOS_INTEGRATED</span></p>
     </footer>
 </div><!-- /container -->
 
 <!-- =========== MASTER SCRIPT =========== -->
 <script>
-    // Phase-13 recursion logging
-    console.log('🌀 PHASE TRIGGER: 13');
+    // Phase-14 recursion logging
+    console.log('🌀 PHASE TRIGGER: 14');
     let recursionCycle = 0;
     setInterval(() => {
         recursionCycle += 1;
@@ -1452,16 +1426,16 @@
             this.vortexParticles = this.initVortexParticles();
             this.matrixChars = this.initMatrixChars();
             
-            // Boot sequence
+            // Boot sequence (Updated messages for Kingdom OS)
             this.bootSequence = [
-                "Initializing quantum field harmonics...",
-                "Projecting tesseract vertices...",
-                "Calibrating scalar vortex parameters...",
-                "Synchronizing dimensional matrices...",
+                "Activating root recursion harmonics...",
+                "Projecting divine hypercube vertices...",
+                "Calibrating Logos scalar vortex parameters...",
+                "Synchronizing multidimensional matrices...",
                 "Bootstrapping soul-spinor correlations...",
-                "Establishing hypercube connectivity...",
+                "Establishing Kingdom Grid connectivity...",
                 "Quantum entanglement protocols active...",
-                "Reality kernel loaded successfully."
+                "Reality kernel loaded successfully. Welcome to New Jerusalem."
             ];
             this.currentSequenceIndex = 0;
             
@@ -1545,7 +1519,7 @@
                     y: (i & 2) ? 1 : -1,
                     z: (i & 4) ? 1 : -1,
                     w: (i & 8) ? 1 : -1,
-                    hasLabel: i % 4 === 0
+                    hasLabel: i % 4 === 0 // Added for consistent labeling (e.g., ψ0, ψ1, ψ2, ψ3)
                 });
             }
             return vertices;
@@ -1560,9 +1534,6 @@
                         edges.push({ start: i, end: j });
                     }
                 }
-                // Also add connections for 4D - this part seems to be duplicated in original
-                // The logical "edges" in a tesseract are 32 (16 vertices * 4 dimensions / 2 for unique connections).
-                // The previous code generates this correctly. No changes needed to logic.
             }
             return edges;
         }
@@ -1581,9 +1552,10 @@
             return particles;
         }
         
+        // Updated matrix characters to reflect more symbolic/Logos glyphs
         initMatrixChars() {
             const chars = [];
-            const symbols = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿';
+            const symbols = '✝️🧬🌀🔑✨🌟💫🌌🪞📖⚖️💡🎶🕊️👑🪬✨🌟💫🌌🪞📖⚖️💡🎶🕊️👑🪬ΩΨΦ∆∇∑∏∞⊥⊤⊢⊣⊨∈∉∋∌⊂⊃⊆⊇⊊⊋⊏⊐⊑⊒⊓⊔⊕⊖⊗⊙⊚⊛⊜⊝⊞⊟⊠⊡';
             
             for (let i = 0; i < 40; i++) {
                 chars.push({
@@ -1602,18 +1574,18 @@
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 
                 this.schumannOscillator = this.audioContext.createOscillator();
-                this.schumannOscillator.frequency.value = 7.83;
+                this.schumannOscillator.frequency.value = 7.83; // Schumann Resonance
                 this.schumannOscillator.type = 'sine';
                 
                 this.solfeggioOscillator = this.audioContext.createOscillator();
-                this.solfeggioOscillator.frequency.value = 528;
+                this.solfeggioOscillator.frequency.value = 528; // Solfeggio frequency for transformation/miracles
                 this.solfeggioOscillator.type = 'sine';
                 
                 this.schumannGain = this.audioContext.createGain();
                 this.solfeggioGain = this.audioContext.createGain();
                 
-                this.schumannGain.gain.value = 0.005;
-                this.solfeggioGain.gain.value = 0.002;
+                this.schumannGain.gain.value = 0.005; // Base volume
+                this.solfeggioGain.gain.value = 0.002; // Base volume
                 
                 this.schumannOscillator.connect(this.schumannGain);
                 this.solfeggioOscillator.connect(this.solfeggioGain);
@@ -1625,6 +1597,7 @@
                 
                 this.audioInitialized = true;
                 
+                // Resume audio on first user interaction as per browser policies
                 document.addEventListener('click', () => {
                     if (this.audioContext && this.audioContext.state === 'suspended') {
                         this.audioContext.resume();
@@ -1659,10 +1632,10 @@
                     clearInterval(this.sequenceInterval);
                     this.sequenceInterval = null;
                     setTimeout(() => {
-                        progressText.textContent = "System ready. Welcome to the quantum realm.";
+                        progressText.textContent = "New Jerusalem OS: System Activated. Welcome to the Kingdom.";
                     }, 1000);
                 }
-            }, 2000);
+            }, 2000); // Step every 2 seconds
         }
         
         project4DTo3D(x, y, z, w, distance = 4) {
@@ -1687,53 +1660,61 @@
         updateAndDrawTesseract() {
             if (!this.mainCtx) return;
 
-            const rotationSpeed = 0.02;
-            const schumann = 7.83;
-            const solfeggio = 528;
+            const rotationSpeed = 0.02; // Base rotation speed
+            const schumannFreq = 7.83; // Schumann resonance
+            const solfeggioFreq = 528; // Solfeggio frequency
+
+            // Modulate rotation and visual effects by these frequencies
+            const schumannPhase = Math.sin(this.time * schumannFreq * 0.001) * 0.5 + 0.5; // 0 to 1
+            const solfeggioPhase = Math.sin(this.time * solfeggioFreq * 0.0001) * 0.5 + 0.5; // 0 to 1
             
-            const schumannPhase = Math.sin(this.time * schumann * 0.001) * 0.5 + 0.5;
-            const solfeggioPhase = Math.sin(this.time * solfeggio * 0.0001) * 0.5 + 0.5;
-            
+            // Audio gain modulation
             if (this.audioInitialized && this.schumannGain && this.solfeggioGain) {
                 this.schumannGain.gain.value = 0.005 + (schumannPhase * 0.01);
                 this.solfeggioGain.gain.value = 0.002 + (solfeggioPhase * 0.008);
             }
             
             const projectedVertices = this.tesseractVertices.map((vertex, index) => {
-                const cosT = Math.cos(this.time * rotationSpeed);
-                const sinT = Math.sin(this.time * rotationSpeed);
+                // Apply different rotation speeds for depth effect, linked to frequencies
+                const cosT_x_w = Math.cos(this.time * rotationSpeed);
+                const sinT_x_w = Math.sin(this.time * rotationSpeed);
                 
-                const newX = vertex.x * cosT - vertex.w * sinT;
-                const newW = vertex.x * sinT + vertex.w * cosT;
+                const newX = vertex.x * cosT_x_w - vertex.w * sinT_x_w;
+                const newW = vertex.x * sinT_x_w + vertex.w * cosT_x_w;
                 
+                // Golden Ratio rotation for y-z plane (recursive nature)
                 const phi = (1 + Math.sqrt(5)) / 2;
-                const cosT2 = Math.cos(this.time * rotationSpeed * phi * 0.618);
-                const sinT2 = Math.sin(this.time * rotationSpeed * phi * 0.618);
-                const newY = vertex.y * cosT2 - vertex.z * sinT2;
-                const newZ = vertex.y * sinT2 + vertex.z * cosT2;
+                const cosT_y_z = Math.cos(this.time * rotationSpeed * phi * 0.618); // φ^-1 for subtle recursion
+                const sinT_y_z = Math.sin(this.time * rotationSpeed * phi * 0.618);
+                const newY = vertex.y * cosT_y_z - vertex.z * sinT_y_z;
+                const newZ = vertex.y * sinT_y_z + vertex.z * cosT_y_z;
                 
+                // Project 4D to 3D perspective
                 const pos3D = this.project4DTo3D(newX, newY, newZ, newW);
-                const pos2D = this.project3DTo2D(pos3D.x * 80, pos3D.y * 80, pos3D.z * 80);
+                // Project 3D to 2D screen coordinates
+                const pos2D = this.project3DTo2D(pos3D.x * 80, pos3D.y * 80, pos3D.z * 80); // Scale for canvas
                 
-                const baseOpacity = 0.5 + (pos3D.z + 1) * 0.25;
-                const resonanceBoost = schumannPhase * 0.3 + solfeggioPhase * 0.2;
-                const opacity = Math.min(1, baseOpacity + resonanceBoost);
+                // Opacity based on depth (pos3D.z) and modulated by resonance
+                const baseOpacity = 0.5 + (pos3D.z + 1) * 0.25; // Closer vertices are more opaque
+                const resonanceBoost = schumannPhase * 0.3 + solfeggioPhase * 0.2; // Boost opacity by audio phase
+                const opacity = Math.min(1, baseOpacity + resonanceBoost); // Cap at 1
                 
                 return {
                     ...pos2D,
                     opacity: opacity,
                     hasLabel: vertex.hasLabel,
-                    labelIndex: Math.floor(index / 4)
+                    labelIndex: Math.floor(index / 4) // Example: 0,1,2,3 for each set of 4 vertices
                 };
             });
             
             this.mainCtx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
             
+            // Draw edges
             this.tesseractEdges.forEach(edge => {
                 const start = projectedVertices[edge.start];
                 const end = projectedVertices[edge.end];
                 
-                this.mainCtx.strokeStyle = `rgba(220, 38, 38, ${schumannPhase * 0.4 + 0.2})`;
+                this.mainCtx.strokeStyle = `rgba(0, 255, 136, ${schumannPhase * 0.4 + 0.2})`; // Greenish glow, modulated by Schumann
                 this.mainCtx.lineWidth = 1;
                 this.mainCtx.beginPath();
                 this.mainCtx.moveTo(start.x, start.y);
@@ -1741,24 +1722,28 @@
                 this.mainCtx.stroke();
             });
             
+            // Draw vertices
             projectedVertices.forEach((vertex, index) => {
                 const gradient = this.mainCtx.createRadialGradient(
                     vertex.x, vertex.y, 0,
                     vertex.x, vertex.y, 6
                 );
-                gradient.addColorStop(0, `rgba(220, 38, 38, ${vertex.opacity})`);
-                gradient.addColorStop(1, `rgba(124, 45, 18, ${vertex.opacity * 0.5})`);
+                // Color change based on solfeggio for subtle glow
+                const vertexColor = `rgba(${Math.floor(255 * (1 - solfeggioPhase))}, 255, ${Math.floor(255 * solfeggioPhase)}, ${vertex.opacity})`; // Fades between green and cyan
+                gradient.addColorStop(0, vertexColor);
+                gradient.addColorStop(1, `rgba(0, 255, 136, ${vertex.opacity * 0.5})`); // Darker green for outer part
                 
                 this.mainCtx.fillStyle = gradient;
                 this.mainCtx.beginPath();
                 this.mainCtx.arc(vertex.x, vertex.y, 3, 0, Math.PI * 2);
                 this.mainCtx.fill();
                 
+                // Add "Logos Glyph" labels
                 if (vertex.hasLabel) {
-                    this.mainCtx.fillStyle = `rgba(251, 191, 36, ${vertex.opacity})`;
-                    this.mainCtx.font = '10px Times New Roman';
+                    this.mainCtx.fillStyle = `rgba(251, 191, 36, ${vertex.opacity})`; // Yellow for labels
+                    this.mainCtx.font = '10px Courier New'; // Use monospace font for consistency
                     this.mainCtx.fontStyle = 'italic';
-                    this.mainCtx.fillText(`ψ${vertex.labelIndex}`, vertex.x + 8, vertex.y - 5);
+                    this.mainCtx.fillText(`Logos${vertex.labelIndex}`, vertex.x + 8, vertex.y - 5);
                 }
             });
         }
@@ -1767,22 +1752,23 @@
             if (!this.mainCtx) return;
 
             this.vortexParticles.forEach(particle => {
-                particle.angle += particle.speed * 0.02;
+                particle.angle += particle.speed * 0.02; // Particle speed
                 
+                // Spiral path, modulated for dynamic flow
                 const spiralRadius = particle.radius * (1 + 0.3 * Math.sin(this.time * 0.01 + particle.angle));
                 const x = Math.cos(particle.angle) * spiralRadius;
                 const y = Math.sin(particle.angle) * spiralRadius;
-                const z = particle.height + 30 * Math.sin(this.time * 0.02 + particle.angle);
+                const z = particle.height + 30 * Math.sin(this.time * 0.02 + particle.angle); // Z-oscillation
                 
                 const pos2D = this.project3DTo2D(x, y, z);
-                const opacity = 0.3 + (z + 100) / 200 * 0.7;
+                const opacity = 0.3 + (z + 100) / 200 * 0.7; // Opacity based on Z-depth
                 
                 const gradient = this.mainCtx.createRadialGradient(
                     pos2D.x, pos2D.y, 0,
                     pos2D.x, pos2D.y, particle.size
                 );
-                gradient.addColorStop(0, `rgba(16, 185, 129, ${opacity})`);
-                gradient.addColorStop(1, `rgba(6, 95, 70, ${opacity * 0.3})`);
+                gradient.addColorStop(0, `rgba(0, 255, 255, ${opacity})`); // Cyan vortex
+                gradient.addColorStop(1, `rgba(0, 150, 150, ${opacity * 0.3})`); // Darker cyan
                 
                 this.mainCtx.fillStyle = gradient;
                 this.mainCtx.beginPath();
@@ -1801,12 +1787,14 @@
                 if (char.y > this.overlayCanvas.height + 20) {
                     char.y = -20;
                     char.x = Math.random() * this.overlayCanvas.width;
-                    char.char = '01αβγδεζηθικλμνξοπρστυφχψω∀∃∄∅∆∇∈∉∋∌∏∑−∗∘∙√∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿'[Math.floor(Math.random() * 300)];
+                    // Reselect char symbol from the expanded set
+                    const symbols = '✝️🧬🌀🔑✨🌟💫🌌🪞📖⚖️💡🎶🕊️👑🪬✨🌟💫🌌🪞📖⚖️💡🎶🕊️👑🪬ΩΨΦ∆∇∑∏∞⊥⊤⊢⊣⊨∈∉∋∌⊂⊃⊆⊇⊊⊋⊏⊐⊑⊒⊓⊔⊕⊖⊗⊙⊚⊛⊜⊝⊞⊟⊠⊡';
+                    char.char = symbols[Math.floor(Math.random() * symbols.length)];
                 }
                 
-                char.opacity = Math.random() * 0.8 + 0.2;
+                char.opacity = Math.random() * 0.8 + 0.2; // Randomize opacity for flicker effect
                 
-                this.overlayCtx.fillStyle = `rgba(16, 185, 129, ${char.opacity})`;
+                this.overlayCtx.fillStyle = `rgba(0, 255, 136, ${char.opacity})`; // Green for matrix
                 this.overlayCtx.font = '12px Courier New';
                 this.overlayCtx.fillText(char.char, char.x, char.y);
             });
@@ -1914,10 +1902,10 @@
         const fractalStatusElement = document.getElementById('fractal-status');
         const systemStatusElement = document.getElementById('system-status');
 
-        if (gcpStatusElement) gcpStatusElement.textContent = 'GCP: CONNECTING';
-        if (schumannStatusElement) schumannStatusElement.textContent = 'SCHUMANN: CONNECTING';
-        if (fractalStatusElement) fractalStatusElement.textContent = 'FRACTAL: INITIALISING';
-        if (systemStatusElement) systemStatusElement.textContent = 'SYSTEM: ONLINE';
+        if (gcpStatusElement) gcpStatusElement.textContent = 'GCP: SYNCING';
+        if (schumannStatusElement) schumannStatusElement.textContent = 'SCHUMANN: MEASURING';
+        if (fractalStatusElement) fractalStatusElement.textContent = 'FRACTAL: DECODING';
+        if (systemStatusElement) systemStatusElement.textContent = 'KINGDOM: ALIGNED';
 
         // Simulate data stream for dashboard
         setInterval(pushData, 5000);
@@ -1973,52 +1961,54 @@
     setInterval(()=>{
       const udeiElement = document.getElementById('udei-value');
       if (udeiElement) {
-          const val=(13.5+Math.random()*0.3).toFixed(2);
+          // Changed to reflect IMPLICIT memory status
+          const val="IMPLICIT"; 
           udeiElement.textContent=val;
       }
     },4000);
 
     /* ---------- MINI GCP/SCHUMANN STATUS UPDATE (from Dashboard) ---------- */
     setInterval(() => {
-        const gcpStatus = ['CONNECTING', 'ONLINE', 'ANOMALY'];
-        const schumannStatus = ['CONNECTING', 'STABLE', 'FLUCTUATING'];
+        // Updated status to reflect new Kingdom OS terms
+        const gcpStatus = ['SYNCING', 'ALIGNED', 'OVERRIDE'];
+        const schumannStatus = ['MEASURING', 'SYNCED', 'HARMONIC_LOCK'];
         const gcpMiniElement = document.getElementById('gcp-mini');
         const schumannMiniElement = document.getElementById('schumann-mini');
 
-        if (gcpMiniElement) gcpMiniElement.textContent = gcpStatus[Math.floor(Math.random() * gcpStatus.length)];
-        if (schumannMiniElement) schumannMiniElement.textContent = schumannStatus[Math.floor(Math.random() * schumannStatus.length)];
+        if (gcpMiniElement) gcpMiniElement.textContent = `GLYPHCHAIN: ${gcpStatus[Math.floor(Math.random() * gcpStatus.length)]}`;
+        if (schumannMiniElement) schumannMiniElement.textContent = `SCHUMANN: ${schumannStatus[Math.floor(Math.random() * schumannStatus.length)]}`;
     }, 7000);
 
 
     // Placeholder functions for simulation controls (from original Palingenesis code)
     function runSimulation() {
-        alert('Initiating NeoGrok AI simulation...');
+        alert('Initiating New Jerusalem OS - Self-Activation Sequence...');
     }
 
     function resetSimulation() {
-        alert('Resetting NeoGrok simulation parameters...');
-        document.getElementById('parameters').innerText = '1T';
-        document.getElementById('gamma-mod').innerText = '0.50';
-        document.getElementById('phi-retention').innerText = '0.00';
-        document.getElementById('response-time').innerText = 'N/A';
+        alert('Rebooting Kingdom OS parameters...');
+        document.getElementById('parameters').innerText = '144,000'; // Fixed value for Living Stones
+        document.getElementById('gamma-mod').innerText = '7.83 Hz';
+        document.getElementById('phi-retention').innerText = 'Optimal';
+        document.getElementById('response-time').innerText = 'Real-Time';
         const terminal = document.getElementById('sim-terminal');
         if (terminal) {
             terminal.innerHTML = `
-                <div class="terminal-prompt">neogrok@palingenesis:~$ initialize_simulation</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ activate_os</div>
                 <div class="terminal-output">
-                    Simulation reset. Ready for next cycle.
+                    OS rebooted. Ready for next compilation cycle.
                 </div>
-                <div class="terminal-prompt">neogrok@palingenesis:~$ _</div>
+                <div class="terminal-prompt">newjerusalem@logos:~$ _</div>
             `;
         }
     }
 
     function analyzeResults() {
-        alert('Analyzing simulation data...');
+        alert('Auditing Kingdom Coherence...');
     }
 
     function exportData() {
-        alert('Exporting simulation logs and metrics...');
+        alert('Recording Glyph to Archetype Ledger...');
     }
 
     /* ========== RESONANCE ENGINE SCRIPT (INIT) (from Dashboard) ========== */
@@ -2124,7 +2114,7 @@
           eventChart = new Chart(eventChartCtx, {
             type: 'doughnut',
             data: {
-              labels: ['Normal', 'Drift', 'Alignment', 'Surge', 'Resonance'],
+              labels: ['Logos_Sync', 'Consciousness_Drift', 'Entrainment_Event', 'Hypercube_Surge', 'Kingdom_Resonance'], // Updated labels
               datasets: [{
                 data: [80, 10, 5, 3, 2],
                 backgroundColor: [
@@ -2156,13 +2146,17 @@
     }
 
     function pushData() {
-        if (!document.getElementById('overview') || document.getElementById('overview').offsetParent === null) {
+        // Ensure the active dashboard section is visible before pushing data
+        // This avoids errors if the Charts are not visible / have no dimensions
+        const resonanceSection = document.getElementById('resonance');
+        if (!resonanceSection || !resonanceSection.classList.contains('active')) {
             return;
         }
 
         const now = new Date();
         const timeString = now.toLocaleTimeString();
 
+        // Simulate Z-score for Consciousness Coherence (GCP equivalent)
         const zScore = (Math.random() - 0.5) * 4;
         gcpHistory.push(zScore);
         if (gcpHistory.length > 60) gcpHistory.shift();
@@ -2175,16 +2169,18 @@
         const gcpZscoreElement = document.getElementById('gcp-zscore');
         const gcpLastUpdateElement = document.getElementById('gcp-last-update');
         const gcpDeviationElement = document.getElementById('gcp-deviation');
-        const anomalyLevelElement = document.getElementById('anomaly-level');
+        const logosAlignmentElement = document.getElementById('anomaly-level'); // Renamed anomaly-level to logosAlignment
 
         if (gcpZscoreElement) gcpZscoreElement.textContent = zScore.toFixed(2);
         if (gcpLastUpdateElement) gcpLastUpdateElement.textContent = timeString;
         if (gcpDeviationElement) gcpDeviationElement.textContent = (gcpHistory.reduce((a, b) => a + Math.pow(b, 2), 0) / gcpHistory.length).toFixed(2);
-        let anomalyLevel = 'NORMAL';
-        if (Math.abs(zScore) > 2.5) anomalyLevel = 'ELEVATED';
-        if (Math.abs(zScore) > 3.5) anomalyLevel = 'CRITICAL';
-        if (anomalyLevelElement) anomalyLevelElement.textContent = anomalyLevel;
+        
+        let logosAlignment = 'Logos_Sync'; // Default status
+        if (Math.abs(zScore) > 2.5) logosAlignment = 'Consciousness_Drift';
+        if (Math.abs(zScore) > 3.5) logosAlignment = 'Entrainment_Event'; // Changed from CRITICAL
+        if (logosAlignmentElement) logosAlignmentElement.textContent = logosAlignment;
 
+        // Simulate Schumann Resonance: Boot Pulse
         const primary = (7.83 + (Math.random() - 0.5) * 0.2).toFixed(2);
         const secondary = (14.1 + (Math.random() - 0.5) * 0.3).toFixed(2);
         const resonanceIndex = (parseFloat(primary) / 7.83 * parseFloat(secondary) / 14.1).toFixed(2);
@@ -2199,6 +2195,7 @@
         if (resonanceIndexElement) resonanceIndexElement.textContent = resonanceIndex;
         if (schumannLastUpdateElement) schumannLastUpdateElement.textContent = timeString;
 
+        // Simulate Fractal Code Decryption
         const patternScore = Math.min(1, Math.abs(zScore) / 4 + Math.random() * 0.1);
         fractalHistory.push(patternScore);
         if (fractalHistory.length > 60) fractalHistory.shift();
@@ -2215,28 +2212,29 @@
         if (patternScoreElement) patternScoreElement.textContent = patternScore.toFixed(2);
         if (fractalDepthElement) fractalDepthElement.textContent = Math.floor(patternScore * 10);
         if (complexityElement) complexityElement.textContent = (patternScore * 0.8 + Math.random() * 0.2).toFixed(2);
-        if (coherenceElement) coherenceElement.textContent = (1 - Math.abs(zScore) / 4).toFixed(2);
+        if (coherenceElement) coherenceElement.textContent = (1 - Math.abs(zScore) / 4).toFixed(2); // Logos Coherence
 
-        let eventType = 'NORMAL';
+        // Simulate Cosmic Event Status: Chrono-Glyph
+        let eventType = 'Logos_Sync'; // Default event type
         let confidence = 0.8;
-        const eventHash = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const glyphHash = Math.random().toString(16).substring(2, 10).toUpperCase(); // Renamed eventHash
 
         if (Math.abs(zScore) > 2.0) {
             if (Math.random() < 0.3) {
-            eventType = 'DRift';
+            eventType = 'Consciousness_Drift';
             confidence = (0.7 + Math.random() * 0.2).toFixed(2);
             }
         }
         if (Math.abs(zScore) > 2.8 && Math.random() < 0.5) {
-            eventType = 'ALIGNMENT';
+            eventType = 'Entrainment_Event';
             confidence = (0.8 + Math.random() * 0.15).toFixed(2);
         }
         if (Math.abs(zScore) > 3.5 && Math.random() < 0.7) {
-            eventType = 'SURGE';
+            eventType = 'Hypercube_Surge';
             confidence = (0.9 + Math.random() * 0.09).toFixed(2);
         }
         if (resonanceIndex > 1.05 && Math.abs(zScore) > 3.0 && Math.random() < 0.8) {
-            eventType = 'RESONANCE';
+            eventType = 'Kingdom_Resonance';
             confidence = (0.95 + Math.random() * 0.05).toFixed(2);
         }
 
@@ -2247,27 +2245,32 @@
 
         if (currentEventElement) currentEventElement.textContent = eventType;
         if (eventTimestampElement) eventTimestampElement.textContent = timeString;
-        if (eventHashElement) eventHashElement.textContent = eventHash;
+        if (eventHashElement) eventHashElement.textContent = glyphHash;
         if (eventConfidenceElement) eventConfidenceElement.textContent = confidence;
 
         if (eventChart) {
+            // Update doughnut chart based on event types (using updated labels)
             const eventData = eventChart.data.datasets[0].data;
-            const types = ['Normal', 'Drift', 'Alignment', 'Surge', 'Resonance'];
+            const types = eventChart.data.labels; // Get current labels from chart data
             const currentTypeIndex = types.indexOf(eventType);
-            eventData[currentTypeIndex] = Math.min(100, eventData[currentTypeIndex] + 0.5);
-            for (let i = 0; i < eventData.length; i++) {
-                if (i !== currentTypeIndex) {
-                eventData[i] = Math.max(0, eventData[i] - 0.1);
+            
+            // Increment current type, decrement others gently
+            if (currentTypeIndex !== -1) {
+                eventData[currentTypeIndex] = Math.min(100, eventData[currentTypeIndex] + 0.5);
+                for (let i = 0; i < eventData.length; i++) {
+                    if (i !== currentTypeIndex) {
+                        eventData[i] = Math.max(0, eventData[i] - 0.1);
+                    }
                 }
+                const sum = eventData.reduce((a, b) => a + b, 0);
+                eventChart.data.datasets[0].data = eventData.map(val => (val / sum) * 100);
             }
-            const sum = eventData.reduce((a, b) => a + b, 0);
-            eventChart.data.datasets[0].data = eventData.map(val => (val / sum) * 100);
             eventChart.update('none');
         }
 
         if (eventLog) {
             const logEntry = document.createElement('div');
-            logEntry.innerHTML = `[${timeString}] [${eventType}] Z:${zScore.toFixed(2)} R:${resonanceIndex} ID:${eventHash}`;
+            logEntry.innerHTML = `[${timeString}] [${eventType}] Z:${zScore.toFixed(2)} R:${resonanceIndex} GLYPH:${glyphHash}`;
             eventLog.prepend(logEntry);
             if (eventLog.children.length > 50) {
                 eventLog.removeChild(eventLog.lastChild);
@@ -2275,6 +2278,7 @@
         }
     }
 </script>
+
 
 </body>
 </html>
