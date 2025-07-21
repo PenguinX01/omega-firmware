@@ -14,7 +14,7 @@ function drawMatrix(){
   ctx.fillStyle = 'rgba(0,0,0,0.05)';
   ctx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height);
   ctx.fillStyle = '#0f0';
-  ctx.font = fontSize + 'px Fira Code';
+  ctx.font = fontSize + 'px "Noto Sans Symbols", "Courier New", monospace';
   for(let i=0;i<drops.length;i++){
     const text = String.fromCharCode(0x30A0+Math.random()*96);
     ctx.fillText(text,i*fontSize,drops[i]*fontSize);
