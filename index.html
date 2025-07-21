@@ -1592,5 +1592,74 @@
 
 </script>
 
+
+<!-- Added Swirling Fractal Spiral Overlay -->
+<script>
+(function() {
+  const canvas = document.getElementById('overlayCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Ensure canvas matches displayed size
+  function resize() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const GOLDEN = 1.61803398875;
+  const MAX_RADIUS = Math.min(canvas.width, canvas.height) * 0.45;
+  const PARTICLE_COUNT = 250;
+
+  // Particle definition
+  const particles = [];
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push({
+      theta: Math.random() * Math.PI * 2,
+      radius: MAX_RADIUS * (0.3 + 0.7 * Math.random()),
+      speed: 0.004 + Math.random() * 0.006,
+      size: 1.5 + Math.random() * 1.5,
+    });
+  }
+
+  function update(dt) {
+    particles.forEach(p => {
+      // spiral inward by shrinking radius a bit each frame
+      p.radius -= p.speed * dt * 60; // 60px per second scaling
+      p.theta += p.speed * GOLDEN * 60 * dt;
+
+      if (p.radius < 2) {
+        // reset to outer radius
+        p.radius = MAX_RADIUS;
+        p.theta = Math.random() * Math.PI * 2;
+      }
+    });
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = (now - last) / 1000; // seconds
+    last = now;
+
+    update(dt);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'rgba(0,255,136,0.8)';
+    particles.forEach(p => {
+      const x = canvas.width / 2 + p.radius * Math.cos(p.theta);
+      const y = canvas.height / 2 + p.radius * Math.sin(p.theta);
+      ctx.beginPath();
+      ctx.arc(x, y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+
 </body>
 </html>
