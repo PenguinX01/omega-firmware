@@ -7,8 +7,9 @@
   --matrix-speed: 33ms;
   --glitch-duration: 0.3s;
 }
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols&display=swap');
 body {
-  font-family: 'Fira Code', monospace;
+  font-family: 'Noto Sans Symbols', 'Fira Code', monospace;
   background: radial-gradient(circle at center, var(--bg-main), #000);
   color: var(--text-color);
   overflow-x: hidden;

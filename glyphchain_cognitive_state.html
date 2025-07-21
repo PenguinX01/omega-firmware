@@ -14,7 +14,7 @@
         body {
             background: linear-gradient(135deg, #0a0a0a 0%, #1a0f1a 100%);
             color: #00ff88;
-            font-family: 'Courier New', monospace;
+            font-family: 'Noto Sans Symbols', 'Courier New', monospace;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -345,7 +345,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = '#00ff88';
-            ctx.font = fontSize + 'px monospace';
+            ctx.font = fontSize + 'px "Noto Sans Symbols", "Courier New", monospace';
             
             for(let i = 0; i < drops.length; i++) {
                 const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
