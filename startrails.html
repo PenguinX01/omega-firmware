@@ -4,107 +4,171 @@
   <meta charset="UTF-8" />
   <title>Fractal Luminary Viewer — Epoch Clock (Gleason Grid)</title>
   <style>
-    html,body{margin:0;height:100%;background:#0a0a1a;color:#e0e0e0;overflow:hidden;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif}
+    html,body{margin:0;height:100%;background:#000014;color:#e0e0e0;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
     canvas{display:block}
-    .ui-panel{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
-      display:flex;gap:12px;z-index:2;padding:10px 20px;border-radius:30px;
-      background:rgba(15, 20, 40, 0.7);backdrop-filter:blur(10px);
-      border:1px solid rgba(100, 180, 255, 0.2);box-shadow:0 0 20px rgba(0, 50, 150, 0.3);}
-    .btn{padding:10px 20px;font-size:14px;font-weight:500;border-radius:25px;border:1px solid #4a6fc5;
-      background:linear-gradient(145deg, rgba(30, 50, 100, 0.4), rgba(20, 30, 70, 0.6));
-      color:#a0c0ff;cursor:pointer;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);}
-    .btn:hover{background:linear-gradient(145deg, rgba(40, 70, 140, 0.5), rgba(30, 50, 110, 0.7));
-      transform:translateY(-2px);box-shadow:0 4px 12px rgba(0, 50, 150, 0.4);}
-    .btn:active{transform:translateY(1px);box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);}
-    .speed-label{display:inline-block;min-width:50px;text-align:center;font-weight:bold;color:#7aa8ff}
-    input[type=range]{accent-color:#4a6fc5;width:120px;}
-    #legend{position:absolute;top:25px;right:25px;z-index:3;
-      background:rgba(15, 20, 40, 0.7);padding:15px 20px;border-radius:12px;
-      border:1px solid rgba(100, 180, 255, 0.2);font-size:15px;line-height:1.8;
-      font-family:'Courier New', monospace;box-shadow:0 0 20px rgba(0, 30, 100, 0.4);}
-    #legend span{display:block;padding:4px 0;}
-    #cityLegend{position:absolute;top:25px;left:25px;z-index:3;
-      background:rgba(15, 20, 40, 0.7);padding:15px 20px;border-radius:12px;
-      border:1px solid rgba(255, 140, 0, 0.3);font-size:14px;line-height:1.6;
-      font-family:'Courier New', monospace;box-shadow:0 0 20px rgba(150, 80, 0, 0.4);
-      max-width:250px;max-height:calc(100vh - 100px);overflow-y:auto;}
-    #cityLegend .header {text-align:center;margin-bottom:10px;font-weight:bold;color:#ff8c00;font-size:16px;}
-    #cityLegend span{display:block;padding:4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .title {position:absolute;top:25px;left:50%;transform:translateX(-50%);
-      font-size:28px;font-weight:700;color:#a0c0ff;text-shadow:0 0 10px rgba(100, 180, 255, 0.5);
-      letter-spacing:2px;z-index:3;font-family:'Georgia', serif;}
-    .subtitle {position:absolute;top:60px;left:50%;transform:translateX(-50%);
-      font-size:14px;color:#7aa8ff;z-index:3;opacity:0.8;}
-    .counter {display:inline-block;width:40px;text-align:right;font-weight:bold;color:#ffd700;}
-    #cityLegend::-webkit-scrollbar {width: 8px;}
-    #cityLegend::-webkit-scrollbar-track {background: rgba(10, 15, 30, 0.5);}
-    #cityLegend::-webkit-scrollbar-thumb {background: #4a6fc5;border-radius: 4px;}
+
+    /* control buttons */
+    .ui-panel{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+      display:flex;gap:10px;z-index:2}
+
+    .btn{padding:8px 14px;font-size:12px;border-radius:18px;border:1px solid #099;
+      background:rgba(0,153,153,.15);color:#0ff;cursor:pointer;backdrop-filter:blur(8px);transition:.25s}
+    .btn:hover{background:rgba(0,153,153,.25)}
+    .btn:active{transform:translateY(1px)}
+    .speed-label{display:inline-block;min-width:48px;text-align:center}
+    input[type=range]{accent-color:#0ff}
+
+    /* legend (top-right) */
+    #legend{position:absolute;top:20px;right:20px;z-index:3;
+      background:rgba(0,0,0,.6);padding:10px;border-radius:8px;
+      border:1px solid #0ff;font-size:14px;line-height:1.5;color:#0ff;
+      font-family:monospace}
+    #legend span{display:block}
   </style>
 </head>
 <body>
-  <div class="title">GLEASON GRID</div>
-  <div class="subtitle">Fractal Luminary Viewer — Epoch Clock</div>
   <canvas id="canvas"></canvas>
-  <div class="ui-panel">
-    <button class="btn" id="pauseBtn">⏸ PAUSE</button>
-    <span class="speed-label" id="speedVal">1×</span>
-    <input id="speedSl" type="range" min="0.2" max="3" step="0.1" value="1">
-    <button class="btn" id="trailBtn">✨ TRAILS ON</button>
-    <button class="btn" id="waveBtn">🌊 WAVES ON</button>
-  </div>
-  <div id="legend">
-    <span style="color:#ffd65c">● Sun — <span id="sunCnt" class="counter">0</span></span>
-    <span style="color:#e6e6fa">● Moon — <span id="moonCnt" class="counter">0</span></span>
-    <span style="color:#99eeff">● Venus — <span id="venusCnt" class="counter">0</span></span>
-    <span style="color:#ff6b4a">● Mars — <span id="marsCnt" class="counter">0</span></span>
-  </div>
-  <div id="cityLegend"></div>
-<script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-let W = canvas.width = window.innerWidth;
-let H = canvas.height = window.innerHeight;
-const CENTER = { x: W / 2, y: H / 2 };
-const TAU = Math.PI * 2;
-const DEG = Math.PI / 180;
-let R = Math.min(W, H) / 2.4;
 
-window.addEventListener('resize', () => {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-  CENTER.x = W / 2;
-  CENTER.y = H / 2;
-  R = Math.min(W, H) / 2.4;
-});
+  <!-- controls -->
+  <div class="ui-panel">
+    <button class="btn" id="pauseBtn">⏸ PAUSE</button>
+    <span  class="speed-label" id="speedVal">1×</span>
+    <input  id="speedSl" type="range" min="0.2" max="3" step="0.1" value="1">
+    <button class="btn" id="trailBtn">✨ TRAILS ON</button>
+  </div>
+
+  <!-- luminary counters -->
+  <div id="legend">
+    <span style="color:#ffd65c">● Sun — <span id="sunCnt">0</span></span>
+    <span style="color:#e6e6fa">● Moon — <span id="moonCnt">0</span></span>
+    <span style="color:#99eeff">● Venus — <span id="venusCnt">0</span></span>
+    <span style="color:#ff6b4a">● Mars — <span id="marsCnt">0</span></span>
+  </div>
+
+<script>
+/******************** BASIC SETUP *************************/
+const cvs = document.getElementById('canvas'), ctx = cvs.getContext('2d');
+let W=cvs.width=innerWidth, H=cvs.height=innerHeight;
+const CENTER={x:W/2,y:H/2}, TAU=Math.PI*2, DEG=Math.PI/180;
+let R=Math.min(W,H)/2.0;
+addEventListener('resize',()=>{W=cvs.width=innerWidth;H=cvs.height=innerHeight;
+  CENTER.x=W/2;CENTER.y=H/2;R=Math.min(W,H)/2.0;});
 
 /******************** UI STATE ***************************/
 let running=true, showTrails=true, speed=1, time=0;
 document.getElementById('pauseBtn').onclick=()=>{running=!running;
-  pauseBtn.textContent=running?'⏸ PAUSE':'▶ PLAY';};
+  pauseBtn.textContent=running?'⏸ PAUSE':'▶ PLAY';};
 document.getElementById('speedSl').oninput=e=>{
   speed=+e.target.value; speedVal.textContent=speed.toFixed(1)+'×';};
 document.getElementById('trailBtn').onclick=()=>{
   showTrails=!showTrails;
-  trailBtn.textContent=showTrails?'✨ TRAILS ON':'💤 TRAILS OFF';
+  trailBtn.textContent=showTrails?'✨ TRAILS ON':'💤 TRAILS OFF';
   if(!showTrails) luminaries.forEach(l=>l.trail=[]);
 };
 
 /******************** LUMINARIES *************************/
-function fractalPath(baseR,sFreq,aSpeed,phase=0,off=0){
-  return t=>{
-    const ang=t*aSpeed+phase;
-    const r=baseR+baseR*0.25*Math.sin(t*sFreq+off);
-    return{ x:CENTER.x+r*Math.cos(ang), y:CENTER.y+r*Math.sin(ang)};
-  };
+// New general path function based on latitudinal oscillation
+function luminaryPath(
+    angularSpeed,             // How fast it circles the center (e.g., TAU/365, TAU/27.3)
+    latOscillationMaxDeg,     // Max degrees latitude deviation (amplitude)
+    latOscillationPeriodDays, // Period for latitudinal swing (e.g., 365 days)
+    latOscillationPhase = 0,  // Phase for latitudinal swing
+    initialAngularPhase = 0,  // Starting angular position
+    radialWobbleFreq = 0,     // Frequency for the "fractal" radial wobble
+    radialWobbleOffset = 0,   // Offset for the "fractal" radial wobble
+    northOnly = false         // If true, latitude oscillates between 0 and maxLatOscillation
+) {
+    return t => {
+        let currentLat;
+        if (northOnly) {
+            // Oscillate latitude between 0 and latOscillationMaxDeg (always north)
+            currentLat = latOscillationMaxDeg * (0.5 + 0.5 * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase));
+        } else {
+            // Oscillate latitude between -latOscillationMaxDeg and +latOscillationMaxDeg
+            currentLat = latOscillationMaxDeg * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase);
+        }
+
+        // Convert latitude to base radius for the Gleason Grid: r = (90 - latitude) / 180 * R
+        let r = R * (90 - currentLat) / 180;
+
+        // Apply an additional small radial wobble (fractal component) on top of the latitude-derived radius
+        if (radialWobbleFreq > 0) {
+            r += r * 0.05 * Math.sin(t * radialWobbleFreq + radialWobbleOffset); // Wobble is 5% of current radius
+        }
+
+        // Calculate angular position
+        const angle = t * angularSpeed + initialAngularPhase;
+
+        return {
+            x: CENTER.x + r * Math.cos(angle),
+            y: CENTER.y + r * Math.sin(angle)
+        };
+    };
 }
 
+
 const luminaries=[
-  {n:'Sun',  c:'#ffd65c',sz:12, path:fractalPath(R*.6,0.017,TAU/365),         trail:[],max:500,glow:true,glowSize:15},
-  {n:'Moon', c:'#e6e6fa',sz:9, path:fractalPath(R*.5,0.12,TAU/27.3,Math.PI/3),trail:[],max:400,glow:true,glowSize:12},
-  {n:'Venus',c:'#99eeff',sz:7, path:fractalPath(R*.7,0.05,TAU/225,Math.PI/4), trail:[],max:350,glow:true,glowSize:10},
-  {n:'Mars', c:'#ff6b4a',sz:7, path:fractalPath(R*.8,0.033,TAU/687,Math.PI/5),trail:[],max:350,glow:true,glowSize:10},
-  {n:'Stars',c:'#8a8aff',sz:2,trail:false,
-   path:t=>{const a=[],m=300;for(let i=0;i<m;i++){const ang=i*1.2+t*.03;
+  {n:'Sun',  c:'#ffd65c',sz:8, glow:true, glowSize:12,
+   // Sun: Oscillates between Cancer (23.5N) and Capricorn (23.5S) annually
+   // Latitudinal range: R * 0.37 (at 23.5N) to R * 0.63 (at 23.5S)
+   path:luminaryPath(
+     TAU/365, // angularSpeed: circles once per 365 days
+     23.5,    // latOscillationMaxDeg: oscillates between -23.5 and +23.5
+     365,     // latOscillationPeriodDays: annual declination cycle
+     0,       // latOscillationPhase
+     0,       // initialAngularPhase (starts around vernal equinox)
+     0.017,   // radialWobbleFreq (subtle fractal wobble)
+     0        // radialWobbleOffset
+   ),
+   trail:[],max:500},
+
+  {n:'Moon', c:'#e6e6fa',sz:5, glow:true, glowSize:8,
+   // Moon: Oscillates between approx -28.5S and +28.5N (slightly wider than Sun for "more drift")
+   // While lunar nodal cycle is ~18.6 years, for clock visualization, annual lat swing or lunar cycle for the 'drift' might be used.
+   // Using annual lat oscillation for general declination tracking, with fractal wobble for unique 'drift'.
+   path:luminaryPath(
+     TAU/27.3, // angularSpeed: circles once per ~27.3 days (sidereal month)
+     28.5,     // latOscillationMaxDeg: wider latitude oscillation
+     365,      // latOscillationPeriodDays: general annual declination mimic
+     Math.PI/3,// latOscillationPhase
+     Math.PI/3,// initialAngularPhase
+     0.12,     // radialWobbleFreq (higher freq for 'more drift')
+     Math.PI/3 // radialWobbleOffset
+   ),
+   trail:[],max:400},
+
+  {n:'Venus',c:'#99eeff',sz:4, glow:true, glowSize:7,
+   // Venus: Stays north of equator (0 to 23.5N), within Sun's path.
+   // Radial range: R * 0.5 (at 0 deg) to R * 0.37 (at 23.5N)
+   path:luminaryPath(
+     TAU/225, // angularSpeed: circles once per ~225 days (orbital period)
+     23.5,    // latOscillationMaxDeg: max North latitude (Tropic of Cancer)
+     225,     // latOscillationPeriodDays: using orbital period for latitudinal swing
+     Math.PI/4,// latOscillationPhase
+     Math.PI/4,// initialAngularPhase
+     0.05,    // radialWobbleFreq
+     Math.PI/4,// radialWobbleOffset
+     true     // northOnly: true, ensures latitude stays between 0 and 23.5N
+   ),
+   trail:[],max:350},
+
+  {n:'Mars', c:'#ff6b4a',sz:4, glow:true, glowSize:7,
+   // Mars: Stays north of equator (0 to 23.5N), inside Sun's range.
+   // Radial range: R * 0.5 (at 0 deg) to R * 0.37 (at 23.5N)
+   path:luminaryPath(
+     TAU/687, // angularSpeed: circles once per ~687 days (orbital period)
+     23.5,    // latOscillationMaxDeg: max North latitude (Tropic of Cancer)
+     687,     // latOscillationPeriodDays: using orbital period for latitudinal swing
+     Math.PI/5,// latOscillationPhase
+     Math.PI/5,// initialAngularPhase
+     0.033,   // radialWobbleFreq
+     Math.PI/5,// radialWobbleOffset
+     true     // northOnly: true, ensures latitude stays between 0 and 23.5N
+   ),
+   trail:[],max:350},
+
+  {n:'Stars',c:'#8a8aff',sz:1.5,trail:false,
+   path:t=>{const a=[],m=240;for(let i=0;i<m;i++){const ang=i*1.5+t*.03;
       const r=R*(0.92+0.04*Math.sin(i*.09+t*.001));
       a.push({x:CENTER.x+r*Math.cos(ang*DEG), y:CENTER.y+r*Math.sin(ang*DEG)});}return a;}}
 ];
@@ -126,238 +190,86 @@ function getAngle(p){return( Math.atan2(p.y-CENTER.y,p.x-CENTER.x)+TAU)%TAU;}
 function crossedTop(name,ang){const x= (prevAngles[name] < LIBRA && ang >= LIBRA);prevAngles[name]=ang;return x;}
 function bump(name){counters[name]++;document.getElementById(outIds[name]).textContent=counters[name];}
 
-/******************** CITY DATA **************************/
-const cities=[
-  {name:'Brunei',       emoji:'🐧', lat:4.5,   lon:115,     color:'#0ff'},
-  {name:'New York',     emoji:'🗽', lat:40.7,  lon:-74,     color:'#ffd700'},
-  {name:'London',       emoji:'🎡', lat:51.5,  lon:0,       color:'#ff69b4'},
-  {name:'Tokyo',        emoji:'🗼', lat:35.7,  lon:139.7,   color:'#a0c0ff'},
-  {name:'Los Angeles',  emoji:'🌴', lat:34.05, lon:-118.25, color:'#ff8c00'},
-  {name:'Cairo',        emoji:'🕌', lat:30.0,  lon:31.2,    color:'#ffa500'},
-  {name:'Sydney',       emoji:'🌊', lat:-33.9, lon:151.2,   color:'#00bfff'},
-  {name:'Buenos Aires', emoji:'💃', lat:-34.6, lon:-58.4,   color:'#f08080'},
-  {name:'Moscow',       emoji:'❄️', lat:55.8,  lon:37.6,    color:'#dcdcdc'},
-  {name:'Cape Town',    emoji:'🦁', lat:-33.9, lon:18.4,    color:'#deb887'},
-  {name:'Beijing',      emoji:'🏯', lat:39.9,  lon:116.4,   color:'#ff6347'},
-  {name:'Rio de Janeiro',emoji:'🏖️', lat:-22.9, lon:-43.2,   color:'#20b2aa'},
-  {name:'Dubai',        emoji:'🏙️', lat:25.2,  lon:55.3,    color:'#daa520'},
-  {name:'Reykjavik',    emoji:'🌋', lat:64.1,  lon:-21.9,   color:'#87ceeb'},
-  {name:'Bangkok',      emoji:'🛕', lat:13.75, lon:100.5,   color:'#ff7f50'},
-  {name:'Toronto',      emoji:'🍁', lat:43.7,  lon:-79.4,   color:'#9370db'},
-  {name:'Diomede Is.',  emoji:'🏝️', lat:65.75, lon:-168.95, color:'#00fa9a'}
-];
-// populate legend
-const cityLegend=document.getElementById('cityLegend');
-cityLegend.innerHTML=`<div class="header">CITIES</div>` + 
-  cities.map(c=>`<span style="color:${c.color}">${c.emoji} ${c.name}</span>`).join('');
-
-function cityPos(c){
-  const rho = R * (90 - c.lat) / 90; // distance from center (adjusted for better spacing)
-  const ang = -c.lon * DEG;       // clockwise east positive
-  return{ x:CENTER.x+rho*Math.cos(ang), y:CENTER.y+rho*Math.sin(ang) };
-}
-
-/******************** CONSTRUCTIVE INTERFERENCE RINGS *************/
-const constructRings = [];
-for (let i = 1; i <= 5; i++) {
-  let nodeR = R * (i * 0.125);  // approx every ~1/8th outward
-  constructRings.push(nodeR);
-}
-
-function drawConstructiveRings() {
-  ctx.save();
-  ctx.lineWidth = 1.5;
-  constructRings.forEach(r => {
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,128,0.12)';
-    ctx.setLineDash([4, 4]);
-    ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
-    ctx.stroke();
-  });
-  ctx.setLineDash([]);
-  ctx.restore();
-}
-
-/******************** SCHUMANN WAVES *********************/
-const waves = [];
-const WAVE_SPEED = R / 150;
-const WAVE_MAX_AGE = 200;
-let waveTimer = 0;
-let showWaves = true;
-document.getElementById('waveBtn').onclick = () => {
-  showWaves = !showWaves;
-  document.getElementById('waveBtn').textContent = showWaves ? '🌊 WAVES ON' : '🌊 WAVES OFF';
-};
-function addWave() {
-  waves.push({ r: 0, outbound: true, age: 0 });
-}
-
-function drawSchumannWaves() {
-  waveTimer++;
-  if (waveTimer >= 50) {
-    addWave();
-    waveTimer = 0;
-  }
-  waves.forEach(w => {
-    w.age++;
-    if (w.outbound) {
-      w.r += WAVE_SPEED;
-      if (w.r >= R) {
-        w.outbound = false;
-        w.r = 2 * R - w.r;
-      }
-    } else {
-      w.r -= WAVE_SPEED;
-    }
-  });
-  while (waves.length && waves[0].age > WAVE_MAX_AGE) waves.shift();
-
-  waves.forEach(w => {
-    ctx.strokeStyle = `rgba(0,255,255,${0.3 * (1 - w.age / WAVE_MAX_AGE)})`;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(CENTER.x, CENTER.y, w.r, 0, TAU);
-    ctx.stroke();
-  });
-
-  for (let i = 0; i < waves.length; i++) {
-    for (let j = i + 1; j < waves.length; j++) {
-      if (Math.abs(waves[i].r - waves[j].r) < 10) {
-        ctx.strokeStyle = 'rgba(255,255,0,0.5)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(CENTER.x, CENTER.y, (waves[i].r + waves[j].r) / 2, 0, TAU);
-        ctx.stroke();
-      }
-    }
-  }
-}
-
 /******************** GRID *******************************/
 function grid(){
   // latitude rings every 10° (optional)
-  ctx.strokeStyle='rgba(100, 180, 255, 0.1)';ctx.lineWidth=1;
-  for(let lat=10; lat<=80; lat+=10){ 
-    const r=R*(90-lat)/90; 
-    ctx.beginPath(); 
-    ctx.arc(CENTER.x,CENTER.y,r,0,TAU); 
-    ctx.stroke(); 
-  }
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let lat=10; lat<=80; lat+=10){ const r=R*(90-lat)/180; ctx.beginPath(); ctx.arc(CENTER.x,CENTER.y,r,0,TAU); ctx.stroke(); }
   // equator bold
-  ctx.strokeStyle='rgba(0,255,255,.3)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU); ctx.stroke();
+  ctx.strokeStyle='rgba(0,255,255,.2)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU); ctx.stroke();
   // longitude spokes
-  ctx.strokeStyle='rgba(100, 180, 255, 0.15)';ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
   for(let j=0;j<LONGITUDES;j++){
     const ang=j*TAU/LONGITUDES;
     ctx.beginPath();ctx.moveTo(CENTER.x,CENTER.y);
     ctx.lineTo(CENTER.x+R*Math.cos(ang),CENTER.y+R*Math.sin(ang));ctx.stroke();
   }
   // zodiac labels
-  zodiac.forEach(z=>{
-    ctx.fillStyle='#7aa8ff'; 
-    ctx.font='bold 18px Arial';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(z.label,z.x,z.y);
-    
-    // Add decorative circles around zodiac symbols
-    ctx.beginPath();
-    ctx.arc(z.x, z.y, 20, 0, TAU);
-    ctx.strokeStyle = 'rgba(100, 180, 255, 0.2)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  });
-  
-  // Draw outer circle
-  ctx.strokeStyle = 'rgba(100, 180, 255, 0.3)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(CENTER.x, CENTER.y, R, 0, TAU);
-  ctx.stroke();
+  zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(z.label,z.x,z.y);});
 }
 
 /******************** MAIN LOOP *************************/
-function draw() {
+function draw(){
   requestAnimationFrame(draw);
   if(running) time+=speed;
 
-  // Create a subtle fade effect for trails
-  ctx.fillStyle='rgba(10, 10, 26, '+(showTrails ? 0.08 : 0.15)+')'; 
-  ctx.fillRect(0,0,W,H);
-  
+  ctx.fillStyle='rgba(0,0,20,.2)';ctx.fillRect(0,0,W,H);
   grid();
-  drawConstructiveRings();
-  if (showWaves) drawSchumannWaves();
 
   luminaries.forEach(b=>{
-    if(b.n==='Stars'){
-      ctx.fillStyle=b.c; 
+    if (b.n === 'Stars') {
+      ctx.fillStyle = b.c;
       const stars = b.path(time);
       stars.forEach((p, i) => {
-        // Add a subtle twinkle effect to stars
         const alpha = 0.6 + 0.4 * Math.sin(time * 0.05 + i * 0.1);
         ctx.globalAlpha = alpha;
-        ctx.fillRect(p.x,p.y,b.sz,b.sz);
+        ctx.fillRect(p.x, p.y, b.sz, b.sz);
       });
-      ctx.globalAlpha = 1.0;
+      ctx.globalAlpha = 1.0; // Reset globalAlpha after drawing stars
       return;
     }
-    const pos=b.path(time);const ang=getAngle(pos);
-    if(crossedTop(b.n,ang)) bump(b.n);
-    if(showTrails){
-      b.trail.push(pos);if(b.trail.length>b.max)b.trail.shift();
-      
-      // Draw trail with gradient effect
-      const gradient = ctx.createLinearGradient(
-        b.trail[0].x, b.trail[0].y, 
-        pos.x, pos.y
-      );
-      gradient.addColorStop(0, 'rgba(0,0,0,0)');
-      gradient.addColorStop(0.5, b.c+'80');
-      gradient.addColorStop(1, b.c);
-      
-      ctx.strokeStyle=gradient; 
-      ctx.lineWidth=2; 
-      ctx.beginPath(); 
-      b.trail.forEach((pt,i)=>{
-        if(i===0) ctx.moveTo(pt.x,pt.y);
-        else ctx.lineTo(pt.x,pt.y);
-      }); 
-      ctx.stroke();
-    }
-    // Draw the celestial body with enhanced glow
-    ctx.beginPath(); 
-    ctx.fillStyle=b.c; 
-    if(b.glow){
-      ctx.shadowBlur=b.glowSize; 
-      ctx.shadowColor=b.c;
-    } 
-    ctx.arc(pos.x,pos.y,b.sz,0,TAU); 
-    ctx.fill(); 
-    ctx.shadowBlur=0;
-  });
 
-  /***** CITY MARKERS *****/
-  cities.forEach(c=>{
-    const p=cityPos(c);
-    ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=c.color;
-    ctx.fillText(c.emoji,p.x,p.y);
-    
-    // Add a subtle glow effect to city markers
-    ctx.shadowBlur=5;
-    ctx.shadowColor=c.color;
-    ctx.fillText(c.emoji,p.x,p.y);
-    ctx.shadowBlur=0;
-    
-    // Draw a small circle around the city
+    const pos = b.path(time);
+    const ang = getAngle(pos);
+
+    if (crossedTop(b.n, ang)) bump(b.n);
+
+    if (showTrails) {
+      b.trail.push(pos);
+      if (b.trail.length > b.max) b.trail.shift();
+
+      // Draw trail segments with fading alpha
+      ctx.lineWidth = 2; // Fixed line width for the trail
+      for (let i = 0; i < b.trail.length - 1; i++) {
+        const p1 = b.trail[i];
+        const p2 = b.trail[i+1];
+
+        // Calculate alpha based on position in trail (older points fade out)
+        // Alpha ranges from ~0.1 at the start of the trail to ~0.9 at the end
+        const alpha = (i / b.trail.length) * 0.8 + 0.1; // Adjust coefficients for desired fade intensity
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        
+        // Convert alpha to a two-digit hex string and append to the color
+        ctx.strokeStyle = b.c + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+        ctx.stroke();
+      }
+    }
+
+    // Draw the luminary itself
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 8, 0, TAU);
-    ctx.strokeStyle = c.color + '80';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.fillStyle = b.c;
+    if (b.glow) {
+      ctx.shadowBlur = b.glowSize;
+      ctx.shadowColor = b.c;
+    }
+    ctx.arc(pos.x, pos.y, b.sz, 0, TAU);
+    ctx.fill();
+    ctx.shadowBlur = 0; // Reset shadow blur after drawing each luminary
   });
 }
-
 draw();
 </script>
 </body>
