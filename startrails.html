@@ -79,10 +79,46 @@
     #legend span {
       display: block;
     }
+
+    /* Propagation mode selector */
+    .mode-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 3;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #0ff;
+      color: #0ff;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .mode-panel select {
+      background: rgba(0, 20, 20, 0.8);
+      color: #0ff;
+      border: 1px solid #099;
+      border-radius: 4px;
+      padding: 4px;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
+
+  <!-- Propagation Mode Selector -->
+  <div class="mode-panel">
+    <div>Schumann Mode:</div>
+    <select id="modeSelect">
+      <option value="realistic">🌍 Realistic (21ms)</option>
+      <option value="symbolic">⏱️ Symbolic (1s)</option>
+      <option value="resonant">🌊 7.83Hz Resonant</option>
+      <option value="original">📡 Original (2.5s)</option>
+    </select>
+    <div id="propagationInfo" style="margin-top: 8px; font-size: 10px; color: #99eeff;"></div>
+  </div>
 
   <!-- Controls -->
   <div class="ui-panel">
@@ -124,6 +160,7 @@ let running = true;
 let showTrails = true;
 let speed = 1;
 let time = 0;
+let propagationMode = 'realistic';
 
 document.getElementById('pauseBtn').onclick = () => {
   running = !running;
@@ -142,6 +179,24 @@ document.getElementById('trailBtn').onclick = () => {
     luminaries.forEach(l => l.trail = []);
   }
 };
+
+document.getElementById('modeSelect').onchange = e => {
+  propagationMode = e.target.value;
+  updatePropagationInfo();
+};
+
+function updatePropagationInfo() {
+  const info = document.getElementById('propagationInfo');
+  const modes = {
+    realistic: 'Center→Edge: ~21ms<br>Light speed propagation',
+    symbolic: 'Center→Edge: 1 second<br>Sacred timing alignment',
+    resonant: 'Center→Edge: ~128ms<br>7.83Hz Schumann cycle',
+    original: 'Center→Edge: 2.5 seconds<br>Original placeholder'
+  };
+  info.innerHTML = modes[propagationMode] || '';
+}
+
+updatePropagationInfo();
 
 /******************** LUMINARIES *************************/
 function luminaryPath(
@@ -339,7 +394,40 @@ function grid() {
 
 /******************** SCHUMANN WAVES *************************/
 function drawSchumannWaves() {
-  const wavePropSpeed = R / 150;
+  // ⚡ ACCURATE PROPAGATION CALCULATION
+  let wavePropSpeed;
+  
+  switch (propagationMode) {
+    case 'realistic':
+      // Real-world propagation based on 6371km radius and 300,000 km/s EM speed
+      const EARTH_RADIUS_KM = 6371;
+      const EM_SPEED_KM_S = 300_000;
+      const FRAMES_PER_SECOND = 60;
+      
+      // Calculate real-time travel in seconds and convert to frame units
+      const timeToEdgeSeconds = EARTH_RADIUS_KM / EM_SPEED_KM_S; // ~0.0212s
+      const framesToEdge = timeToEdgeSeconds * FRAMES_PER_SECOND; // ≈1.27 frames
+      
+      wavePropSpeed = R / framesToEdge;
+      break;
+      
+    case 'symbolic':
+      // One second from center to edge (sacred timing)
+      wavePropSpeed = R / 60; // 60 frames = 1s
+      break;
+      
+    case 'resonant':
+      // Match 7.83 Hz Schumann resonance frequency
+      wavePropSpeed = R * 7.83 / 60; // One full cycle = 1/7.83s ≈ 128ms
+      break;
+      
+    case 'original':
+    default:
+      // Original placeholder timing
+      wavePropSpeed = R / 150;
+      break;
+  }
+
   const waveProgress = (time * speed * 0.1) % (R / wavePropSpeed);
   const numWavefronts = 6;
   const waveSpacing = R / numWavefronts;
@@ -374,13 +462,18 @@ function drawSchumannWaves() {
 
   ctx.globalAlpha = 1.0;
 
-  // Constructive Nodal Zones
+  // Constructive Nodal Zones - frequency adjusted based on propagation mode
   const numNodalZones = 5;
   const nodalZoneSpacing = R / numNodalZones;
+  
+  // Adjust nodal zone pulsing based on propagation speed
+  let nodalFreq = 0.05;
+  if (propagationMode === 'realistic') nodalFreq = 0.5; // Faster pulsing for realistic mode
+  else if (propagationMode === 'resonant') nodalFreq = 7.83 / 60; // Match Schumann frequency
 
   for (let i = 1; i <= numNodalZones; i++) {
     const nodalRadius = i * nodalZoneSpacing;
-    const pulseStrength = 0.5 + 0.5 * Math.sin(time * speed * 0.05 + i * Math.PI / numNodalZones);
+    const pulseStrength = 0.5 + 0.5 * Math.sin(time * speed * nodalFreq + i * Math.PI / numNodalZones);
 
     ctx.strokeStyle = `rgba(255, 255, 0, ${pulseStrength * 0.7})`;
     ctx.lineWidth = 2 + pulseStrength * 3;
@@ -424,7 +517,7 @@ function draw() {
 
     if (crossedTop(b.n, ang)) bump(b.n);
 
-    if (showTrails) {
+    if (showTrails && b.trail !== false) {
       b.trail.push(pos);
       if (b.trail.length > b.max) b.trail.shift();
 
