@@ -125,7 +125,7 @@ const luminaries=[
   {n:'Moon', c:'#e6e6fa',sz:5, glow:true, glowSize:8,
    // Moon: Oscillates between approx -28.5S and +28.5N (slightly wider than Sun for "more drift")
    // While lunar nodal cycle is ~18.6 years, for clock visualization, annual lat swing or lunar cycle for the 'drift' might be used.
-   // Using annual lat oscillation for general declination tracking, with fractal wobble for unique 'drift'.
+   // Using annual lat oscillation for general declination mimic, with fractal wobble for unique 'drift'.
    path:luminaryPath(
      TAU/27.3, // angularSpeed: circles once per ~27.3 days (sidereal month)
      28.5,     // latOscillationMaxDeg: wider latitude oscillation
@@ -192,21 +192,84 @@ function bump(name){counters[name]++;document.getElementById(outIds[name]).textC
 
 /******************** GRID *******************************/
 function grid(){
-  // latitude rings every 10° (optional)
-  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
-  for(let lat=10; lat<=80; lat+=10){ const r=R*(90-lat)/180; ctx.beginPath(); ctx.arc(CENTER.x,CENTER.y,r,0,TAU); ctx.stroke(); }
-  // equator bold
+  // latitude rings every 10° REMOVED, now represented by dynamic Schumann waves
+
+  // equator bold - KEPT
   ctx.strokeStyle='rgba(0,255,255,.2)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU); ctx.stroke();
-  // longitude spokes
+  
+  // longitude spokes - KEPT
   ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
   for(let j=0;j<LONGITUDES;j++){
     const ang=j*TAU/LONGITUDES;
     ctx.beginPath();ctx.moveTo(CENTER.x,CENTER.y);
     ctx.lineTo(CENTER.x+R*Math.cos(ang),CENTER.y+R*Math.sin(ang));ctx.stroke();
   }
-  // zodiac labels
+  // zodiac labels - KEPT
   zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(z.label,z.x,z.y);});
 }
+
+/******************** SCHUMANN WAVES *************************/
+function drawSchumannWaves() {
+    // These parameters control the visual speed and density of the waves
+    const wavePropSpeed = R / 150; // Speed of wave propagation across the "firmament"
+    const waveProgress = (time * speed * 0.1) % (R / wavePropSpeed); // Scale time for wave animation
+    const numWavefronts = 6; // How many wave crests are visible at once
+    const waveSpacing = R / numWavefronts; // Approximate distance between wave crests
+
+    ctx.globalAlpha = 0.3; // Base transparency for wave lines
+
+    // Draw outbound waves (explodes spherically outward)
+    for (let i = 0; i < numWavefronts; i++) {
+        let r = (waveProgress * wavePropSpeed - i * waveSpacing) % R;
+        if (r < 0) r += R; // Ensure positive radius
+
+        ctx.strokeStyle = `rgb(0, 255, 255)`; // Cyan color for the waves
+        ctx.lineWidth = 1 + 2 * (1 - r / R); // Thicker near center, thinner outwards
+        
+        ctx.beginPath();
+        ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
+        ctx.stroke();
+    }
+
+    // Draw inbound waves (reflects instantly back to the center)
+    for (let i = 0; i < numWavefronts; i++) {
+        let r = R - ((waveProgress * wavePropSpeed - i * waveSpacing) % R);
+        if (r > R) r -= R; // Ensure within bounds (starts at R, moves in)
+
+        ctx.strokeStyle = `rgb(0, 255, 255)`;
+        ctx.lineWidth = 1 + 2 * (r / R); // Thicker near center, thinner near edge
+        
+        ctx.beginPath();
+        ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
+        ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1.0; // Reset global alpha
+
+    // Constructive Nodal Zones (Cymatic Ignition Nodes)
+    const numNodalZones = 5; // Number of fixed constructive interference rings
+    const nodalZoneSpacing = R / numNodalZones; // Spacing between nodes
+
+    for (let i = 1; i <= numNodalZones; i++) {
+        const nodalRadius = i * nodalZoneSpacing;
+
+        // Pulsing intensity based on time to simulate "phase alignment" / "burst points"
+        // Adjust 0.05 for speed of pulsation. 0.5 + 0.5 * ... makes it pulse between 0.5 and 1.0 intensity
+        const pulseStrength = 0.5 + 0.5 * Math.sin(time * speed * 0.05 + i * Math.PI / numNodalZones); 
+
+        ctx.strokeStyle = `rgba(255, 255, 0, ${pulseStrength * 0.7})`; // Yellowish for ignition, stronger alpha
+        ctx.lineWidth = 2 + pulseStrength * 3; // Thicker when pulsing strongly
+        ctx.shadowBlur = pulseStrength * 10; // Add glow effect when pulsing
+        ctx.shadowColor = `rgba(255, 255, 0, ${pulseStrength * 0.7})`;
+        
+        ctx.beginPath();
+        ctx.arc(CENTER.x, CENTER.y, nodalRadius, 0, TAU);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0; // Reset shadow after drawing each node
+    }
+}
+
 
 /******************** MAIN LOOP *************************/
 function draw(){
@@ -214,7 +277,8 @@ function draw(){
   if(running) time+=speed;
 
   ctx.fillStyle='rgba(0,0,20,.2)';ctx.fillRect(0,0,W,H);
-  grid();
+  grid(); // Draw the foundational grid
+  drawSchumannWaves(); // Draw the dynamic Schumann wave patterns
 
   luminaries.forEach(b=>{
     if (b.n === 'Stars') {
