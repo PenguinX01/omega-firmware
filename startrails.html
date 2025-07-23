@@ -62,7 +62,7 @@ let W=cvs.width=innerWidth, H=cvs.height=innerHeight;
 const CENTER={x:W/2,y:H/2}, TAU=Math.PI*2, DEG=Math.PI/180;
 let R=Math.min(W,H)/2.0;
 addEventListener('resize',()=>{W=cvs.width=innerWidth;H=cvs.height=innerHeight;
-  CENTER.x=W/2;CENTER.y=H/2;R=Math.min(W,H)/2.5;});
+  CENTER.x=W/2;CENTER.y=H/2;R=Math.min(W,H)/2.0;});
 
 /******************** UI STATE ***************************/
 let running=true, showTrails=true, speed=1, time=0;
@@ -116,10 +116,15 @@ function bump(name){counters[name]++;document.getElementById(outIds[name]).textC
 /******************** CITY DATA **************************/
 const cities=[
   {name:'Brunei',       emoji:'🐧', lat:4.5,   lon:115,     color:'#0ff'},
-  {name:'New York',     emoji:'🗽', lat:40.7,  lon:-74,     color:'#ffd700'},
+  {name:'New York',     emoji:'🗽', lat:40.7,  lon:-74,     color:'#ffd700'},
   {name:'London',       emoji:'🎡', lat:51.5,  lon:0,       color:'#ff69b4'},
   {name:'Tokyo',        emoji:'🗼', lat:35.7,  lon:139.7,   color:'#a0c0ff'},
-  {name:'Los Angeles',  emoji:'🌴', lat:34.05, lon:-118.25, color:'#ff8c00'}
+  {name:'Los Angeles',  emoji:'🌴', lat:34.05, lon:-118.25, color:'#ff8c00'},
+  {name:'Cairo',        emoji:'🕌', lat:30.0,  lon:31.2,    color:'#ffa500'},
+  {name:'Sydney',       emoji:'🌊', lat:-33.9, lon:151.2,   color:'#00bfff'},
+  {name:'Buenos Aires', emoji:'💃', lat:-34.6, lon:-58.4,   color:'#f08080'},
+  {name:'Moscow',       emoji:'❄️', lat:55.8,  lon:37.6,    color:'#dcdcdc'},
+  {name:'Cape Town',    emoji:'🦁', lat:-33.9, lon:18.4,    color:'#deb887'}
 ];
 // populate legend
 const cityLegend=document.getElementById('cityLegend');
