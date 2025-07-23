@@ -24,6 +24,13 @@
       border:1px solid #0ff;font-size:14px;line-height:1.5;color:#0ff;
       font-family:monospace}
     #legend span{display:block}
+
+    /* city legend (top‑left) */
+    #cityLegend{position:absolute;top:20px;left:20px;z-index:3;
+      background:rgba(0,0,0,.6);padding:10px 14px;border-radius:8px;
+      border:1px solid #ff8c00;font-size:14px;line-height:1.5;color:#ffb56c;
+      font-family:monospace;text-align:left}
+    #cityLegend span{display:block}
   </style>
 </head>
 <body>
@@ -37,7 +44,7 @@
     <button class="btn" id="trailBtn">✨ TRAILS ON</button>
   </div>
 
-  <!-- legend / counters -->
+  <!-- luminary counters -->
   <div id="legend">
     <span style="color:#ffd65c">● Sun — <span id="sunCnt">0</span></span>
     <span style="color:#e6e6fa">● Moon — <span id="moonCnt">0</span></span>
@@ -45,16 +52,19 @@
     <span style="color:#ff6b4a">● Mars — <span id="marsCnt">0</span></span>
   </div>
 
+  <!-- city legend -->
+  <div id="cityLegend"></div>
+
 <script>
-/* ─── basic setup ───────────────────────────────────────── */
+/******************** BASIC SETUP *************************/
 const cvs = document.getElementById('canvas'), ctx = cvs.getContext('2d');
 let W=cvs.width=innerWidth, H=cvs.height=innerHeight;
-const CENTER={x:W/2,y:H/2}, TAU=Math.PI*2;
-let R=Math.min(W,H)/2.4;
+const CENTER={x:W/2,y:H/2}, TAU=Math.PI*2, DEG=Math.PI/180;
+let R=Math.min(W,H)/2.0;
 addEventListener('resize',()=>{W=cvs.width=innerWidth;H=cvs.height=innerHeight;
-  CENTER.x=W/2;CENTER.y=H/2;R=Math.min(W,H)/2.4;});
+  CENTER.x=W/2;CENTER.y=H/2;R=Math.min(W,H)/2.5;});
 
-/* ─── ui state ──────────────────────────────────────────── */
+/******************** UI STATE ***************************/
 let running=true, showTrails=true, speed=1, time=0;
 document.getElementById('pauseBtn').onclick=()=>{running=!running;
   pauseBtn.textContent=running?'⏸ PAUSE':'▶ PLAY';};
@@ -66,7 +76,7 @@ document.getElementById('trailBtn').onclick=()=>{
   if(!showTrails) luminaries.forEach(l=>l.trail=[]);
 };
 
-/* ─── paths & data ─────────────────────────────────────── */
+/******************** LUMINARIES *************************/
 function fractalPath(baseR,sFreq,aSpeed,phase=0,off=0){
   return t=>{
     const ang=t*aSpeed+phase;
@@ -81,92 +91,87 @@ const luminaries=[
   {n:'Venus',c:'#99eeff',sz:4, path:fractalPath(R*.7,0.05,TAU/225,Math.PI/4), trail:[],max:350,glow:true},
   {n:'Mars', c:'#ff6b4a',sz:4, path:fractalPath(R*.8,0.033,TAU/687,Math.PI/5),trail:[],max:350,glow:true},
   {n:'Stars',c:'#8a8aff',sz:1.5,trail:false,
-   path:t=>{const a=[],m=180;for(let i=0;i<m;i++){const ang=i*2+t*.03;
-      const r=R*(0.9+0.05*Math.sin(i*.1+t*.001));
-      a.push({x:CENTER.x+r*Math.cos(ang*Math.PI/180),
-              y:CENTER.y+r*Math.sin(ang*Math.PI/180)});}return a;}}
+   path:t=>{const a=[],m=240;for(let i=0;i<m;i++){const ang=i*1.5+t*.03;
+      const r=R*(0.92+0.04*Math.sin(i*.09+t*.001));
+      a.push({x:CENTER.x+r*Math.cos(ang*DEG), y:CENTER.y+r*Math.sin(ang*DEG)});}return a;}}
 ];
 
-/* zodiac glyph coordinates (Libra ♎ at top as geographic North) */
-const zodiac=[]; for(let i=0;i<12;i++){
-  const ang=TAU*i/12+Math.PI/2;           // Libra (♎) at top
-  zodiac.push({x:CENTER.x+R*Math.cos(ang),
-               y:CENTER.y+R*Math.sin(ang),
-               label:String.fromCharCode(9800+i)});
+/******************** ZODIAC + LONGITUDE *****************/
+const zodiac=[];for(let i=0;i<12;i++){
+  const ang=TAU*i/12+Math.PI/2;
+  zodiac.push({x:CENTER.x+R*Math.cos(ang),y:CENTER.y+R*Math.sin(ang),label:String.fromCharCode(9800+i)});
 }
 
-/* ─── epoch counters ───────────────────────────────────── */
-const counters   ={Sun:0,Moon:0,Venus:0,Mars:0};
-const prevAngles ={Sun:0,Moon:0,Venus:0,Mars:0};
-const outIds     ={Sun:'sunCnt',Moon:'moonCnt',Venus:'venusCnt',Mars:'marsCnt'};
-const LIBRA= Math.PI/2;                    // 90° = top
+const LONGITUDES=24; // every 15°
 
-function getAngle(p){return(Math.atan2(p.y-CENTER.y,p.x-CENTER.x)+TAU)%TAU;}
-function crossedTop(name,ang){
-  const crossed = (prevAngles[name] < LIBRA && ang >= LIBRA);
-  prevAngles[name]=ang; return crossed;
-}
-function bump(name){
-  counters[name]++; document.getElementById(outIds[name]).textContent=counters[name];
+/******************** EPOCH COUNTERS *********************/
+const counters={Sun:0,Moon:0,Venus:0,Mars:0};
+const prevAngles={Sun:0,Moon:0,Venus:0,Mars:0};
+const outIds={Sun:'sunCnt',Moon:'moonCnt',Venus:'venusCnt',Mars:'marsCnt'};
+const LIBRA=Math.PI/2; // top axis
+function getAngle(p){return( Math.atan2(p.y-CENTER.y,p.x-CENTER.x)+TAU)%TAU;}
+function crossedTop(name,ang){const x= (prevAngles[name] < LIBRA && ang >= LIBRA);prevAngles[name]=ang;return x;}
+function bump(name){counters[name]++;document.getElementById(outIds[name]).textContent=counters[name];}
+
+/******************** CITY DATA **************************/
+const cities=[
+  {name:'Brunei',       emoji:'🐧', lat:4.5,   lon:115,     color:'#0ff'},
+  {name:'New York',     emoji:'🗽', lat:40.7,  lon:-74,     color:'#ffd700'},
+  {name:'London',       emoji:'🎡', lat:51.5,  lon:0,       color:'#ff69b4'},
+  {name:'Tokyo',        emoji:'🗼', lat:35.7,  lon:139.7,   color:'#a0c0ff'},
+  {name:'Los Angeles',  emoji:'🌴', lat:34.05, lon:-118.25, color:'#ff8c00'}
+];
+// populate legend
+const cityLegend=document.getElementById('cityLegend');
+cityLegend.innerHTML=cities.map(c=>`<span>${c.emoji} ${c.name}</span>`).join('');
+
+function cityPos(c){
+  const rho = R * (90 - c.lat) / 180; // distance from center
+  const ang = -c.lon * DEG;       // clockwise east positive
+  return{ x:CENTER.x+rho*Math.cos(ang), y:CENTER.y+rho*Math.sin(ang) };
 }
 
-/* ─── grid (background) ────────────────────────────────── */
+/******************** GRID *******************************/
 function grid(){
-  ctx.lineWidth=1;
-
-  /* --- 1. latitude rings (every 10°) --- */
-  ctx.strokeStyle='rgba(255,255,255,.07)';
-  for(let lat=10; lat<=80; lat+=10){
-    const r = R * (lat/90);               // AE projection: r ~ lat/90 * maxR
-    ctx.beginPath(); ctx.arc(CENTER.x,CENTER.y,r,0,TAU); ctx.stroke();
+  // latitude rings every 10° (optional)
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let lat=10; lat<=80; lat+=10){ const r=R*(90-lat)/180; ctx.beginPath(); ctx.arc(CENTER.x,CENTER.y,r,0,TAU); ctx.stroke(); }
+  // equator bold
+  ctx.strokeStyle='rgba(0,255,255,.2)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU); ctx.stroke();
+  // longitude spokes
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+  for(let j=0;j<LONGITUDES;j++){
+    const ang=j*TAU/LONGITUDES;
+    ctx.beginPath();ctx.moveTo(CENTER.x,CENTER.y);
+    ctx.lineTo(CENTER.x+R*Math.cos(ang),CENTER.y+R*Math.sin(ang));ctx.stroke();
   }
-
-  /* --- 2. EQUATOR ring (special highlight) --- */
-  ctx.strokeStyle='rgba(0,255,255,.25)'; ctx.lineWidth=1.5;
-  const REQ = R * (90/90);               // equator at 90° from pole
-  ctx.beginPath(); ctx.arc(CENTER.x,CENTER.y,REQ,0,TAU); ctx.stroke();
-
-  /* --- 3. longitude spokes (every 15°) --- */
-  ctx.lineWidth=1;
-  ctx.strokeStyle='rgba(255,255,255,.08)';
-  const LONG_DIV=24;                     // 360 / 24 = 15°
-  for(let a=0;a<TAU;a+=TAU/LONG_DIV){
-    ctx.beginPath(); ctx.moveTo(CENTER.x,CENTER.y);
-    ctx.lineTo(CENTER.x+R*Math.cos(a),CENTER.y+R*Math.sin(a)); ctx.stroke();
-  }
-
-  /* --- 4. zodiac glyphs around outer rim --- */
-  zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';
-    ctx.fillText(z.label,z.x-6,z.y+4);});
+  // zodiac labels
+  zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(z.label,z.x,z.y);});
 }
 
-/* ─── main loop ────────────────────────────────────────── */
+/******************** MAIN LOOP *************************/
 function draw(){
   requestAnimationFrame(draw);
   if(running) time+=speed;
 
-  ctx.fillStyle='rgba(0,0,20,.2)'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,20,.2)';ctx.fillRect(0,0,W,H);
   grid();
 
   luminaries.forEach(b=>{
     if(b.n==='Stars'){
-      ctx.fillStyle=b.c; b.path(time).forEach(p=>ctx.fillRect(p.x,p.y,1.5,1.5));
-      return;
-    }
-    const pos=b.path(time);
-    const ang=getAngle(pos);
-
+      ctx.fillStyle=b.c;b.path(time).forEach(p=>ctx.fillRect(p.x,p.y,1.2,1.2));return;}
+    const pos=b.path(time);const ang=getAngle(pos);
     if(crossedTop(b.n,ang)) bump(b.n);
+    if(showTrails){b.trail.push(pos);if(b.trail.length>b.max)b.trail.shift();
+      ctx.strokeStyle=b.c;ctx.lineWidth=1.2;ctx.beginPath();b.trail.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y));ctx.stroke();}
+    ctx.beginPath();ctx.fillStyle=b.c;if(b.glow){ctx.shadowBlur=8;ctx.shadowColor=b.c;}
+    ctx.arc(pos.x,pos.y,b.sz,0,TAU);ctx.fill();ctx.shadowBlur=0;});
 
-    if(showTrails){
-      b.trail.push(pos); if(b.trail.length>b.max) b.trail.shift();
-      ctx.strokeStyle=b.c; ctx.lineWidth=1.2; ctx.beginPath();
-      b.trail.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y)); ctx.stroke();
-    }
-
-    ctx.beginPath(); ctx.fillStyle=b.c;
-    if(b.glow){ctx.shadowBlur=8; ctx.shadowColor=b.c;}
-    ctx.arc(pos.x,pos.y,b.sz,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+  /***** CITY MARKERS *****/
+  cities.forEach(c=>{
+    const p=cityPos(c);
+    ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=c.color;
+    ctx.fillText(c.emoji,p.x,p.y);
   });
 }
 draw();
