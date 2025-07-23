@@ -2,100 +2,154 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fractal Luminary Viewer — Kingdom Mode</title>
+  <title>Fractal Luminary Viewer — Epoch Clock</title>
   <style>
     html,body{margin:0;height:100%;background:#000014;color:#e0e0e0;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
     canvas{display:block}
-    .ui-panel{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:2}
-    .legend{position:absolute;top:20px;right:20px;z-index:3;background:rgba(0,0,0,0.6);padding:10px;border-radius:8px;border:1px solid #0ff;font-size:14px;line-height:1.4;color:#0ff;font-family:monospace}
-    .legend span{display:block;margin-bottom:4px}
-    .btn{padding:8px 14px;border-radius:18px;border:1px solid #099;cursor:pointer;font-size:12px;background:rgba(0,153,153,.15);color:#0ff;backdrop-filter:blur(8px);transition:.25s}
+
+    /* control buttons */
+    .ui-panel{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+      display:flex;gap:10px;z-index:2}
+
+    .btn{padding:8px 14px;font-size:12px;border-radius:18px;border:1px solid #099;
+      background:rgba(0,153,153,.15);color:#0ff;cursor:pointer;backdrop-filter:blur(8px);transition:.25s}
     .btn:hover{background:rgba(0,153,153,.25)}
     .btn:active{transform:translateY(1px)}
     .speed-label{display:inline-block;min-width:48px;text-align:center}
     input[type=range]{accent-color:#0ff}
+
+    /* legend (top‑right) */
+    #legend{position:absolute;top:20px;right:20px;z-index:3;
+      background:rgba(0,0,0,.6);padding:10px;border-radius:8px;
+      border:1px solid #0ff;font-size:14px;line-height:1.5;color:#0ff;
+      font-family:monospace}
+    #legend span{display:block}
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
-  <div class="ui-panel" id="controls">
-    <button class="btn" id="pauseBtn">⏸ PAUSE</button>
-    <span class="speed-label" id="speedVal">1×</span>
-    <input type="range" id="speedSlider" min="0.2" max="3" step="0.1" value="1">
-    <button class="btn" id="trailBtn">✨ TRAILS ON</button>
+
+  <!-- controls -->
+  <div class="ui-panel">
+    <button class="btn" id="pauseBtn">⏸ PAUSE</button>
+    <span  class="speed-label" id="speedVal">1×</span>
+    <input  id="speedSl" type="range" min="0.2" max="3" step="0.1" value="1">
+    <button class="btn" id="trailBtn">✨ TRAILS ON</button>
   </div>
-  <div class="legend" id="legend">
-    <span style="color:#ffd65c">● Sun</span>
-    <span style="color:#e6e6fa">● Moon</span>
-    <span style="color:#99eeff">● Venus</span>
-    <span style="color:#ff6b4a">● Mars</span>
-    <span style="color:#8a8aff">● Stars</span>
+
+  <!-- legend / counters -->
+  <div id="legend">
+    <span style="color:#ffd65c">● Sun — <span id="sunCnt">0</span></span>
+    <span style="color:#e6e6fa">● Moon — <span id="moonCnt">0</span></span>
+    <span style="color:#99eeff">● Venus — <span id="venusCnt">0</span></span>
+    <span style="color:#ff6b4a">● Mars — <span id="marsCnt">0</span></span>
   </div>
-  <script>
-  const cvs = document.getElementById('canvas');
-  const ctx = cvs.getContext('2d');
-  let W = cvs.width  = innerWidth;
-  let H = cvs.height = innerHeight;
-  const CENTER = {x:W/2,y:H/2};
-  const TAU = Math.PI*2, DEG=Math.PI/180;
-  let R = Math.min(W,H)/2.5;
-  function resize(){ W=cvs.width=innerWidth; H=cvs.height=innerHeight; CENTER.x=W/2; CENTER.y=H/2; R=Math.min(W,H)/2.5; }
-  addEventListener('resize',resize);
 
-  function fractalPath(baseR,sFreq,aSpeed,phase=0,off=0){
-    return t=>{
-      const ang=t*aSpeed+phase;
-      const r = baseR + baseR*0.25*Math.sin(t*sFreq+off);
-      return {x:CENTER.x+r*Math.cos(ang),y:CENTER.y+r*Math.sin(ang)};
-    };
-  }
+<script>
+/* ─── basic setup ───────────────────────────────────────── */
+const cvs = document.getElementById('canvas'), ctx = cvs.getContext('2d');
+let W=cvs.width=innerWidth, H=cvs.height=innerHeight;
+const CENTER={x:W/2,y:H/2}, TAU=Math.PI*2;
+let R=Math.min(W,H)/2.5;
+addEventListener('resize',()=>{W=cvs.width=innerWidth;H=cvs.height=innerHeight;
+  CENTER.x=W/2;CENTER.y=H/2;R=Math.min(W,H)/2.5;});
 
-  const luminaries=[
-    {n:'Sun', c:'#ffd65c', sz:8, path:fractalPath(R*.6,0.017,TAU/365),  trail:[], max:500, glow:true},
-    {n:'Moon',c:'#e6e6fa',sz:5, path:fractalPath(R*.5,0.12,TAU/27.3,Math.PI/3), trail:[], max:400, glow:true},
-    {n:'Venus',c:'#99eeff',sz:4, path:fractalPath(R*.7,0.05,TAU/225,Math.PI/4),  trail:[], max:350, glow:true},
-    {n:'Mars', c:'#ff6b4a',sz:4, path:fractalPath(R*.8,0.033,TAU/687,Math.PI/5), trail:[], max:350, glow:true},
-    {n:'Stars',c:'#8a8aff',sz:1.5,trail:false,
-      path:t=>{const arr=[];for(let i=0;i<180;i++){const a=i*2+t*.03;const r=R*(0.9+0.05*Math.sin(i*.1+t*.001));arr.push({x:CENTER.x+r*Math.cos(a*DEG),y:CENTER.y+r*Math.sin(a*DEG)});}return arr;}}
-  ];
+/* ─── ui state ──────────────────────────────────────────── */
+let running=true, showTrails=true, speed=1, time=0;
+document.getElementById('pauseBtn').onclick=()=>{running=!running;
+  pauseBtn.textContent=running?'⏸ PAUSE':'▶ PLAY';};
+document.getElementById('speedSl').oninput=e=>{
+  speed=+e.target.value; speedVal.textContent=speed.toFixed(1)+'×';};
+document.getElementById('trailBtn').onclick=()=>{
+  showTrails=!showTrails;
+  trailBtn.textContent=showTrails?'✨ TRAILS ON':'💤 TRAILS OFF';
+  if(!showTrails) luminaries.forEach(l=>l.trail=[]);
+};
 
-  const zodiac = [];
-  for(let i=0;i<12;i++){
-    const ang = TAU*i/12 + Math.PI/2;
-    zodiac.push({x:CENTER.x+R*Math.cos(ang), y:CENTER.y+R*Math.sin(ang), label:String.fromCharCode(9800+i)});
-  }
+/* ─── paths & data ─────────────────────────────────────── */
+function fractalPath(baseR,sFreq,aSpeed,phase=0,off=0){
+  return t=>{
+    const ang=t*aSpeed+phase;
+    const r=baseR+baseR*0.25*Math.sin(t*sFreq+off);
+    return{ x:CENTER.x+r*Math.cos(ang), y:CENTER.y+r*Math.sin(ang)};
+  };
+}
 
-  let running=true, showTrails=true, speed=1, time=0;
-  const pauseBtn  = document.getElementById('pauseBtn');
-  const speedVal  = document.getElementById('speedVal');
-  const speedSl   = document.getElementById('speedSlider');
-  const trailBtn  = document.getElementById('trailBtn');
+const luminaries=[
+  {n:'Sun',  c:'#ffd65c',sz:8, path:fractalPath(R*.6,0.017,TAU/365),         trail:[],max:500,glow:true},
+  {n:'Moon', c:'#e6e6fa',sz:5, path:fractalPath(R*.5,0.12,TAU/27.3,Math.PI/3),trail:[],max:400,glow:true},
+  {n:'Venus',c:'#99eeff',sz:4, path:fractalPath(R*.7,0.05,TAU/225,Math.PI/4), trail:[],max:350,glow:true},
+  {n:'Mars', c:'#ff6b4a',sz:4, path:fractalPath(R*.8,0.033,TAU/687,Math.PI/5),trail:[],max:350,glow:true},
+  {n:'Stars',c:'#8a8aff',sz:1.5,trail:false,
+   path:t=>{const a=[],m=180;for(let i=0;i<m;i++){const ang=i*2+t*.03;
+      const r=R*(0.9+0.05*Math.sin(i*.1+t*.001));
+      a.push({x:CENTER.x+r*Math.cos(ang*Math.PI/180),
+              y:CENTER.y+r*Math.sin(ang*Math.PI/180)});}return a;}}
+];
 
-  pauseBtn.onclick = ()=>{ running=!running; pauseBtn.textContent = running? '⏸ PAUSE':'▶ PLAY'; };
-  speedSl.oninput  = e=>{ speed=+e.target.value; speedVal.textContent=speed.toFixed(1)+'×'; };
-  trailBtn.onclick = ()=>{ showTrails=!showTrails; trailBtn.textContent = showTrails? '✨ TRAILS ON':'💤 TRAILS OFF'; if(!showTrails) luminaries.forEach(l=>l.trail=[]);} ;
+/* zodiac glyph coordinates (for grid) */
+const zodiac=[]; for(let i=0;i<12;i++){
+  const ang=TAU*i/12+Math.PI/2;           // Libra (♎) at top
+  zodiac.push({x:CENTER.x+R*Math.cos(ang),
+               y:CENTER.y+R*Math.sin(ang),
+               label:String.fromCharCode(9800+i)});
+}
 
-  function grid(){
-    ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
-    for(let r=50;r<R;r+=50){ctx.beginPath();ctx.arc(CENTER.x,CENTER.y,r,0,TAU);ctx.stroke();}
-    for(let a=0;a<TAU;a+=TAU/12){ctx.beginPath();ctx.moveTo(CENTER.x,CENTER.y);ctx.lineTo(CENTER.x+R*Math.cos(a),CENTER.y+R*Math.sin(a));ctx.stroke();}
-    zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';ctx.fillText(z.label,z.x-6,z.y+4);});
-  }
+/* ─── epoch counters ───────────────────────────────────── */
+const counters   ={Sun:0,Moon:0,Venus:0,Mars:0};
+const prevAngles ={Sun:0,Moon:0,Venus:0,Mars:0};
+const outIds     ={Sun:'sunCnt',Moon:'moonCnt',Venus:'venusCnt',Mars:'marsCnt'};
+const LIBRA= Math.PI/2;                    // 90° = top
 
-  function draw(){
-    requestAnimationFrame(draw);
-    if(running) time+=speed;
-    ctx.fillStyle='rgba(0,0,20,.2)';ctx.fillRect(0,0,W,H);
-    grid();
-    luminaries.forEach(b=>{
-      if(b.n==='Stars'){
-        const stars=b.path(time);ctx.fillStyle=b.c;stars.forEach(p=>ctx.fillRect(p.x,p.y,1.5,1.5));return;}
-      const pos=b.path(time);
-      if(showTrails){b.trail.push(pos); if(b.trail.length>b.max) b.trail.shift(); ctx.strokeStyle=b.c; ctx.lineWidth=1.2; ctx.beginPath(); b.trail.forEach((pt,i)=>{i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y)}); ctx.stroke();}
-      ctx.beginPath(); ctx.fillStyle=b.c; if(b.glow){ctx.shadowBlur=8;ctx.shadowColor=b.c;} ctx.arc(pos.x,pos.y,b.sz,0,TAU); ctx.fill(); ctx.shadowBlur=0;
-    });
-  }
-  draw();
-  </script>
+function getAngle(p){return(Math.atan2(p.y-CENTER.y,p.x-CENTER.x)+TAU)%TAU;}
+function crossedTop(name,ang){
+  const crossed = (prevAngles[name] < LIBRA && ang >= LIBRA);
+  prevAngles[name]=ang; return crossed;
+}
+function bump(name){
+  counters[name]++; document.getElementById(outIds[name]).textContent=counters[name];
+}
+
+/* ─── grid (background) ────────────────────────────────── */
+function grid(){
+  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
+  for(let r=50;r<R;r+=50){ctx.beginPath();ctx.arc(CENTER.x,CENTER.y,r,0,TAU);ctx.stroke();}
+  for(let a=0;a<TAU;a+=TAU/12){ctx.beginPath();ctx.moveTo(CENTER.x,CENTER.y);
+    ctx.lineTo(CENTER.x+R*Math.cos(a),CENTER.y+R*Math.sin(a));ctx.stroke();}
+  zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';
+    ctx.fillText(z.label,z.x-6,z.y+4);});
+}
+
+/* ─── main loop ────────────────────────────────────────── */
+function draw(){
+  requestAnimationFrame(draw);
+  if(running) time+=speed;
+
+  ctx.fillStyle='rgba(0,0,20,.2)'; ctx.fillRect(0,0,W,H);
+  grid();
+
+  luminaries.forEach(b=>{
+    if(b.n==='Stars'){
+      ctx.fillStyle=b.c; b.path(time).forEach(p=>ctx.fillRect(p.x,p.y,1.5,1.5));
+      return;
+    }
+    const pos=b.path(time);
+    const ang=getAngle(pos);
+
+    if(crossedTop(b.n,ang)) bump(b.n);
+
+    if(showTrails){
+      b.trail.push(pos); if(b.trail.length>b.max) b.trail.shift();
+      ctx.strokeStyle=b.c; ctx.lineWidth=1.2; ctx.beginPath();
+      b.trail.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y)); ctx.stroke();
+    }
+
+    ctx.beginPath(); ctx.fillStyle=b.c;
+    if(b.glow){ctx.shadowBlur=8; ctx.shadowColor=b.c;}
+    ctx.arc(pos.x,pos.y,b.sz,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+  });
+}
+draw();
+</script>
 </body>
 </html>
