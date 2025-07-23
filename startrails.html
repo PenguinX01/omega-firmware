@@ -4,45 +4,29 @@
   <meta charset="UTF-8" />
   <title>Fractal Luminary Viewer — Epoch Clock</title>
   <style>
-    html,body{margin:0;height:100%;background:#0a0a1a;color:#e0e0e0;overflow:hidden;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif}
+    html,body{margin:0;height:100%;background:#000014;color:#e0e0e0;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
     canvas{display:block}
 
     /* control buttons */
-    .ui-panel{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
-      display:flex;gap:12px;z-index:2;padding:10px 20px;border-radius:30px;
-      background:rgba(10, 15, 30, 0.7);backdrop-filter:blur(10px);
-      border:1px solid rgba(100, 150, 255, 0.2);box-shadow:0 0 20px rgba(0, 50, 150, 0.3);}
+    .ui-panel{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+      display:flex;gap:10px;z-index:2}
 
-    .btn{padding:10px 20px;font-size:14px;font-weight:500;border-radius:25px;border:1px solid #4a6fc5;
-      background:linear-gradient(145deg, rgba(30, 50, 100, 0.4), rgba(20, 30, 70, 0.6));
-      color:#a0c0ff;cursor:pointer;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);}
-    .btn:hover{background:linear-gradient(145deg, rgba(40, 70, 140, 0.5), rgba(30, 50, 110, 0.7));
-      transform:translateY(-2px);box-shadow:0 4px 12px rgba(0, 50, 150, 0.4);}
-    .btn:active{transform:translateY(1px);box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);}
-    .speed-label{display:inline-block;min-width:50px;text-align:center;font-weight:bold;color:#7aa8ff}
-    input[type=range]{accent-color:#4a6fc5;width:120px;}
+    .btn{padding:8px 14px;font-size:12px;border-radius:18px;border:1px solid #099;
+      background:rgba(0,153,153,.15);color:#0ff;cursor:pointer;backdrop-filter:blur(8px);transition:.25s}
+    .btn:hover{background:rgba(0,153,153,.25)}
+    .btn:active{transform:translateY(1px)}
+    .speed-label{display:inline-block;min-width:48px;text-align:center}
+    input[type=range]{accent-color:#0ff}
 
     /* legend (top‑right) */
-    #legend{position:absolute;top:25px;right:25px;z-index:3;
-      background:rgba(10, 15, 30, 0.7);padding:15px 20px;border-radius:12px;
-      border:1px solid rgba(100, 150, 255, 0.2);font-size:15px;line-height:1.8;
-      font-family:'Courier New', monospace;box-shadow:0 0 20px rgba(0, 30, 100, 0.4);}
-    #legend span{display:block;padding:4px 0;}
-    
-    /* Title */
-    .title {position:absolute;top:25px;left:50%;transform:translateX(-50%);
-      font-size:28px;font-weight:700;color:#a0c0ff;text-shadow:0 0 10px rgba(100, 150, 255, 0.5);
-      letter-spacing:2px;z-index:3;font-family:'Georgia', serif;}
-    .subtitle {position:absolute;top:60px;left:50%;transform:translateX(-50%);
-      font-size:14px;color:#7aa8ff;z-index:3;opacity:0.8;}
-    
-    /* Counter styling */
-    .counter {display:inline-block;width:40px;text-align:right;font-weight:bold;color:#ffd700;}
+    #legend{position:absolute;top:20px;right:20px;z-index:3;
+      background:rgba(0,0,0,.6);padding:10px;border-radius:8px;
+      border:1px solid #0ff;font-size:14px;line-height:1.5;color:#0ff;
+      font-family:monospace}
+    #legend span{display:block}
   </style>
 </head>
 <body>
-  <div class="title">EPOCH CLOCK</div>
-  <div class="subtitle">Fractal Luminary Viewer</div>
   <canvas id="canvas"></canvas>
 
   <!-- controls -->
@@ -55,10 +39,10 @@
 
   <!-- legend / counters -->
   <div id="legend">
-    <span style="color:#ffd65c">● Sun — <span id="sunCnt" class="counter">0</span></span>
-    <span style="color:#e6e6fa">● Moon — <span id="moonCnt" class="counter">0</span></span>
-    <span style="color:#99eeff">● Venus — <span id="venusCnt" class="counter">0</span></span>
-    <span style="color:#ff6b4a">● Mars — <span id="marsCnt" class="counter">0</span></span>
+    <span style="color:#ffd65c">● Sun — <span id="sunCnt">0</span></span>
+    <span style="color:#e6e6fa">● Moon — <span id="moonCnt">0</span></span>
+    <span style="color:#99eeff">● Venus — <span id="venusCnt">0</span></span>
+    <span style="color:#ff6b4a">● Mars — <span id="marsCnt">0</span></span>
   </div>
 
 <script>
@@ -92,13 +76,13 @@ function fractalPath(baseR,sFreq,aSpeed,phase=0,off=0){
 }
 
 const luminaries=[
-  {n:'Sun',  c:'#ffd65c',sz:12, path:fractalPath(R*.6,0.017,TAU/365),         trail:[],max:500,glow:true,glowSize:15},
-  {n:'Moon', c:'#e6e6fa',sz:9, path:fractalPath(R*.5,0.12,TAU/27.3,Math.PI/3),trail:[],max:400,glow:true,glowSize:12},
-  {n:'Venus',c:'#99eeff',sz:7, path:fractalPath(R*.7,0.05,TAU/225,Math.PI/4), trail:[],max:350,glow:true,glowSize:10},
-  {n:'Mars', c:'#ff6b4a',sz:7, path:fractalPath(R*.8,0.033,TAU/687,Math.PI/5),trail:[],max:350,glow:true,glowSize:10},
-  {n:'Stars',c:'#8a8aff',sz:2,trail:false,
-   path:t=>{const a=[],m=250;for(let i=0;i<m;i++){const ang=i*1.8+t*.03;
-      const r=R*(0.9+0.05*Math.sin(i*.12+t*.001));
+  {n:'Sun',  c:'#ffd65c',sz:8, path:fractalPath(R*.6,0.017,TAU/365),         trail:[],max:500,glow:true},
+  {n:'Moon', c:'#e6e6fa',sz:5, path:fractalPath(R*.5,0.12,TAU/27.3,Math.PI/3),trail:[],max:400,glow:true},
+  {n:'Venus',c:'#99eeff',sz:4, path:fractalPath(R*.7,0.05,TAU/225,Math.PI/4), trail:[],max:350,glow:true},
+  {n:'Mars', c:'#ff6b4a',sz:4, path:fractalPath(R*.8,0.033,TAU/687,Math.PI/5),trail:[],max:350,glow:true},
+  {n:'Stars',c:'#8a8aff',sz:1.5,trail:false,
+   path:t=>{const a=[],m=180;for(let i=0;i<m;i++){const ang=i*2+t*.03;
+      const r=R*(0.9+0.05*Math.sin(i*.1+t*.001));
       a.push({x:CENTER.x+r*Math.cos(ang*Math.PI/180),
               y:CENTER.y+r*Math.sin(ang*Math.PI/180)});}return a;}}
 ];
@@ -128,13 +112,12 @@ function bump(name){
 
 /* ─── grid (background) ────────────────────────────────── */
 function grid(){
-  ctx.strokeStyle='rgba(100, 150, 255, 0.1)'; ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
   for(let r=50;r<R;r+=50){ctx.beginPath();ctx.arc(CENTER.x,CENTER.y,r,0,TAU);ctx.stroke();}
   for(let a=0;a<TAU;a+=TAU/12){ctx.beginPath();ctx.moveTo(CENTER.x,CENTER.y);
     ctx.lineTo(CENTER.x+R*Math.cos(a),CENTER.y+R*Math.sin(a));ctx.stroke();}
-  zodiac.forEach(z=>{ctx.fillStyle='#7aa8ff';ctx.font='bold 18px Arial';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(z.label,z.x,z.y);});
+  zodiac.forEach(z=>{ctx.fillStyle='#0ff';ctx.font='14px Arial';
+    ctx.fillText(z.label,z.x-6,z.y+4);});
 }
 
 /* ─── main loop ────────────────────────────────────────── */
@@ -142,23 +125,12 @@ function draw(){
   requestAnimationFrame(draw);
   if(running) time+=speed;
 
-  // Create a subtle fade effect for trails
-  ctx.fillStyle='rgba(10, 10, 26, '+(showTrails ? 0.08 : 0.15)+')'; 
-  ctx.fillRect(0,0,W,H);
-  
+  ctx.fillStyle='rgba(0,0,20,.2)'; ctx.fillRect(0,0,W,H);
   grid();
 
   luminaries.forEach(b=>{
     if(b.n==='Stars'){
-      ctx.fillStyle=b.c; 
-      const stars = b.path(time);
-      stars.forEach((p, i) => {
-        // Add a subtle twinkle effect to stars
-        const alpha = 0.6 + 0.4 * Math.sin(time * 0.05 + i * 0.1);
-        ctx.globalAlpha = alpha;
-        ctx.fillRect(p.x,p.y,b.sz,b.sz);
-      });
-      ctx.globalAlpha = 1.0;
+      ctx.fillStyle=b.c; b.path(time).forEach(p=>ctx.fillRect(p.x,p.y,1.5,1.5));
       return;
     }
     const pos=b.path(time);
@@ -168,36 +140,13 @@ function draw(){
 
     if(showTrails){
       b.trail.push(pos); if(b.trail.length>b.max) b.trail.shift();
-      
-      // Draw trail with gradient effect
-      const gradient = ctx.createLinearGradient(
-        b.trail[0].x, b.trail[0].y, 
-        pos.x, pos.y
-      );
-      gradient.addColorStop(0, 'rgba(0,0,0,0)');
-      gradient.addColorStop(0.5, b.c+'80');
-      gradient.addColorStop(1, b.c);
-      
-      ctx.strokeStyle=gradient; 
-      ctx.lineWidth=2; 
-      ctx.beginPath(); 
-      b.trail.forEach((pt,i)=>{
-        if(i===0) ctx.moveTo(pt.x,pt.y);
-        else ctx.lineTo(pt.x,pt.y);
-      }); 
-      ctx.stroke();
+      ctx.strokeStyle=b.c; ctx.lineWidth=1.2; ctx.beginPath();
+      b.trail.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y)); ctx.stroke();
     }
 
-    // Draw the celestial body with enhanced glow
-    ctx.beginPath(); 
-    ctx.fillStyle=b.c; 
-    if(b.glow){
-      ctx.shadowBlur=b.glowSize; 
-      ctx.shadowColor=b.c;
-    } 
-    ctx.arc(pos.x,pos.y,b.sz,0,TAU); 
-    ctx.fill(); 
-    ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.fillStyle=b.c;
+    if(b.glow){ctx.shadowBlur=8; ctx.shadowColor=b.c;}
+    ctx.arc(pos.x,pos.y,b.sz,0,TAU); ctx.fill(); ctx.shadowBlur=0;
   });
 }
 draw();
