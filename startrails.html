@@ -61,7 +61,7 @@
 
   const zodiac = [];
   for(let i=0;i<12;i++){
-    const ang = TAU*i/12;
+    const ang = TAU*i/12 + Math.PI/2;
     zodiac.push({x:CENTER.x+R*Math.cos(ang), y:CENTER.y+R*Math.sin(ang), label:String.fromCharCode(9800+i)});
   }
 
