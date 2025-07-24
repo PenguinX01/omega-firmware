@@ -1,143 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Fractal Luminary Viewer — Epoch Clock (Gleason Grid)</title>
-  <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: #000014;
-      color: #e0e0e0;
-      overflow: hidden;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    
-    canvas {
-      display: block;
-    }
-
-    /* Control buttons */
-    .ui-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 2;
-    }
-
-    .btn {
-      padding: 8px 14px;
-      font-size: 12px;
-      border-radius: 18px;
-      border: 1px solid #099;
-      background: rgba(0, 153, 153, 0.15);
-      color: #0ff;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: 0.25s;
-    }
-    
-    .btn:hover {
-      background: rgba(0, 153, 153, 0.25);
-    }
-    
-    .btn:active {
-      transform: translateY(1px);
-    }
-    
-    .speed-label {
-      display: inline-block;
-      min-width: 48px;
-      text-align: center;
-      color: #0ff;
-      line-height: 2.5;
-    }
-    
-    input[type=range] {
-      accent-color: #0ff;
-    }
-
-    /* Legend (top-right) */
-    #legend {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 3;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #0ff;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #0ff;
-      font-family: monospace;
-    }
-    
-    #legend span {
-      display: block;
-    }
-
-    /* Propagation mode selector */
-    .mode-panel {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 3;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #0ff;
-      color: #0ff;
-      font-family: monospace;
-      font-size: 12px;
-    }
-
-    .mode-panel select {
-      background: rgba(0, 20, 20, 0.8);
-      color: #0ff;
-      border: 1px solid #099;
-      border-radius: 4px;
-      padding: 4px;
-      margin-top: 5px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Enhanced Schumann Resonance - Celestial Interface</title>
+<style>
+html, body {
+margin: 0;
+height: 100%;
+background: radial-gradient(circle at center, #000022 0%, #000011 70%, #000000 100%);
+color: #e0e0e0;
+overflow: hidden;
+font-family: 'Courier New', monospace;
+}
+canvas {
+display: block;
+filter: contrast(1.1) brightness(1.05);
+}
+.ui-panel {
+position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 12px;
+z-index: 2;
+align-items: center;
+}
+.btn {
+padding: 10px 16px;
+font-size: 11px;
+border-radius: 20px;
+border: 1px solid #0ff;
+background: rgba(0, 255, 255, 0.1);
+color: #0ff;
+cursor: pointer;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+text-transform: uppercase;
+font-weight: bold;
+}
+.btn:hover {
+background: rgba(0, 255, 255, 0.2);
+box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+}
+.btn:active {
+transform: translateY(1px) scale(0.98);
+}
+.speed-label {
+display: inline-block;
+min-width: 60px;
+text-align: center;
+color: #0ff;
+line-height: 2.5;
+font-weight: bold;
+text-shadow: 0 0 5px #0ff;
+}
+input[type=range] {
+accent-color: #0ff;
+width: 120px;
+}
+#legend {
+position: absolute;
+top: 20px;
+right: 20px;
+z-index: 3;
+background: rgba(0, 0, 0, 0.8);
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #0ff;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+font-size: 12px;
+line-height: 1.6;
+color: #0ff;
+font-family: 'Courier New', monospace;
+}
+#legend span {
+display: block;
+margin: 3px 0;
+}
+.mode-panel {
+position: absolute;
+top: 20px;
+left: 20px;
+z-index: 3;
+background: rgba(0, 0, 0, 0.8);
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #0ff;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+color: #0ff;
+font-family: 'Courier New', monospace;
+font-size: 11px;
+}
+.mode-panel select {
+background: rgba(0, 30, 30, 0.9);
+color: #0ff;
+border: 1px solid #099;
+border-radius: 6px;
+padding: 6px;
+margin-top: 8px;
+font-family: 'Courier New', monospace;
+}
+.resonance-panel {
+position: absolute;
+bottom: 20px;
+right: 20px;
+z-index: 3;
+background: rgba(0, 0, 0, 0.8);
+padding: 12px;
+border-radius: 10px;
+border: 1px solid #ff0;
+box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+color: #ff0;
+font-family: 'Courier New', monospace;
+font-size: 10px;
+text-align: center;
+}
+</style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
+<canvas id="canvas"></canvas>
 
-  <!-- Propagation Mode Selector -->
-  <div class="mode-panel">
-    <div>Schumann Mode:</div>
-    <select id="modeSelect">
-      <option value="realistic">🌍 Realistic (21ms)</option>
-      <option value="symbolic">⏱️ Symbolic (1s)</option>
-      <option value="resonant">🌊 7.83Hz Resonant</option>
-      <option value="original">📡 Original (2.5s)</option>
-    </select>
-    <div id="propagationInfo" style="margin-top: 8px; font-size: 10px; color: #99eeff;"></div>
-  </div>
+<!-- Propagation Mode Selector -->
+<div class="mode-panel">
+<div>⚡ SCHUMANN RESONANCE MODE</div>
+<select id="modeSelect">
+<option value="realistic">🌍 REALISTIC (21ms)</option>
+<option value="symbolic">⏱ SYMBOLIC (1s)</option>
+<option value="resonant">🌊 7.83Hz RESONANT</option>
+<option value="harmonic">🎵 HARMONIC CASCADE</option>
+<option value="dome">🏛 DOME REFLECTION</option>
+</select>
+<div id="propagationInfo" style="margin-top: 8px; font-size: 9px; color: #99eeff;"></div>
+</div>
 
-  <!-- Controls -->
-  <div class="ui-panel">
-    <button class="btn" id="pauseBtn">⏸ PAUSE</button>
-    <span class="speed-label" id="speedVal">1×</span>
-    <input id="speedSl" type="range" min="0.2" max="3" step="0.1" value="1">
-    <button class="btn" id="trailBtn">✨ TRAILS ON</button>
-  </div>
+<!-- Controls -->
+<div class="ui-panel">
+<button class="btn" id="pauseBtn">⏸ PAUSE</button>
+<span class="speed-label" id="speedVal">1.0×</span>
+<input id="speedSl" type="range" min="0.1" max="5" step="0.1" value="1">
+<button class="btn" id="trailBtn">✨ TRAILS</button>
+<button class="btn" id="waveBtn">🌊 WAVES</button>
+<button class="btn" id="nodesBtn">⚡ NODES</button>
+</div>
 
-  <!-- Luminary counters -->
-  <div id="legend">
-    <span style="color:#ffd65c">● Sun — <span id="sunCnt">0</span></span>
-    <span style="color:#e6e6fa">● Moon — <span id="moonCnt">0</span></span>
-    <span style="color:#99eeff">● Venus — <span id="venusCnt">0</span></span>
-    <span style="color:#ff6b4a">● Mars — <span id="marsCnt">0</span></span>
-  </div>
+<!-- Celestial Legend -->
+<div id="legend">
+<div style="color:#ffd65c; font-weight: bold;">☉ SUN — <span id="sunCnt">0</span></div>
+<div style="color:#e6e6fa;">☾ MOON — <span id="moonCnt">0</span></div>
+<div style="color:#99eeff;">♀ VENUS — <span id="venusCnt">0</span></div>
+<div style="color:#ff6b4a;">♂ MARS — <span id="marsCnt">0</span></div>
+<div style="color:#ffaa44;">♄ SATURN — <span id="saturnCnt">0</span></div>
+<div style="color:#aa44ff;">☊ RAHU — <span id="rahuCnt">0</span></div>
+<div style="color:#44aaff;">☋ KETU — <span id="ketuCnt">0</span></div>
+</div>
+
+<!-- Resonance Monitor -->
+<div class="resonance-panel">
+<div>SCHUMANN INTENSITY</div>
+<div id="resonanceLevel" style="font-size: 14px; font-weight: bold;">7.83 Hz</div>
+<div id="harmonicDisplay" style="font-size: 8px; margin-top: 4px;">ALPHA SYNC</div>
+</div>
 
 <script>
-/******************** BASIC SETUP *************************/
+/******************** ENHANCED SETUP *************************/
 const cvs = document.getElementById('canvas');
 const ctx = cvs.getContext('2d');
 let W = cvs.width = innerWidth;
@@ -145,407 +171,460 @@ let H = cvs.height = innerHeight;
 const CENTER = { x: W / 2, y: H / 2 };
 const TAU = Math.PI * 2;
 const DEG = Math.PI / 180;
-let R = Math.min(W, H) / 2.0;
+let R = Math.min(W, H) / 2.2;
 
 addEventListener('resize', () => {
-  W = cvs.width = innerWidth;
-  H = cvs.height = innerHeight;
-  CENTER.x = W / 2;
-  CENTER.y = H / 2;
-  R = Math.min(W, H) / 2.0;
+W = cvs.width = innerWidth;
+H = cvs.height = innerHeight;
+CENTER.x = W / 2;
+CENTER.y = H / 2;
+R = Math.min(W, H) / 2.2;
 });
 
-/******************** UI STATE ***************************/
+/******************** ENHANCED UI STATE ***************************/
 let running = true;
 let showTrails = true;
+let showWaves = true;
+let showNodes = true;
 let speed = 1;
 let time = 0;
 let propagationMode = 'realistic';
 
+// UI Event Handlers
 document.getElementById('pauseBtn').onclick = () => {
-  running = !running;
-  document.getElementById('pauseBtn').textContent = running ? '⏸ PAUSE' : '▶ PLAY';
+running = !running;
+document.getElementById('pauseBtn').textContent = running ? '⏸ PAUSE' : '▶ PLAY';
 };
 
 document.getElementById('speedSl').oninput = e => {
-  speed = +e.target.value;
-  document.getElementById('speedVal').textContent = speed.toFixed(1) + '×';
+speed = +e.target.value;
+document.getElementById('speedVal').textContent = speed.toFixed(1) + '×';
 };
 
 document.getElementById('trailBtn').onclick = () => {
-  showTrails = !showTrails;
-  document.getElementById('trailBtn').textContent = showTrails ? '✨ TRAILS ON' : '💤 TRAILS OFF';
-  if (!showTrails) {
-    luminaries.forEach(l => l.trail = []);
-  }
+showTrails = !showTrails;
+document.getElementById('trailBtn').textContent = showTrails ? '✨ TRAILS' : '💤 NO TRAILS';
+if (!showTrails) {
+luminaries.forEach(l => l.trail = []);
+}
+};
+
+document.getElementById('waveBtn').onclick = () => {
+showWaves = !showWaves;
+document.getElementById('waveBtn').textContent = showWaves ? '🌊 WAVES' : '🚫 NO WAVES';
+};
+
+document.getElementById('nodesBtn').onclick = () => {
+showNodes = !showNodes;
+document.getElementById('nodesBtn').textContent = showNodes ? '⚡ NODES' : '🚫 NO NODES';
 };
 
 document.getElementById('modeSelect').onchange = e => {
-  propagationMode = e.target.value;
-  updatePropagationInfo();
+propagationMode = e.target.value;
+updatePropagationInfo();
 };
 
 function updatePropagationInfo() {
-  const info = document.getElementById('propagationInfo');
-  const modes = {
-    realistic: 'Center→Edge: ~21ms<br>Light speed propagation',
-    symbolic: 'Center→Edge: 1 second<br>Sacred timing alignment',
-    resonant: 'Center→Edge: ~128ms<br>7.83Hz Schumann cycle',
-    original: 'Center→Edge: 2.5 seconds<br>Original placeholder'
-  };
-  info.innerHTML = modes[propagationMode] || '';
+const info = document.getElementById('propagationInfo');
+const modes = {
+realistic: 'Light Speed: ~21ms<br>EM Wave Propagation',
+symbolic: 'Sacred Time: 1 second<br>Consciousness Sync',
+resonant: '7.83Hz Cycle: ~128ms<br>Alpha Brain Resonance',
+harmonic: 'Multi-Frequency<br>Harmonic Overtones',
+dome: 'Firmament Reflection<br>Standing Wave Pattern'
+};
+info.innerHTML = modes[propagationMode] || '';
 }
-
 updatePropagationInfo();
 
-/******************** LUMINARIES *************************/
+/******************** ENHANCED LUMINARIES *************************/
 function luminaryPath(
-  angularSpeed,
-  latOscillationMaxDeg,
-  latOscillationPeriodDays,
-  latOscillationPhase = 0,
-  initialAngularPhase = 0,
-  radialWobbleFreq = 0,
-  radialWobbleOffset = 0,
-  northOnly = false
+angularSpeed,
+latOscillationMaxDeg,
+latOscillationPeriodDays,
+latOscillationPhase = 0,
+initialAngularPhase = 0,
+radialWobbleFreq = 0,
+radialWobbleOffset = 0,
+northOnly = false
 ) {
-  return t => {
-    let currentLat;
-    if (northOnly) {
-      currentLat = latOscillationMaxDeg * (0.5 + 0.5 * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase));
-    } else {
-      currentLat = latOscillationMaxDeg * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase);
-    }
-
-    let r = R * (90 - currentLat) / 180;
-
-    if (radialWobbleFreq > 0) {
-      r += r * 0.05 * Math.sin(t * radialWobbleFreq + radialWobbleOffset);
-    }
-
-    const angle = t * angularSpeed + initialAngularPhase;
-
-    return {
-      x: CENTER.x + r * Math.cos(angle),
-      y: CENTER.y + r * Math.sin(angle)
-    };
-  };
+return t => {
+let currentLat;
+if (northOnly) {
+currentLat = latOscillationMaxDeg * (0.5 + 0.5 * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase));
+} else {
+currentLat = latOscillationMaxDeg * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase);
+}
+let r = R * (90 - currentLat) / 180;
+if (radialWobbleFreq > 0) {
+r += r * 0.05 * Math.sin(t * radialWobbleFreq + radialWobbleOffset);
+}
+const angle = t * angularSpeed + initialAngularPhase;
+return {
+x: CENTER.x + r * Math.cos(angle),
+y: CENTER.y + r * Math.sin(angle)
+};
+};
 }
 
 const luminaries = [
-  {
-    n: 'Sun',
-    c: '#ffd65c',
-    sz: 8,
-    glow: true,
-    glowSize: 12,
-    path: luminaryPath(
-      TAU / 365,
-      23.5,
-      365,
-      0,
-      0,
-      0.017,
-      0
-    ),
-    trail: [],
-    max: 500
-  },
-  {
-    n: 'Moon',
-    c: '#e6e6fa',
-    sz: 5,
-    glow: true,
-    glowSize: 8,
-    path: luminaryPath(
-      TAU / 27.3,
-      28.5,
-      365,
-      Math.PI / 3,
-      Math.PI / 3,
-      0.12,
-      Math.PI / 3
-    ),
-    trail: [],
-    max: 400
-  },
-  {
-    n: 'Venus',
-    c: '#99eeff',
-    sz: 4,
-    glow: true,
-    glowSize: 7,
-    path: luminaryPath(
-      TAU / 225,
-      23.5,
-      225,
-      Math.PI / 4,
-      Math.PI / 4,
-      0.05,
-      Math.PI / 4,
-      true
-    ),
-    trail: [],
-    max: 350
-  },
-  {
-    n: 'Mars',
-    c: '#ff6b4a',
-    sz: 4,
-    glow: true,
-    glowSize: 7,
-    path: luminaryPath(
-      TAU / 687,
-      23.5,
-      687,
-      Math.PI / 5,
-      Math.PI / 5,
-      0.033,
-      Math.PI / 5,
-      true
-    ),
-    trail: [],
-    max: 350
-  },
-  {
-    n: 'Stars',
-    c: '#8a8aff',
-    sz: 1.5,
-    trail: false,
-    path: t => {
-      const a = [];
-      const m = 240;
-      for (let i = 0; i < m; i++) {
-        const ang = i * 1.5 + t * 0.03;
-        const r = R * (0.92 + 0.04 * Math.sin(i * 0.09 + t * 0.001));
-        a.push({
-          x: CENTER.x + r * Math.cos(ang * DEG),
-          y: CENTER.y + r * Math.sin(ang * DEG)
-        });
-      }
-      return a;
-    }
-  }
+{
+n: 'Sun',
+c: '#ffd65c',
+sz: 10,
+glow: true,
+glowSize: 20,
+path: luminaryPath(TAU / 365, 23.5, 365, 0, 0, 0.017, 0),
+trail: [],
+max: 600
+},
+{
+n: 'Moon',
+c: '#e6e6fa',
+sz: 6,
+glow: true,
+glowSize: 12,
+path: luminaryPath(TAU / 27.3, 28.5, 365, Math.PI / 3, Math.PI / 3, 0.12, Math.PI / 3),
+trail: [],
+max: 500
+},
+{
+n: 'Venus',
+c: '#99eeff',
+sz: 5,
+glow: true,
+glowSize: 10,
+path: luminaryPath(TAU / 225, 23.5, 225, Math.PI / 4, Math.PI / 4, 0.05, Math.PI / 4, true),
+trail: [],
+max: 400
+},
+{
+n: 'Mars',
+c: '#ff6b4a',
+sz: 5,
+glow: true,
+glowSize: 10,
+path: luminaryPath(TAU / 687, 23.5, 687, Math.PI / 5, Math.PI / 5, 0.033, Math.PI / 5, true),
+trail: [],
+max: 400
+},
+{
+n: 'Saturn',
+c: '#ffaa44',
+sz: 7,
+glow: true,
+glowSize: 15,
+rings: true,
+path: luminaryPath(TAU / (29.5 * 365), 26.7, 29.5 * 365, Math.PI / 6, Math.PI / 6, 0.02, Math.PI / 6),
+trail: [],
+max: 300
+},
+{
+n: 'Rahu',
+c: '#aa44ff',
+sz: 4,
+glow: true,
+glowSize: 8,
+path: luminaryPath(-TAU / (18.6 * 365), 0, 18.6 * 365, 0, 0, 0.01, 0),
+trail: [],
+max: 200
+},
+{
+n: 'Ketu',
+c: '#44aaff',
+sz: 4,
+glow: true,
+glowSize: 8,
+path: luminaryPath(TAU / (18.6 * 365), 0, 18.6 * 365, Math.PI, Math.PI, 0.01, Math.PI),
+trail: [],
+max: 200
+},
+{
+n: 'Stars',
+c: '#8a8aff',
+sz: 1.5,
+trail: false,
+path: t => {
+const stars = [];
+const numStars = 360;
+for (let i = 0; i < numStars; i++) {
+const ang = i * 1.0 + t * 0.01;
+const r = R * (0.95 + 0.03 * Math.sin(i * 0.05 + t * 0.002));
+const twinkle = 0.3 + 0.7 * Math.sin(i * 0.1 + t * 0.05);
+stars.push({
+x: CENTER.x + r * Math.cos(ang * DEG),
+y: CENTER.y + r * Math.sin(ang * DEG),
+brightness: twinkle
+});
+}
+return stars;
+}
+}
 ];
 
-/******************** ZODIAC + LONGITUDE *****************/
+/******************** ZODIAC + GRID *****************/
+const zodiacSymbols = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
 const zodiac = [];
 for (let i = 0; i < 12; i++) {
-  const ang = TAU * i / 12 + Math.PI / 2;
-  zodiac.push({
-    x: CENTER.x + R * Math.cos(ang),
-    y: CENTER.y + R * Math.sin(ang),
-    label: String.fromCharCode(9800 + i)
-  });
+const ang = TAU * i / 12 + Math.PI / 2;
+zodiac.push({
+x: CENTER.x + R * 1.05 * Math.cos(ang),
+y: CENTER.y + R * 1.05 * Math.sin(ang),
+label: zodiacSymbols[i]
+});
 }
 
 const LONGITUDES = 24;
 
-/******************** EPOCH COUNTERS *********************/
-const counters = { Sun: 0, Moon: 0, Venus: 0, Mars: 0 };
-const prevAngles = { Sun: 0, Moon: 0, Venus: 0, Mars: 0 };
-const outIds = { Sun: 'sunCnt', Moon: 'moonCnt', Venus: 'venusCnt', Mars: 'marsCnt' };
+/******************** COUNTERS *********************/
+const counters = { Sun: 0, Moon: 0, Venus: 0, Mars: 0, Saturn: 0, Rahu: 0, Ketu: 0 };
+const prevAngles = { Sun: 0, Moon: 0, Venus: 0, Mars: 0, Saturn: 0, Rahu: 0, Ketu: 0 };
+const outIds = { 
+Sun: 'sunCnt', Moon: 'moonCnt', Venus: 'venusCnt', Mars: 'marsCnt',
+Saturn: 'saturnCnt', Rahu: 'rahuCnt', Ketu: 'ketuCnt'
+};
 const LIBRA = Math.PI / 2;
 
 function getAngle(p) {
-  return (Math.atan2(p.y - CENTER.y, p.x - CENTER.x) + TAU) % TAU;
+return (Math.atan2(p.y - CENTER.y, p.x - CENTER.x) + TAU) % TAU;
 }
 
 function crossedTop(name, ang) {
-  const x = (prevAngles[name] < LIBRA && ang >= LIBRA);
-  prevAngles[name] = ang;
-  return x;
+const crossed = (prevAngles[name] < LIBRA && ang >= LIBRA);
+prevAngles[name] = ang;
+return crossed;
 }
 
 function bump(name) {
-  counters[name]++;
-  document.getElementById(outIds[name]).textContent = counters[name];
+counters[name]++;
+if (outIds[name]) {
+document.getElementById(outIds[name]).textContent = counters[name];
+}
 }
 
-/******************** GRID *******************************/
-function grid() {
-  // Equator bold
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU);
-  ctx.stroke();
+/******************** ENHANCED GRID *******************************/
+function drawGrid() {
+// Equatorial circles
+ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU);
+ctx.stroke();
 
-  // Longitude spokes
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1;
-  for (let j = 0; j < LONGITUDES; j++) {
-    const ang = j * TAU / LONGITUDES;
-    ctx.beginPath();
-    ctx.moveTo(CENTER.x, CENTER.y);
-    ctx.lineTo(CENTER.x + R * Math.cos(ang), CENTER.y + R * Math.sin(ang));
-    ctx.stroke();
-  }
+// Tropic circles
+ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.37, 0, TAU);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.63, 0, TAU);
+ctx.stroke();
 
-  // Zodiac labels
-  zodiac.forEach(z => {
-    ctx.fillStyle = '#0ff';
-    ctx.font = '14px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(z.label, z.x, z.y);
-  });
+// Longitude meridians
+ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+ctx.lineWidth = 1;
+for (let j = 0; j < LONGITUDES; j++) {
+const ang = j * TAU / LONGITUDES;
+ctx.beginPath();
+ctx.moveTo(CENTER.x, CENTER.y);
+ctx.lineTo(CENTER.x + R * Math.cos(ang), CENTER.y + R * Math.sin(ang));
+ctx.stroke();
 }
 
-/******************** SCHUMANN WAVES *************************/
+// Enhanced zodiac labels
+zodiac.forEach((z, i) => {
+ctx.fillStyle = '#0ff';
+ctx.font = 'bold 16px Arial';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.shadowBlur = 3;
+ctx.shadowColor = '#0ff';
+ctx.fillText(z.label, z.x, z.y);
+ctx.shadowBlur = 0;
+});
+}
+
+/******************** ENHANCED SCHUMANN WAVES *************************/
 function drawSchumannWaves() {
-  // ⚡ ACCURATE PROPAGATION CALCULATION
-  let wavePropSpeed;
-  
-  switch (propagationMode) {
-    case 'realistic':
-      // Real-world propagation based on 6371km radius and 300,000 km/s EM speed
-      const EARTH_RADIUS_KM = 6371;
-      const EM_SPEED_KM_S = 300_000;
-      const FRAMES_PER_SECOND = 60;
-      
-      // Calculate real-time travel in seconds and convert to frame units
-      const timeToEdgeSeconds = EARTH_RADIUS_KM / EM_SPEED_KM_S; // ~0.0212s
-      const framesToEdge = timeToEdgeSeconds * FRAMES_PER_SECOND; // ≈1.27 frames
-      
-      wavePropSpeed = R / framesToEdge;
-      break;
-      
-    case 'symbolic':
-      // One second from center to edge (sacred timing)
-      wavePropSpeed = R / 60; // 60 frames = 1s
-      break;
-      
-    case 'resonant':
-      // Match 7.83 Hz Schumann resonance frequency
-      wavePropSpeed = R * 7.83 / 60; // One full cycle = 1/7.83s ≈ 128ms
-      break;
-      
-    case 'original':
-    default:
-      // Original placeholder timing
-      wavePropSpeed = R / 150;
-      break;
-  }
+if (!showWaves) return;
 
-  const waveProgress = (time * speed * 0.1) % (R / wavePropSpeed);
-  const numWavefronts = 6;
-  const waveSpacing = R / numWavefronts;
+let wavePropSpeed;
+let harmonics = [7.83];
 
-  ctx.globalAlpha = 0.3;
-
-  // Draw outbound waves
-  for (let i = 0; i < numWavefronts; i++) {
-    let r = (waveProgress * wavePropSpeed - i * waveSpacing) % R;
-    if (r < 0) r += R;
-
-    ctx.strokeStyle = 'rgb(0, 255, 255)';
-    ctx.lineWidth = 1 + 2 * (1 - r / R);
-
-    ctx.beginPath();
-    ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
-    ctx.stroke();
-  }
-
-  // Draw inbound waves
-  for (let i = 0; i < numWavefronts; i++) {
-    let r = R - ((waveProgress * wavePropSpeed - i * waveSpacing) % R);
-    if (r > R) r -= R;
-
-    ctx.strokeStyle = 'rgb(0, 255, 255)';
-    ctx.lineWidth = 1 + 2 * (r / R);
-
-    ctx.beginPath();
-    ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
-    ctx.stroke();
-  }
-
-  ctx.globalAlpha = 1.0;
-
-  // Constructive Nodal Zones - frequency adjusted based on propagation mode
-  const numNodalZones = 5;
-  const nodalZoneSpacing = R / numNodalZones;
-  
-  // Adjust nodal zone pulsing based on propagation speed
-  let nodalFreq = 0.05;
-  if (propagationMode === 'realistic') nodalFreq = 0.5; // Faster pulsing for realistic mode
-  else if (propagationMode === 'resonant') nodalFreq = 7.83 / 60; // Match Schumann frequency
-
-  for (let i = 1; i <= numNodalZones; i++) {
-    const nodalRadius = i * nodalZoneSpacing;
-    const pulseStrength = 0.5 + 0.5 * Math.sin(time * speed * nodalFreq + i * Math.PI / numNodalZones);
-
-    ctx.strokeStyle = `rgba(255, 255, 0, ${pulseStrength * 0.7})`;
-    ctx.lineWidth = 2 + pulseStrength * 3;
-    ctx.shadowBlur = pulseStrength * 10;
-    ctx.shadowColor = `rgba(255, 255, 0, ${pulseStrength * 0.7})`;
-
-    ctx.beginPath();
-    ctx.arc(CENTER.x, CENTER.y, nodalRadius, 0, TAU);
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-  }
+switch (propagationMode) {
+case 'realistic':
+const EARTH_RADIUS_KM = 6371;
+const EM_SPEED_KM_S = 300_000;
+const FRAMES_PER_SECOND = 60;
+const timeToEdgeSeconds = EARTH_RADIUS_KM / EM_SPEED_KM_S;
+const framesToEdge = timeToEdgeSeconds * FRAMES_PER_SECOND;
+wavePropSpeed = R / framesToEdge;
+break;
+case 'symbolic':
+wavePropSpeed = R / 60;
+break;
+case 'resonant':
+wavePropSpeed = R * 7.83 / 60;
+break;
+case 'harmonic':
+wavePropSpeed = R / 100;
+harmonics = [7.83, 14.3, 20.8, 27.3, 33.8];
+break;
+case 'dome':
+wavePropSpeed = R / 80;
+break;
+default:
+wavePropSpeed = R / 150;
 }
 
-/******************** MAIN LOOP *************************/
+// Update resonance display
+const resonanceLevel = document.getElementById('resonanceLevel');
+const harmonicDisplay = document.getElementById('harmonicDisplay');
+const intensity = 7.83 + 0.5 * Math.sin(time * 0.1);
+resonanceLevel.textContent = intensity.toFixed(2) + ' Hz';
+harmonicDisplay.textContent = intensity > 8 ? 'BETA SYNC' : 'ALPHA SYNC';
+
+// Draw wave patterns for each harmonic
+harmonics.forEach((freq, freqIndex) => {
+const waveProgress = (time * speed * freq * 0.01) % (R / wavePropSpeed);
+const numWavefronts = 8;
+const waveSpacing = R / numWavefronts;
+
+const hue = (freqIndex * 60) % 360;
+const color = `hsl(${hue}, 100%, 50%)`;
+
+ctx.globalAlpha = 0.3 / harmonics.length;
+
+// Outbound waves
+for (let i = 0; i < numWavefronts; i++) {
+let r = (waveProgress * wavePropSpeed - i * waveSpacing) % R;
+if (r < 0) r += R;
+
+ctx.strokeStyle = color;
+ctx.lineWidth = 1 + 3 * (1 - r / R);
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
+ctx.stroke();
+}
+
+// Dome reflection mode
+if (propagationMode === 'dome') {
+for (let i = 0; i < numWavefronts; i++) {
+let r = R - ((waveProgress * wavePropSpeed - i * waveSpacing) % R);
+if (r > R) r -= R;
+
+ctx.strokeStyle = color;
+ctx.lineWidth = 1 + 3 * (r / R);
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
+ctx.stroke();
+}
+}
+});
+
+ctx.globalAlpha = 1.0;
+
+// Constructive interference nodes
+if (showNodes) {
+const numNodalZones = 7;
+const nodalZoneSpacing = R / numNodalZones;
+let nodalFreq = 0.05;
+
+if (propagationMode === 'realistic') nodalFreq = 0.5;
+else if (propagationMode === 'resonant') nodalFreq = 7.83 / 60;
+else if (propagationMode === 'harmonic') nodalFreq = 0.2;
+
+for (let i = 1; i <= numNodalZones; i++) {
+const nodalRadius = i * nodalZoneSpacing;
+const pulseStrength = 0.5 + 0.5 * Math.sin(time * speed * nodalFreq + i * Math.PI / numNodalZones);
+
+ctx.strokeStyle = `rgba(255, 255, 0, ${pulseStrength * 0.8})`;
+ctx.lineWidth = 2 + pulseStrength * 4;
+ctx.shadowBlur = pulseStrength * 15;
+ctx.shadowColor = `rgba(255, 255, 0, ${pulseStrength * 0.8})`;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, nodalRadius, 0, TAU);
+ctx.stroke();
+ctx.shadowBlur = 0;
+}
+}
+}
+
+/******************** MAIN RENDERING LOOP *************************/
 function draw() {
-  requestAnimationFrame(draw);
-  if (running) time += speed;
+requestAnimationFrame(draw);
+if (running) time += speed;
 
-  ctx.fillStyle = 'rgba(0, 0, 20, 0.2)';
-  ctx.fillRect(0, 0, W, H);
-  
-  grid();
-  drawSchumannWaves();
+// Background with subtle gradient animation
+const bgIntensity = 0.1 + 0.05 * Math.sin(time * 0.02);
+ctx.fillStyle = `rgba(0, 0, 20, ${bgIntensity})`;
+ctx.fillRect(0, 0, W, H);
 
-  luminaries.forEach(b => {
-    if (b.n === 'Stars') {
-      ctx.fillStyle = b.c;
-      const stars = b.path(time);
-      stars.forEach((p, i) => {
-        const alpha = 0.6 + 0.4 * Math.sin(time * 0.05 + i * 0.1);
-        ctx.globalAlpha = alpha;
-        ctx.fillRect(p.x, p.y, b.sz, b.sz);
-      });
-      ctx.globalAlpha = 1.0;
-      return;
-    }
+drawGrid();
+drawSchumannWaves();
 
-    const pos = b.path(time);
-    const ang = getAngle(pos);
+// Render luminaries
+luminaries.forEach(body => {
+if (body.n === 'Stars') {
+const stars = body.path(time);
+stars.forEach((star, i) => {
+ctx.globalAlpha = star.brightness;
+ctx.fillStyle = body.c;
+ctx.fillRect(star.x - body.sz/2, star.y - body.sz/2, body.sz, body.sz);
+});
+ctx.globalAlpha = 1.0;
+return;
+}
 
-    if (crossedTop(b.n, ang)) bump(b.n);
+const pos = body.path(time);
+const ang = getAngle(pos);
+if (crossedTop(body.n, ang)) bump(body.n);
 
-    if (showTrails && b.trail !== false) {
-      b.trail.push(pos);
-      if (b.trail.length > b.max) b.trail.shift();
+// Trail rendering
+if (showTrails && body.trail !== false) {
+body.trail.push(pos);
+if (body.trail.length > body.max) body.trail.shift();
 
-      ctx.lineWidth = 2;
-      for (let i = 0; i < b.trail.length - 1; i++) {
-        const p1 = b.trail[i];
-        const p2 = b.trail[i + 1];
-        const alpha = (i / b.trail.length) * 0.8 + 0.1;
+ctx.lineWidth = 2;
+for (let i = 0; i < body.trail.length - 1; i++) {
+const p1 = body.trail[i];
+const p2 = body.trail[i + 1];
+const alpha = (i / body.trail.length) * 0.9 + 0.1;
+ctx.beginPath();
+ctx.moveTo(p1.x, p1.y);
+ctx.lineTo(p2.x, p2.y);
+ctx.strokeStyle = body.c + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+ctx.stroke();
+}
+}
 
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = b.c + Math.floor(alpha * 255).toString(16).padStart(2, '0');
-        ctx.stroke();
-      }
-    }
+// Enhanced luminary rendering
+ctx.beginPath();
+ctx.fillStyle = body.c;
+if (body.glow) {
+ctx.shadowBlur = body.glowSize;
+ctx.shadowColor = body.c;
+}
 
-    // Draw the luminary itself
-    ctx.beginPath();
-    ctx.fillStyle = b.c;
-    if (b.glow) {
-      ctx.shadowBlur = b.glowSize;
-      ctx.shadowColor = b.c;
-    }
-    ctx.arc(pos.x, pos.y, b.sz, 0, TAU);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  });
+// Special rendering for Saturn's rings
+if (body.rings) {
+ctx.globalAlpha = 0.6;
+ctx.strokeStyle = body.c;
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 1.8, 0, TAU);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 2.3, 0, TAU);
+ctx.stroke();
+ctx.globalAlpha = 1.0;
+}
+
+ctx.arc(pos.x, pos.y, body.sz, 0, TAU);
+ctx.fill();
+ctx.shadowBlur = 0;
+});
 }
 
 draw();
