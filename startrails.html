@@ -132,6 +132,13 @@ text-align: center;
 <option value="dome">🏛 DOME REFLECTION</option>
 </select>
 <div id="propagationInfo" style="margin-top: 8px; font-size: 9px; color: #99eeff;"></div>
+<div style="margin-top: 12px; border-top: 1px solid #0ff; padding-top: 8px;">
+<div>🌌 CELESTIAL MECHANICS</div>
+<select id="cosmologySelect">
+<option value="geocentric">🎯 GEOCENTRIC (Axis Mundi)</option>
+<option value="heliocentric">🌍 HELIOCENTRIC (Globe Model)</option>
+</select>
+</div>
 </div>
 
 <!-- Controls -->
@@ -147,12 +154,15 @@ text-align: center;
 <!-- Celestial Legend -->
 <div id="legend">
 <div style="color:#ffd65c; font-weight: bold;">☉ SUN — <span id="sunCnt">0</span></div>
-<div style="color:#e6e6fa;">☾ MOON — <span id="moonCnt">0</span></div>
+<div style="color:#e6e6fa;">☾ MOON — <span id="moonCnt">0</span> | <span id="lunarPhase">●</span></div>
 <div style="color:#99eeff;">♀ VENUS — <span id="venusCnt">0</span></div>
 <div style="color:#ff6b4a;">♂ MARS — <span id="marsCnt">0</span></div>
 <div style="color:#ffaa44;">♄ SATURN — <span id="saturnCnt">0</span></div>
 <div style="color:#aa44ff;">☊ RAHU — <span id="rahuCnt">0</span></div>
 <div style="color:#44aaff;">☋ KETU — <span id="ketuCnt">0</span></div>
+<div style="margin-top: 8px; font-size: 10px; color: #aaa;">
+<span id="synodicInfo">Synodic: 0 days</span>
+</div>
 </div>
 
 <!-- Resonance Monitor -->
@@ -189,6 +199,7 @@ let showNodes = true;
 let speed = 1;
 let time = 0;
 let propagationMode = 'realistic';
+let cosmologyMode = 'geocentric';
 
 // UI Event Handlers
 document.getElementById('pauseBtn').onclick = () => {
@@ -224,6 +235,12 @@ propagationMode = e.target.value;
 updatePropagationInfo();
 };
 
+document.getElementById('cosmologySelect').onchange = e => {
+cosmologyMode = e.target.value;
+// Reset trails when switching cosmology
+luminaries.forEach(l => l.trail = []);
+};
+
 function updatePropagationInfo() {
 const info = document.getElementById('propagationInfo');
 const modes = {
@@ -239,14 +256,15 @@ updatePropagationInfo();
 
 /******************** ENHANCED LUMINARIES *************************/
 function luminaryPath(
-angularSpeed,
+baseSpeed,
 latOscillationMaxDeg,
 latOscillationPeriodDays,
 latOscillationPhase = 0,
 initialAngularPhase = 0,
-radialWobbleFreq = 0,
-radialWobbleOffset = 0,
-northOnly = false
+harmonicFreq = 0,
+harmonicOffset = 0,
+northOnly = false,
+pathType = 'solar'
 ) {
 return t => {
 let currentLat;
@@ -256,10 +274,61 @@ currentLat = latOscillationMaxDeg * (0.5 + 0.5 * Math.sin(TAU * t / latOscillati
 currentLat = latOscillationMaxDeg * Math.sin(TAU * t / latOscillationPeriodDays + latOscillationPhase);
 }
 let r = R * (90 - currentLat) / 180;
-if (radialWobbleFreq > 0) {
-r += r * 0.05 * Math.sin(t * radialWobbleFreq + radialWobbleOffset);
+
+// Add harmonic spiraling instead of fake elliptical wobble
+if (harmonicFreq > 0) {
+r += r * 0.03 * Math.sin(t * harmonicFreq + harmonicOffset);
 }
-const angle = t * angularSpeed + initialAngularPhase;
+
+let angle;
+const solarSpeed = TAU / 365; // Sun's base rhythm
+const dailySpeed = TAU; // 24-hour cycle
+
+switch (pathType) {
+case 'solar':
+// Sun sets the primary tempo
+angle = t * solarSpeed + initialAngularPhase;
+break;
+case 'lunar':
+// Moon chases Sun with synodic lag
+const sunAngle = t * solarSpeed;
+const lunarLag = t * (TAU * 13 / (365 * 360)); // 13° daily lag
+angle = sunAngle - lunarLag + initialAngularPhase;
+break;
+case 'venus':
+// Venus creates 5-petal rose pattern over 8 years
+// Returns to same position every 584 days (synodic period)
+const venusianCycle = t * (TAU / 584) * 5; // 5-fold symmetry
+const venusPetals = Math.sin(venusianCycle) * 0.1;
+angle = t * solarSpeed * 1.6 + venusPetals + initialAngularPhase;
+break;
+case 'mars':
+// Mars with retrograde loops - perspective-based wandering
+const marsBase = t * solarSpeed * 0.53; // ~687 day cycle adjusted
+const retrograde = Math.sin(t * 0.005) * 0.2; // Retrograde looping
+angle = marsBase + retrograde + initialAngularPhase;
+break;
+case 'saturn':
+// Saturn - slow archivist, guardian of deep time cycles
+// Moves in 29.5-year spirals, not orbits
+const saturnCycle = t * solarSpeed / 29.5; // Deep time rhythm
+const sabbathPhase = Math.sin(t * 0.001) * 0.05; // Sabbatical harmonics
+angle = saturnCycle + sabbathPhase + initialAngularPhase;
+break;
+case 'rahu':
+// North Node - shadow ascending, eclipse bringer
+const nodeCycle = t * solarSpeed / 18.6; // 18.6 year cycle
+angle = -nodeCycle + initialAngularPhase; // Counter-clockwise
+break;
+case 'ketu':
+// South Node - shadow descending, karmic release
+const southCycle = t * solarSpeed / 18.6;
+angle = southCycle + Math.PI + initialAngularPhase; // Opposite Rahu
+break;
+default:
+angle = t * baseSpeed + initialAngularPhase;
+}
+
 return {
 x: CENTER.x + r * Math.cos(angle),
 y: CENTER.y + r * Math.sin(angle)
@@ -274,7 +343,7 @@ c: '#ffd65c',
 sz: 10,
 glow: true,
 glowSize: 20,
-path: luminaryPath(TAU / 365, 23.5, 365, 0, 0, 0.017, 0),
+path: luminaryPath(0, 23.5, 365, 0, 0, 0.017, 0, false, 'solar'),
 trail: [],
 max: 600
 },
@@ -284,7 +353,7 @@ c: '#e6e6fa',
 sz: 6,
 glow: true,
 glowSize: 12,
-path: luminaryPath(TAU / 27.3, 28.5, 365, Math.PI / 3, Math.PI / 3, 0.12, Math.PI / 3),
+path: luminaryPath(0, 28.5, 365, Math.PI / 3, Math.PI / 3, 0.12, Math.PI / 3, false, 'lunar'),
 trail: [],
 max: 500
 },
@@ -294,7 +363,7 @@ c: '#99eeff',
 sz: 5,
 glow: true,
 glowSize: 10,
-path: luminaryPath(TAU / 225, 23.5, 225, Math.PI / 4, Math.PI / 4, 0.05, Math.PI / 4, true),
+path: luminaryPath(0, 23.5, 225, Math.PI / 4, Math.PI / 4, 0.05, Math.PI / 4, true, 'venus'),
 trail: [],
 max: 400
 },
@@ -304,7 +373,7 @@ c: '#ff6b4a',
 sz: 5,
 glow: true,
 glowSize: 10,
-path: luminaryPath(TAU / 687, 23.5, 687, Math.PI / 5, Math.PI / 5, 0.033, Math.PI / 5, true),
+path: luminaryPath(0, 23.5, 687, Math.PI / 5, Math.PI / 5, 0.033, Math.PI / 5, true, 'mars'),
 trail: [],
 max: 400
 },
@@ -315,7 +384,7 @@ sz: 7,
 glow: true,
 glowSize: 15,
 rings: true,
-path: luminaryPath(TAU / (29.5 * 365), 26.7, 29.5 * 365, Math.PI / 6, Math.PI / 6, 0.02, Math.PI / 6),
+path: luminaryPath(0, 26.7, 29.5 * 365, Math.PI / 6, Math.PI / 6, 0.02, Math.PI / 6, false, 'saturn'),
 trail: [],
 max: 300
 },
@@ -325,7 +394,8 @@ c: '#aa44ff',
 sz: 4,
 glow: true,
 glowSize: 8,
-path: luminaryPath(-TAU / (18.6 * 365), 0, 18.6 * 365, 0, 0, 0.01, 0),
+eclipse: true,
+path: luminaryPath(0, 0, 18.6 * 365, 0, 0, 0.01, 0, false, 'rahu'),
 trail: [],
 max: 200
 },
@@ -335,7 +405,8 @@ c: '#44aaff',
 sz: 4,
 glow: true,
 glowSize: 8,
-path: luminaryPath(TAU / (18.6 * 365), 0, 18.6 * 365, Math.PI, Math.PI, 0.01, Math.PI),
+eclipse: true,
+path: luminaryPath(0, 0, 18.6 * 365, Math.PI, Math.PI, 0.01, Math.PI, false, 'ketu'),
 trail: [],
 max: 200
 },
@@ -581,6 +652,20 @@ const pos = body.path(time);
 const ang = getAngle(pos);
 if (crossedTop(body.n, ang)) bump(body.n);
 
+// Update lunar phase display
+if (body.n === 'Moon') {
+const sunPos = luminaries[0].path(time);
+const sunAngle = getAngle(sunPos);
+const moonAngle = ang;
+const phaseDiff = (moonAngle - sunAngle + TAU) % TAU;
+const synodicDay = (phaseDiff / TAU) * 29.5;
+
+const phaseSymbols = ['●', '◐', '○', '◑'];
+const phaseIndex = Math.floor((phaseDiff / TAU) * 4) % 4;
+document.getElementById('lunarPhase').textContent = phaseSymbols[phaseIndex];
+document.getElementById('synodicInfo').textContent = `Synodic: ${synodicDay.toFixed(1)} days`;
+}
+
 // Trail rendering
 if (showTrails && body.trail !== false) {
 body.trail.push(pos);
@@ -607,6 +692,18 @@ ctx.shadowBlur = body.glowSize;
 ctx.shadowColor = body.c;
 }
 
+// Special rendering for eclipse nodes (Rahu/Ketu)
+if (body.eclipse) {
+ctx.globalAlpha = 0.7;
+// Draw shadow eclipse effect
+ctx.strokeStyle = body.c;
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 2, 0, TAU);
+ctx.stroke();
+ctx.globalAlpha = 1.0;
+}
+
 // Special rendering for Saturn's rings
 if (body.rings) {
 ctx.globalAlpha = 0.6;
@@ -618,6 +715,26 @@ ctx.stroke();
 ctx.beginPath();
 ctx.arc(pos.x, pos.y, body.sz * 2.3, 0, TAU);
 ctx.stroke();
+ctx.globalAlpha = 1.0;
+}
+
+// Venus 5-petal rose pattern visualization
+if (body.n === 'Venus' && showTrails && body.trail.length > 200) {
+ctx.strokeStyle = 'rgba(153, 238, 255, 0.2)';
+ctx.lineWidth = 1;
+ctx.globalAlpha = 0.5;
+// Draw subtle pentagonal connecting lines every 40 trail points
+const step = Math.floor(body.trail.length / 10);
+for (let i = 0; i < body.trail.length - step; i += step) {
+const p1 = body.trail[i];
+const p2 = body.trail[i + step];
+if (p1 && p2 && Math.abs(p1.x - p2.x) < R/2) { // Avoid drawing across the center
+ctx.beginPath();
+ctx.moveTo(p1.x, p1.y);
+ctx.lineTo(p2.x, p2.y);
+ctx.stroke();
+}
+}
 ctx.globalAlpha = 1.0;
 }
 
