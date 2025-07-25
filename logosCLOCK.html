@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Schumann • Fractal Luminary (Merged)</title>
+  <title>Schumann • Fractal Luminary (Fixed)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -88,7 +88,7 @@
 
     <section id="hud" class="panel">
       <h3>🌍 Schumann Dashboard</h3>
-      <div>Freq&nbsp;&nbsp;&nbsp; <span id="freq">7.83</span> Hz</div>
+      <div>Freq&nbsp;&nbsp;&nbsp; <span id="freq">7.83</span> Hz</div>
       <div>Amp&nbsp;&nbsp;&nbsp; <span id="amp">100</span>%</div>
       <div>Coherence <span id="coh">85</span>%</div>
       <div>Phase&nbsp; <span id="phase">0</span>°</div>
@@ -122,7 +122,7 @@
         <span>ABOVE THE WATERS</span>
     </div>
 
-    <div id="footer">Earth's Electromagnetic Heartbeat • Base 7.83 Hz • Fractal Geometry Visualizer</div>
+    <div id="footer">Earth's Electromagnetic Heartbeat • Base 7.83 Hz • Fractal Geometry Visualizer</div>
   </div>
 
   <script type="module">
@@ -272,7 +272,6 @@
     const uFixedCy = gl.getUniformLocation(program, 'u_fixed_cy');
     const uIsLogosClockMode = gl.getUniformLocation(program, 'u_is_logos_clock_mode');
 
-
     // === SCHUMANN CALCULATIONS ===
     const schPhase = fr => (fr * BASE * 0.01) % TAU;
     const schCoh = fr => {
@@ -331,6 +330,7 @@
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
+    
     function branch(depth, len, ang=0){
       if(!depth) return;
       ctx.save();
@@ -341,6 +341,7 @@
       branch(depth-1, len * 0.7, -Math.PI/6);
       ctx.restore();
     }
+    
     function orbits(cx, cy, phi, coh){
       if(!state.orbits) return;
       const n = 3;
@@ -362,6 +363,7 @@
         ctx.globalAlpha = 1;
       }
     }
+    
     function pulses(cx, cy, phi, coh){
       if(!state.pulses) return;
       const n = 5;
@@ -478,12 +480,11 @@
             }
             ctx.globalAlpha = 1;
           }
-          orbits(cx, cy, phi, coh); // Orbits are already centered
       } else { // LOGOS CLOCK Mode
           // Polaris (Fixed center star)
-          ctx.fillStyle = 'var(--c-gold)';
+          ctx.fillStyle = '#ffd54d'; // Using the gold color from CSS variable
           ctx.shadowBlur = 10;
-          ctx.shadowColor = 'var(--c-gold)';
+          ctx.shadowColor = '#ffd54d';
           ctx.beginPath();
           ctx.arc(0, 0, canvasMaxDim * POLARIS_RADIUS_FACTOR, 0, TAU);
           ctx.fill();
@@ -526,7 +527,6 @@
             }
             ctx.globalAlpha = 1;
           }
-          orbits(0, 0, phi, coh); // Orbits are already centered
 
           // Update simulated day count
           const currentSimulatedDay = Math.floor(simulated_t_days);
@@ -534,8 +534,12 @@
               state.simulatedDayCount = currentSimulatedDay;
           }
       }
+
+      // Draw orbits - FIXED: Now called AFTER ctx.restore() so coordinates work properly
       ctx.restore(); // Restore 2D context from initial translate/rotate
       
+      // Now draw orbits and pulses with the correct canvas coordinates
+      orbits(cx, cy, phi, coh); // Pass canvas center coordinates
       pulses(cx, cy, phi, coh); // Schumann pulses always emanate from center
 
       updateHud(phi, coh, amp);
