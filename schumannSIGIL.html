@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Schumann-Luminary Fractal Sigil</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000011;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+    
+    #gl {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+    
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .hud {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 2;
+      align-items: center;
+      pointer-events: auto;
+    }
+    
+    .hud button, .hud label {
+      padding: 10px 16px;
+      font-size: 11px;
+      border-radius: 20px;
+      border: 1px solid #ffd700;
+      background: rgba(255, 215, 0, 0.1);
+      color: #ffd700;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .hud button:hover, .hud label:hover {
+      background: rgba(255, 215, 0, 0.2);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+    
+    .hud input[type=range] {
+      accent-color: #ffd700;
+      width: 80px;
+      margin: 0 8px;
+    }
+    
+    #spd {
+      min-width: 30px;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .status {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #00ffff;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      color: #00ffff;
+      font-size: 10px;
+      text-align: center;
+    }
+    
+    .info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ffd700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+      color: #ffd700;
+      font-size: 11px;
+      max-width: 250px;
+    }
+    
+    .active {
+      background: rgba(255, 215, 0, 0.3) !important;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6) !important;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <canvas id="overlay"></canvas>
+
+  <!-- Compact control HUD -->
+  <div class="hud">
+    <button id="play">⏸</button>
+    <label> ×<span id="spd">1.0</span>
+      <input id="speed" type="range" min="0.2" max="5" step="0.1" value="1" />
+    </label>
+    <button id="pulse">⚡ Pulse</button>
+    <button id="geo">🔺 Geometry</button>
+    <button id="trails">✨ Trails</button>
+  </div>
+
+  <!-- Status monitor -->
+  <div class="status">
+    <div>SCHUMANN RESONANCE</div>
+    <div id="freq" style="font-size: 14px; font-weight: bold;">7.83 Hz</div>
+    <div id="state" style="font-size: 8px; margin-top: 4px;">ALPHA SYNC</div>
+    <div id="coherence" style="font-size: 8px; margin-top: 2px;">Coherence: 87%</div>
+  </div>
+
+  <!-- Info panel -->
+  <div class="info">
+    <div>🔮 FRACTAL SIGIL ACTIVE</div>
+    <div style="margin-top: 8px; font-size: 9px; color: #ffdd88;">
+      <div>Phase: <span id="phase">0°</span></div>
+      <div>Iterations: <span id="iters">100</span></div>
+      <div>Zoom: <span id="zoom">1.0x</span></div>
+    </div>
+    <div style="margin-top: 12px; border-top: 1px solid #ffd700; padding-top: 8px;">
+      <div>⚡ LUMINARIES TRACKED</div>
+      <div style="font-size: 9px; margin-top: 4px;">
+        <div>☉ Sun ☾ Moon ♀ Venus</div>
+        <div>♂ Mars ☊ Rahu ☋ Ketu</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -------- WebGL bootstrap
+    const canvas = document.getElementById('gl');
+    const overlay = document.getElementById('overlay');
+    const gl = canvas.getContext('webgl');
+    const ctx = overlay.getContext('2d');
+    
+    function resize() {
+      canvas.width = overlay.width = innerWidth;
+      canvas.height = overlay.height = innerHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    // -------- Shader compilation
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_Status)) {
+        console.error(gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    function createProgram(gl, fragSource) {
+      const vertSource = `
+        attribute vec2 a_position;
+        void main() {
+          gl_Position = vec4(a_position, 0.0, 1.0);
+        }
+      `;
+      
+      const vertShader = createShader(gl, gl.VERTEX_SHADER, vertSource);
+      const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragSource);
+      
+      const program = gl.createProgram();
+      gl.attachShader(program, vertShader);
+      gl.attachShader(program, fragShader);
+      gl.linkProgram(program);
+      
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+        gl.deleteProgram(program);
+        return null;
+      }
+      
+      return program;
+    }
+
+    // -------- Mandelbrot fragment shader
+    const fragSource = `
+      precision mediump float;
+      uniform vec2  u_res;
+      uniform float u_time;
+      uniform float u_zoom;
+      uniform float u_phase;
+      uniform float u_iterBoost;
+      uniform vec3  u_palA;
+      uniform vec3  u_palB;
+
+      float mand(vec2 c) {
+        vec2 z = vec2(0.0);
+        float i;
+        float maxIter = 80.0 + u_iterBoost;
+        for (i = 0.0; i < maxIter; i++) {
+          z = vec2(
+            z.x * z.x - z.y * z.y + c.x,
+            2.0 * z.x * z.y + c.y
+          );
+          if (dot(z, z) > 4.0) break;
+        }
+        return i;
+      }
+
+      void main(){
+        vec2 uv = (gl_FragCoord.xy - 0.5*u_res) / u_res.y;
+        uv /= u_zoom;
+
+        // subtle orbit-driven wobble of the viewport centre
+        uv.x += 0.03 * sin(u_phase);
+        uv.y += 0.03 * cos(u_phase);
+
+        float m = mand(uv - vec2(0.5, 0.0));
+        float t = m / (80.0 + u_iterBoost);
+
+        // golden → cyan palette with phase modulation
+        vec3 col = mix(u_palA, u_palB, pow(t, 0.5));
+        
+        // Add subtle phase-based color shifts
+        col.r += 0.1 * sin(u_phase + t * 6.28);
+        col.g += 0.1 * cos(u_phase * 1.3 + t * 6.28);
+        col.b += 0.1 * sin(u_phase * 0.7 + t * 6.28);
+        
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    const prog = createProgram(gl, fragSource);
+    
+    // Get uniform locations
+    const uniforms = {};
+    const uniformNames = ['u_res', 'u_time', 'u_zoom', 'u_phase', 'u_iterBoost', 'u_palA', 'u_palB'];
+    uniformNames.forEach(name => {
+      uniforms[name] = gl.getUniformLocation(prog, name);
+    });
+
+    // Setup vertex buffer for fullscreen quad
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1, 1, -1, -1, 1, 1, 1
+    ]), gl.STATIC_DRAW);
+
+    const positionLocation = gl.getAttribLocation(prog, 'a_position');
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    // ----------- Luminary mathematics
+    const TAU = Math.PI * 2;
+    const CENTER = { x: 0, y: 0 };
+    
+    function sun(t) { return t * TAU; }
+    function moon(t) { return t * TAU / 0.966; }
+    function venus(t) { return sun(t) * 1.6 + Math.sin(t * TAU / 584) * 0.1; }
+    function mars(t) { return t * TAU / 780 + Math.sin(t * TAU / 120) * 0.2; }
+    function saturn(t) { return t * TAU / (29.5 * 365.25) + Math.sin(t * TAU / (365 * 5)) * 0.05; }
+    function rahu(t) { return -t * TAU / (18.6 * 365.25); }
+    function ketu(t) { return rahu(t) + Math.PI; }
+
+    const luminaries = [
+      { name: 'Sun', fn: sun, color: '#ffd65c', size: 8, trail: [] },
+      { name: 'Moon', fn: moon, color: '#e6e6fa', size: 6, trail: [] },
+      { name: 'Venus', fn: venus, color: '#99eeff', size: 5, trail: [] },
+      { name: 'Mars', fn: mars, color: '#ff6b4a', size: 5, trail: [] },
+      { name: 'Saturn', fn: saturn, color: '#ffaa44', size: 7, trail: [] },
+      { name: 'Rahu', fn: rahu, color: '#aa44ff', size: 4, trail: [] },
+      { name: 'Ketu', fn: ketu, color: '#44aaff', size: 4, trail: [] }
+    ];
+
+    // ----------- Schumann resonance helpers
+    const base = 7.83;
+    const harmonics = [14.3, 20.8, 27.3];
+    
+    function schPhase(frame) { 
+      return (frame / 60) * base * TAU; 
+    }
+    
+    function coherence(frame) {
+      return harmonics.reduce((a, f, i) => 
+        a + Math.abs(Math.sin(frame / 60 * f * TAU)) / (i + 2), 0
+      );
+    }
+
+    // ----------- State variables
+    let frame = 0;
+    let speed = 1;
+    let running = true;
+    let showPulse = true;
+    let showGeometry = true;
+    let showTrails = true;
+
+    // ----------- Enhanced Sacred Mandala Drawing
+    function drawSacredMandala() {
+      if (!showGeometry) return;
+      
+      ctx.save();
+      const cx = overlay.width / 2, cy = overlay.height / 2;
+      ctx.translate(cx, cy);
+
+      // phase & coherence
+      const ph = schPhase(frame);
+      const coh = coherence(frame);
+
+      // rotate the entire mandala slowly
+      ctx.rotate(ph * 0.05);
+
+      // helper to draw a rose curve of k petals
+      function drawRose(k, radius, color, baseAlpha) {
+        ctx.beginPath();
+        for (let deg = 0; deg <= 360; deg++) {
+          const θ = deg * Math.PI / 180;
+          // r = cos(k·θ) creates a k‑petal rose
+          const r = radius * Math.abs(Math.cos(k * θ));
+          const x = r * Math.cos(θ), y = r * Math.sin(θ);
+          if (deg === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = color;
+        // pulse line‑width with Schumann pulse
+        ctx.lineWidth = 1 + 3 * (0.2 + 0.8 * Math.abs(Math.sin(ph)));
+        ctx.globalAlpha = baseAlpha + 0.3 * coh;
+        ctx.stroke();
+      }
+
+      // draw the inner gold 8‑petal rose
+      drawRose(8,
+        Math.min(cx, cy) * 0.22,
+        'hsl(45,100%,60%)',   // golden hue
+        0.3
+      );
+
+      // draw the outer cyan 16‑petal rose
+      drawRose(16,
+        Math.min(cx, cy) * 0.35,
+        'hsl(190,100%,60%)',  // cyan hue
+        0.2
+      );
+
+      // draw little fractal "branches" at the 12 points
+      function branch(depth, len) {
+        if (depth === 0) return;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -len);
+        ctx.stroke();
+        ctx.translate(0, -len);
+        ctx.save();
+        ctx.rotate(30 * Math.PI / 180);
+        branch(depth - 1, len * 0.6);
+        ctx.restore();
+        ctx.save();
+        ctx.rotate(-30 * Math.PI / 180);
+        branch(depth - 1, len * 0.6);
+        ctx.restore();
+        ctx.translate(0, len);
+      }
+
+      ctx.strokeStyle = 'hsl(190,100%,80%)';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4 + 0.3 * coh;
+      for (let i = 0; i < 12; i++) {
+        ctx.save();
+        ctx.rotate((i * 30 / 360) * 2 * Math.PI + ph * 0.1);
+        // length pulses
+        const L = Math.min(cx, cy) * 0.12 * (1 + 0.2 * Math.sin(ph * 2 + i));
+        branch(3, L);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    function drawOrbitalTrails() {
+      if (!showTrails) return;
+      
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const orbitRadius = Math.min(canvas.width, canvas.height) * 0.25;
+      const t = frame / 60;
+      
+      luminaries.forEach(lum => {
+        const angle = lum.fn(t);
+        const x = centerX + Math.cos(angle) * orbitRadius;
+        const y = centerY + Math.sin(angle) * orbitRadius;
+        
+        // Add to trail
+        lum.trail.push({ x, y });
+        if (lum.trail.length > 100) lum.trail.shift();
+        
+        // Draw trail
+        if (lum.trail.length > 1) {
+          ctx.strokeStyle = lum.color + '40'; // Add alpha
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(lum.trail[0].x, lum.trail[0].y);
+          for (let i = 1; i < lum.trail.length; i++) {
+            ctx.lineTo(lum.trail[i].x, lum.trail[i].y);
+          }
+          ctx.stroke();
+        }
+        
+        // Draw luminary
+        ctx.fillStyle = lum.color;
+        ctx.shadowBlur = lum.size;
+        ctx.shadowColor = lum.color;
+        ctx.beginPath();
+        ctx.arc(x, y, lum.size / 2, 0, TAU);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+    }
+
+    function drawSchumannPulse() {
+      if (!showPulse) return;
+      
+      const pulse = Math.sin(schPhase(frame));
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const pulseRadius = Math.min(canvas.width, canvas.height) * 0.1 * (1 + Math.abs(pulse));
+      
+      ctx.save();
+      ctx.globalAlpha = 0.1 + Math.abs(pulse) * 0.3;
+      
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseRadius);
+      gradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+      gradient.addColorStop(0.5, 'rgba(255, 165, 0, 0.4)');
+      gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, pulseRadius, 0, TAU);
+      ctx.fill();
+      
+      ctx.restore();
+    }
+
+    // ----------- Animation loop
+    function tick() {
+      if (running) frame += speed;
+      
+      // Update WebGL uniforms
+      gl.useProgram(prog);
+      gl.uniform2f(uniforms.u_res, canvas.width, canvas.height);
+      gl.uniform1f(uniforms.u_time, frame / 60);
+      gl.uniform1f(uniforms.u_zoom, 1 + 0.4 * Math.sin(schPhase(frame)));
+      gl.uniform1f(uniforms.u_phase, schPhase(frame));
+      gl.uniform1f(uniforms.u_iterBoost, 20 * coherence(frame));
+      gl.uniform3fv(uniforms.u_palA, [1.0, 0.7, 0.0]); // gold
+      gl.uniform3fv(uniforms.u_palB, [0.0, 1.0, 1.0]); // cyan
+      
+      // Render Mandelbrot
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      
+      // Clear overlay and draw enhanced mandala
+      ctx.clearRect(0, 0, overlay.width, overlay.height);
+      
+      // Draw overlay elements
+      drawSacredMandala();
+      drawOrbitalTrails();
+      drawSchumannPulse();
+      
+      // Update displays
+      const phase = schPhase(frame);
+      const freq = base + Math.sin(phase) * 0.5;
+      const coh = coherence(frame);
+      const state = freq > 8 ? 'BETA SYNC' : freq > 7.5 ? 'ALPHA SYNC' : 'THETA SYNC';
+      
+      document.getElementById('phase').textContent = Math.floor((phase / TAU * 360) % 360) + '°';
+      document.getElementById('iters').textContent = Math.floor(80 + 20 * coh);
+      document.getElementById('zoom').textContent = (1 + 0.4 * Math.sin(phase)).toFixed(2) + 'x';
+      document.getElementById('freq').textContent = freq.toFixed(2) + ' Hz';
+      document.getElementById('state').textContent = state;
+      document.getElementById('coherence').textContent = `Coherence: ${Math.floor(coh * 100)}%`;
+      
+      requestAnimationFrame(tick);
+    }
+
+    // ----------- HUD event handlers
+    document.getElementById('speed').addEventListener('input', e => {
+      speed = parseFloat(e.target.value);
+      document.getElementById('spd').textContent = speed.toFixed(1);
+    });
+
+    document.getElementById('play').onclick = () => {
+      running = !running;
+      document.getElementById('play').textContent = running ? '⏸' : '▶';
+    };
+
+    document.getElementById('pulse').onclick = () => {
+      showPulse = !showPulse;
+      document.getElementById('pulse').classList.toggle('active', showPulse);
+    };
+
+    document.getElementById('geo').onclick = () => {
+      showGeometry = !showGeometry;
+      document.getElementById('geo').classList.toggle('active', showGeometry);
+    };
+
+    document.getElementById('trails').onclick = () => {
+      showTrails = !showTrails;
+      document.getElementById('trails').classList.toggle('active', showTrails);
+      if (!showTrails) {
+        luminaries.forEach(lum => lum.trail = []);
+      }
+    };
+
+    // Initialize active states
+    document.getElementById('pulse').classList.add('active');
+    document.getElementById('geo').classList.add('active');
+    document.getElementById('trails').classList.add('active');
+
+    // Start the animation
+    tick();
+  </script>
+</body>
+</html>
