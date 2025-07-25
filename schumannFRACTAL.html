@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Schumann • Fractal Luminary (Merged)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --c-bg:#050510;
+      --c-panel:#001224cc;
+      --c-cyan:#00eaff;
+      --c-gold:#ffd54d;
+      --blur:10px;
+      --radius:12px;
+      --shadow:0 0 20px rgba(0,255,255,.25);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;background:var(--c-bg);color:var(--c-cyan);font-family:'JetBrains Mono',monospace;overflow:hidden}
+    #root{position:relative;width:100%;height:100%}
+    canvas{position:absolute;inset:0;width:100%;height:100%}
+    .panel{
+      position:absolute;backdrop-filter:blur(var(--blur));
+      border:1px solid var(--c-cyan);border-radius:var(--radius);
+      background:var(--c-panel);box-shadow:var(--shadow);padding:14px;font-size:12px;line-height:1.4
+    }
+    #hud{top:18px;left:18px;min-width:180px}
+    #controls{top:18px;right:18px;display:flex;flex-direction:column;gap:6px}
+    #footer{left:50%;transform:translateX(-50%);bottom:16px;text-align:center;font-size:11px;color:#aaaaaa;position:absolute}
+    h3{color:var(--c-gold);font-size:14px;margin-bottom:6px;text-shadow:0 0 8px var(--c-gold)}
+    button{
+      background:transparent;border:1px solid var(--c-cyan);
+      color:var(--c-cyan);padding:6px 10px;border-radius:6px;cursor:pointer;
+      transition:.25s all;font-size:11px
+    }
+    button:hover{background-color:rgba(0,234,255,.15);box-shadow:0 0 8px rgba(0,234,255,.4)}
+    button.active{background:rgba(255,213,77,.15);border-color:var(--c-gold);color:var(--c-gold)}
+  </style>
+</head>
+<body>
+  <div id="root">
+    <canvas id="gl"></canvas>
+    <canvas id="overlay"></canvas>
+
+    <section id="hud" class="panel">
+      <h3>🌍 Schumann Dashboard</h3>
+      <div>Freq&nbsp;&nbsp;&nbsp; <span id="freq">7.83</span> Hz</div>
+      <div>Amp&nbsp;&nbsp;&nbsp; <span id="amp">100</span>%</div>
+      <div>Coherence <span id="coh">85</span>%</div>
+      <div>Phase&nbsp; <span id="phase">0</span>°</div>
+      <div>Harmonics <span id="harm">5</span></div>
+    </section>
+
+    <section id="controls" class="panel">
+      <h3>Sacred Geometry Layers</h3>
+      <button data-toggle="mandala" class="active">🌹 Rose Mandala</button>
+      <button data-toggle="branches" class="active">🌿 Fractal Branches</button>
+      <button data-toggle="orbits" class="active">✨ Energy Orbits</button>
+      <button data-toggle="pulses" class="active">💫 Resonance Pulses</button>
+    </section>
+
+    <div id="footer">Earth's Electromagnetic Heartbeat • Base 7.83 Hz • Fractal Geometry Visualizer</div>
+  </div>
+
+  <script type="module">
+    // === CONSTANTS ===
+    const BASE = 7.83;
+    const HARMONICS = [7.83, 14.3, 20.8, 27.3, 33.8];
+    const state = { frame: 0, mandala: true, branches: true, orbits: true, pulses: true };
+
+    // === WEBGL ===
+    const glCanvas = document.getElementById('gl');
+    const gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
+    if (!gl) alert('WebGL not supported');
+
+    const overlay = document.getElementById('overlay');
+    const ctx = overlay.getContext('2d');
+
+    function resize() {
+      glCanvas.width = overlay.width = innerWidth;
+      glCanvas.height = overlay.height = innerHeight;
+      gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    const vSrc = 'attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.);}';
+    const fSrc = `precision mediump float;
+      uniform float u_time,u_phase,u_coherence;
+      uniform vec2 u_resolution;
+      vec3 palette(float t){
+        vec3 a=vec3(.2,.5,.8), b=vec3(.2,.4,.2), c=vec3(2.,1.,1.);
+        return a + b * cos(6.28318*(c*t + u_phase*.1));
+      }
+      float mandelbrot(vec2 c){
+        vec2 z=vec2(0.0); float iter=0.0;
+        for(int i=0;i<64;i++){
+          if(dot(z,z)>4.0) break;
+          z=vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
+          iter+=1.0;
+        }
+        return iter/64.0;
+      }
+      void main(){
+        vec2 uv=(gl_FragCoord.xy - 0.5*u_resolution.xy) / min(u_resolution.y, u_resolution.x);
+        float zoom = 0.8 + 0.3*sin(u_time*0.1);
+        vec2 offset = vec2(sin(u_time*0.05)*0.3, cos(u_time*0.07)*0.2);
+        uv = uv*zoom + offset;
+        float m = mandelbrot(uv);
+        vec3 color = palette(m + u_time*0.1);
+        float wave1 = sin(uv.x*10.0 + u_phase)*0.5 + 0.5;
+        float wave2 = sin(uv.y*8.0 + u_phase*1.3)*0.5 + 0.5;
+        color += vec3(0.0,0.2,0.4) * wave1 * wave2 * u_coherence;
+        color *= 0.7 + 0.3*u_coherence;
+        gl_FragColor = vec4(color, 1.0);
+      }`;
+
+    function shader(type, src){
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s);
+      return s;
+    }
+    const program = gl.createProgram();
+    gl.attachShader(program, shader(gl.VERTEX_SHADER, vSrc));
+    gl.attachShader(program, shader(gl.FRAGMENT_SHADER, fSrc));
+    gl.linkProgram(program);
+    if(!gl.getProgramParameter(program, gl.LINK_STATUS)) throw gl.getProgramInfoLog(program);
+    gl.useProgram(program);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(program, 'a');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(program, 'u_time');
+    const uPhase = gl.getUniformLocation(program, 'u_phase');
+    const uCoh = gl.getUniformLocation(program, 'u_coherence');
+    const uRes = gl.getUniformLocation(program, 'u_resolution');
+
+    // === SCHUMANN ===
+    const TAU = Math.PI * 2;
+    const toRad = d => d * Math.PI / 180;
+    const schPhase = fr => (fr * BASE * 0.01) % TAU;
+    const schCoh = fr => {
+      let sum = 0;
+      for(let i=0;i<HARMONICS.length;i++){
+        sum += Math.sin(fr * HARMONICS[i] * 0.01 + i) * (0.8 - i * 0.1);
+      }
+      return Math.abs(sum / HARMONICS.length) * 0.5 + 0.5;
+    };
+    const schAmp = fr => 0.7 + 0.3 * Math.sin(fr * 0.02);
+
+    // === 2D DRAW FUNCS ===
+    function rose(k, R, color, alpha, phi){
+      ctx.beginPath();
+      for(let deg=0; deg<=360; deg+=2){
+        const th = toRad(deg);
+        const r = R * Math.abs(Math.cos(k * th));
+        const x = r * Math.cos(th), y = r * Math.sin(th);
+        deg ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2 + 4 * Math.abs(Math.sin(phi));
+      ctx.globalAlpha = alpha + 0.4 * Math.abs(Math.sin(phi * 0.7));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    function branch(depth, len, ang=0){
+      if(!depth) return;
+      ctx.save();
+      ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-len); ctx.stroke();
+      ctx.translate(0,-len);
+      branch(depth-1, len * 0.7, Math.PI/6);
+      branch(depth-1, len * 0.7, -Math.PI/6);
+      ctx.restore();
+    }
+    function orbits(cx, cy, phi, coh){
+      if(!state.orbits) return;
+      const n = 3;
+      for(let i=0;i<n;i++){
+        const r = (50 + i*40) * (1 + 0.2*Math.sin(phi + i));
+        const speed = 0.5 + i * 0.3;
+        const ang = phi * speed + i * TAU / n;
+        const x = cx + r * Math.cos(ang);
+        const y = cy + r * Math.sin(ang);
+        ctx.globalAlpha = 0.1 + 0.1 * coh;
+        ctx.strokeStyle = `hsl(${180 + i*30} 80% 60%)`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = `hsl(${180 + i*30} 100% 80%)`;
+        ctx.beginPath(); ctx.arc(x, y, 3 + 2*Math.sin(phi*2), 0, TAU); ctx.fill();
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath(); ctx.arc(x, y, 8 + 4*Math.sin(phi*2), 0, TAU); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+    function pulses(cx, cy, phi, coh){
+      if(!state.pulses) return;
+      const n = 5;
+      for(let i=0;i<n;i++){
+        const r = (phi * 50 + i * 80) % 400;
+        const a = Math.max(0, 1 - r / 400) * coh;
+        if(a > 0.01){
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = 'hsl(45 100% 70%)';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // === HUD ===
+    const get = id => document.getElementById(id);
+    function hud(phi, coh, amp){
+      get('freq').textContent = (BASE + Math.sin(phi) * 0.1).toFixed(2);
+      get('amp').textContent = Math.round(amp * 100);
+      get('coh').textContent = Math.round(coh * 100);
+      get('phase').textContent = Math.round((phi * 180 / Math.PI) % 360);
+      get('harm').textContent = HARMONICS.length;
+    }
+
+    // === CONTROLS ===
+    document.querySelectorAll('#controls button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.toggle;
+        state[k] = !state[k];
+        btn.classList.toggle('active', state[k]);
+      });
+    });
+
+    // === LOOP ===
+    function loop(){
+      const phi = schPhase(state.frame);
+      const coh = schCoh(state.frame);
+      const amp = schAmp(state.frame);
+
+      // WebGL pass
+      gl.uniform1f(uTime, state.frame * 0.01);
+      gl.uniform1f(uPhase, phi);
+      gl.uniform1f(uCoh, coh);
+      gl.uniform2f(uRes, glCanvas.width, glCanvas.height);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // 2D pass
+      ctx.clearRect(0,0,overlay.width,overlay.height);
+      const cx = overlay.width/2, cy = overlay.height/2;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(phi * 0.1);
+
+      if(state.mandala){
+        rose(8, Math.min(cx, cy) * 0.25, 'hsl(45 100% 65%)', 0.4, phi);
+        rose(16, Math.min(cx, cy) * 0.40, 'hsl(190 100% 70%)', 0.3, phi * 1.3);
+      }
+      if(state.branches){
+        ctx.strokeStyle = 'hsl(190 100% 80%)';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.6 + 0.2 * coh;
+        for(let i=0;i<12;i++){
+          ctx.save();
+          ctx.rotate(i * 30 * Math.PI / 180 + phi * 0.2);
+          const len = Math.min(cx, cy) * 0.15 * (1 + 0.3 * Math.sin(phi * 2 + i));
+          branch(3, len);
+          ctx.restore();
+        }
+        ctx.globalAlpha = 1;
+      }
+      ctx.restore();
+
+      orbits(cx, cy, phi, coh);
+      pulses(cx, cy, phi, coh);
+
+      hud(phi, coh, amp);
+
+      state.frame++;
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
