@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Schumann • Fractal Luminary (Merged)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --c-bg:#050510;
+      --c-panel:#001224cc;
+      --c-cyan:#00eaff;
+      --c-gold:#ffd54d;
+      --blur:10px;
+      --radius:12px;
+      --shadow:0 0 20px rgba(0,255,255,.25);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;background:var(--c-bg);color:var(--c-cyan);font-family:'JetBrains Mono',monospace;overflow:hidden}
+    #root{position:relative;width:100%;height:100%}
+    canvas{position:absolute;inset:0;width:100%;height:100%}
+    .panel{
+      position:absolute;backdrop-filter:blur(var(--blur));
+      border:1px solid var(--c-cyan);border-radius:var(--radius);
+      background:var(--c-panel);box-shadow:var(--shadow);padding:14px;font-size:12px;line-height:1.4
+    }
+    #hud{top:18px;left:18px;min-width:180px}
+    #controls{top:18px;right:18px;display:flex;flex-direction:column;gap:6px}
+    #footer{left:50%;transform:translateX(-50%);bottom:16px;text-align:center;font-size:11px;color:#aaaaaa;position:absolute}
+    h3{color:var(--c-gold);font-size:14px;margin-bottom:6px;text-shadow:0 0 8px var(--c-gold)}
+    button{
+      background:transparent;border:1px solid var(--c-cyan);
+      color:var(--c-cyan);padding:6px 10px;border-radius:6px;cursor:pointer;
+      transition:.25s all;font-size:11px;text-transform:uppercase;
+    }
+    button:hover{background-color:rgba(0,234,255,.15);box-shadow:0 0 8px rgba(0,234,255,.4)}
+    button.active{background:rgba(255,213,77,.15);border-color:var(--c-gold);color:var(--c-gold)}
+    select {
+        background: var(--c-panel);
+        color: var(--c-cyan);
+        border: 1px solid var(--c-cyan);
+        border-radius: 6px;
+        padding: 6px;
+        margin-top: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+    }
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed rgba(0, 255, 255, 0.1);
+        margin-bottom: 10px;
+    }
+    .control-group:last-of-type {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+
+    /* New styles for the fixed Logos Clock title */
+    #logos-clock-title {
+        position: absolute;
+        top: 40px; /* Adjust as needed to avoid overlap with HUD/Controls */
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        color: var(--c-gold);
+        font-size: 18px;
+        font-weight: bold;
+        text-shadow: 0 0 15px var(--c-gold);
+        letter-spacing: 1px;
+        z-index: 10;
+        pointer-events: none; /* Allows mouse events to pass through to canvas */
+        line-height: 1.2; /* Adjust line height for multiline text */
+        display: none; /* Hidden by default, shown when Logos Clock mode is active */
+    }
+    #logos-clock-title span {
+        display: block; /* Ensures each line breaks */
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <canvas id="gl"></canvas>
+    <canvas id="overlay"></canvas>
+
+    <section id="hud" class="panel">
+      <h3>🌍 Schumann Dashboard</h3>
+      <div>Freq&nbsp;&nbsp;&nbsp; <span id="freq">7.83</span> Hz</div>
+      <div>Amp&nbsp;&nbsp;&nbsp; <span id="amp">100</span>%</div>
+      <div>Coherence <span id="coh">85</span>%</div>
+      <div>Phase&nbsp; <span id="phase">0</span>°</div>
+      <div>Harmonics <span id="harm">5</span></div>
+      <div id="logos-clock-info" style="display:none; margin-top: 8px; border-top: 1px dashed rgba(0, 255, 255, 0.1); padding-top: 8px;">
+          <div>Simulated Day: <span id="sim-day-count">0</span></div>
+          <div>Lunar Phase: <span id="lunar-phase">●</span></div>
+      </div>
+    </section>
+
+    <section id="controls" class="panel">
+      <div class="control-group">
+          <h3>Cosmic Model</h3>
+          <select id="model-select">
+            <option value="schumann-fractal">🌌 Schumann Fractal</option>
+            <option value="logos-clock">🧭 LOGOS CLOCK</option>
+          </select>
+      </div>
+
+      <div class="control-group">
+          <h3>Sacred Geometry Layers</h3>
+          <button data-toggle="mandala" class="active">🌹 Rose Mandala</button>
+          <button data-toggle="branches" class="active">🌿 Fractal Branches</button>
+          <button data-toggle="orbits" class="active">✨ Energy Orbits</button>
+          <button data-toggle="pulses" class="active">💫 Resonance Pulses</button>
+      </div>
+    </section>
+
+    <div id="logos-clock-title">
+        <span>THE THRONE IS FIXED</span>
+        <span>ABOVE THE WATERS</span>
+    </div>
+
+    <div id="footer">Earth's Electromagnetic Heartbeat • Base 7.83 Hz • Fractal Geometry Visualizer</div>
+  </div>
+
+  <script type="module">
+    // === CONSTANTS ===
+    const BASE = 7.83;
+    const HARMONICS = [7.83, 14.3, 20.8, 27.3, 33.8];
+    const TAU = Math.PI * 2;
+    const toRad = d => d * Math.PI / 180;
+
+    // --- LOGOS CLOCK SPECIFIC CONSTANTS ---
+    const SIMULATED_DAY_FRAMES = 120; // How many frames for one full simulated day
+    const PERIOD_SUN_DAILY = 1; // Sun completes 1 circle per simulated day
+    const PERIOD_SUN_LATITUDE_DAYS = 365; // Sun's seasonal oscillation period in simulated days
+    const PERIOD_MOON_DAILY = 0.966; // Moon completes 1 circle in ~23 hours 10 minutes (faster than sun)
+    const MAX_SUN_RADIUS_FACTOR = 0.6; // Max radius for Sun's daily circle
+    const MOON_RADIUS_FACTOR = 0.5; // Radius for Moon's daily circle
+    const POLARIS_RADIUS_FACTOR = 0.02; // Size of Polaris star
+
+    const LOGOS_CLOCK_FRACTAL_CENTER_X = -0.7436442; // Center for a good Mandelbrot 'continent' view
+    const LOGOS_CLOCK_FRACTAL_CENTER_Y = 0.1318259;
+    const LOGOS_CLOCK_FRACTAL_ZOOM = 1.0; // Fixed zoom for the 'map'
+
+    // === GLOBAL STATE ===
+    const state = { 
+        frame: 0, 
+        mandala: true, 
+        branches: true, 
+        orbits: true, 
+        pulses: true,
+        model: 'schumann-fractal', // 'schumann-fractal' or 'logos-clock'
+        simulatedDayCount: 0,
+        lastSunAngle: 0,
+        lastMoonAngle: 0
+    };
+
+    // === WEBGL SETUP ===
+    const glCanvas = document.getElementById('gl');
+    const gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
+    if (!gl) alert('WebGL not supported');
+
+    // === 2D OVERLAY SETUP ===
+    const overlay = document.getElementById('overlay');
+    const ctx = overlay.getContext('2d');
+
+    function resize() {
+      glCanvas.width = overlay.width = innerWidth;
+      glCanvas.height = overlay.height = innerHeight;
+      gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    // === WEBGL SHADERS ===
+    const vSrc = 'attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.);}';
+    const fSrc = `precision mediump float;
+      uniform float u_time, u_phase, u_coherence, u_fixed_zoom, u_fixed_cx, u_fixed_cy;
+      uniform int u_is_logos_clock_mode; // New uniform to control fractal behavior
+      uniform vec2 u_resolution;
+      
+      vec3 palette(float t){
+        vec3 a=vec3(.2,.5,.8), b=vec3(.2,.4,.2), c=vec3(2.,1.,1.);
+        return a + b * cos(6.28318*(c*t + u_phase*.1));
+      }
+      float mandelbrot(vec2 c){
+        vec2 z=vec2(0.0); float iter=0.0;
+        for(int i=0;i<64;i++){
+          if(dot(z,z)>4.0) break;
+          z=vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
+          iter+=1.0;
+        }
+        return iter/64.0;
+      }
+      void main(){
+        vec2 uv=(gl_FragCoord.xy - 0.5*u_resolution.xy) / min(u_resolution.y, u_resolution.x);
+        
+        float zoom = u_fixed_zoom;
+        vec2 offset_center = vec2(u_fixed_cx, u_fixed_cy);
+
+        if (u_is_logos_clock_mode == 0) { // Schumann Fractal mode
+            zoom = 0.8 + 0.3*sin(u_time*0.1);
+            offset_center = vec2(sin(u_time*0.05)*0.3, cos(u_time*0.07)*0.2);
+        }
+        
+        uv = uv*zoom + offset_center; // Apply zoom and center/offset based on mode
+
+        float m = mandelbrot(uv);
+        vec3 color = palette(m + u_time*0.1);
+        float wave1 = sin(uv.x*10.0 + u_phase)*0.5 + 0.5;
+        float wave2 = sin(uv.y*8.0 + u_phase*1.3)*0.5 + 0.5;
+        color += vec3(0.0,0.2,0.4) * wave1 * wave2 * u_coherence;
+        color *= 0.7 + 0.3*u_coherence;
+        gl_FragColor = vec4(color, 1.0);
+      }`;
+
+    function createShader(type, src){
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s);
+      return s;
+    }
+    const program = gl.createProgram();
+    gl.attachShader(program, createShader(gl.VERTEX_SHADER, vSrc));
+    gl.attachShader(program, createShader(gl.FRAGMENT_SHADER, fSrc));
+    gl.linkProgram(program);
+    if(!gl.getProgramParameter(program, gl.LINK_STATUS)) throw gl.getProgramInfoLog(program);
+    gl.useProgram(program);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(program, 'a');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    // Get uniform locations
+    const uTime = gl.getUniformLocation(program, 'u_time');
+    const uPhase = gl.getUniformLocation(program, 'u_phase');
+    const uCoh = gl.getUniformLocation(program, 'u_coherence');
+    const uRes = gl.getUniformLocation(program, 'u_resolution');
+    const uFixedZoom = gl.getUniformLocation(program, 'u_fixed_zoom');
+    const uFixedCx = gl.getUniformLocation(program, 'u_fixed_cx');
+    const uFixedCy = gl.getUniformLocation(program, 'u_fixed_cy');
+    const uIsLogosClockMode = gl.getUniformLocation(program, 'u_is_logos_clock_mode');
+
+
+    // === SCHUMANN CALCULATIONS ===
+    const schPhase = fr => (fr * BASE * 0.01) % TAU;
+    const schCoh = fr => {
+      let sum = 0;
+      for(let i=0;i<HARMONICS.length;i++){
+        sum += Math.sin(fr * HARMONICS[i] * 0.01 + i) * (0.8 - i * 0.1);
+      }
+      return Math.abs(sum / HARMONICS.length) * 0.5 + 0.5;
+    };
+    const schAmp = fr => 0.7 + 0.3 * Math.sin(fr * 0.02);
+
+    // === LOGOS CLOCK LUMINARY PATH FUNCTIONS (2D Canvas) ===
+    function getLuminaryPosition(simulated_t_days, pathType, canvasMaxDim) {
+        let angle;
+        let radiusFactor; // Multiplier for the canvasMaxDim radius
+
+        switch (pathType) {
+            case 'sun':
+                angle = simulated_t_days * (TAU / PERIOD_SUN_DAILY);
+                // Simulate seasonal radius change (smaller in winter, larger in summer)
+                radiusFactor = MAX_SUN_RADIUS_FACTOR * (0.8 + 0.2 * Math.sin(simulated_t_days * TAU / PERIOD_SUN_LATITUDE_DAYS));
+                break;
+            case 'moon':
+                angle = simulated_t_days * (TAU / PERIOD_MOON_DAILY);
+                radiusFactor = MOON_RADIUS_FACTOR;
+                break;
+            case 'polaris':
+                angle = 0; // Polaris is fixed
+                radiusFactor = 0; // It's at the center
+                break;
+            default:
+                angle = 0;
+                radiusFactor = 0;
+        }
+
+        const currentRadius = canvasMaxDim * radiusFactor;
+        const x = currentRadius * Math.cos(angle - Math.PI/2); // Adjust for 12 o'clock top
+        const y = currentRadius * Math.sin(angle - Math.PI/2);
+
+        return { x, y, angle };
+    }
+
+    // === 2D DRAWING FUNCTIONS ===
+    function rose(k, R, color, alpha, phi){
+      ctx.beginPath();
+      for(let deg=0; deg<=360; deg+=2){
+        const th = toRad(deg);
+        const r = R * Math.abs(Math.cos(k * th));
+        const x = r * Math.cos(th), y = r * Math.sin(th);
+        deg ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2 + 4 * Math.abs(Math.sin(phi));
+      ctx.globalAlpha = alpha + 0.4 * Math.abs(Math.sin(phi * 0.7));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    function branch(depth, len, ang=0){
+      if(!depth) return;
+      ctx.save();
+      ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-len); ctx.stroke();
+      ctx.translate(0,-len);
+      branch(depth-1, len * 0.7, Math.PI/6);
+      branch(depth-1, len * 0.7, -Math.PI/6);
+      ctx.restore();
+    }
+    function orbits(cx, cy, phi, coh){
+      if(!state.orbits) return;
+      const n = 3;
+      for(let i=0;i<n;i++){
+        const r = (50 + i*40) * (1 + 0.2*Math.sin(phi + i));
+        const speed = 0.5 + i * 0.3;
+        const ang = phi * speed + i * TAU / n;
+        const x = cx + r * Math.cos(ang);
+        const y = cy + r * Math.sin(ang);
+        ctx.globalAlpha = 0.1 + 0.1 * coh;
+        ctx.strokeStyle = `hsl(${180 + i*30} 80% 60%)`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = `hsl(${180 + i*30} 100% 80%)`;
+        ctx.beginPath(); ctx.arc(x, y, 3 + 2*Math.sin(phi*2), 0, TAU); ctx.fill();
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath(); ctx.arc(x, y, 8 + 4*Math.sin(phi*2), 0, TAU); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+    function pulses(cx, cy, phi, coh){
+      if(!state.pulses) return;
+      const n = 5;
+      for(let i=0;i<n;i++){
+        const r = (phi * 50 + i * 80) % 400;
+        const a = Math.max(0, 1 - r / 400) * coh;
+        if(a > 0.01){
+          ctx.globalAlpha = a;
+          ctx.strokeStyle = 'hsl(45 100% 70%)';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // === HUD FUNCTIONS ===
+    const get = id => document.getElementById(id);
+    const logosClockTitle = get('logos-clock-title'); // Get the new title element
+
+    function updateHud(phi, coh, amp){
+      get('freq').textContent = (BASE + Math.sin(phi) * 0.1).toFixed(2);
+      get('amp').textContent = Math.round(amp * 100);
+      get('coh').textContent = Math.round(coh * 100);
+      get('phase').textContent = Math.round((phi * 180 / Math.PI) % 360);
+      get('harm').textContent = HARMONICS.length;
+
+      // Update Logos Clock specific HUD and title visibility
+      if (state.model === 'logos-clock') {
+          get('logos-clock-info').style.display = 'block';
+          logosClockTitle.style.display = 'block'; // Show the fixed title
+
+          get('sim-day-count').textContent = state.simulatedDayCount;
+
+          // Lunar phase calculation (simplified based on sun/moon angles)
+          const sunAngle = state.lastSunAngle;
+          const moonAngle = state.lastMoonAngle;
+          const phaseDiff = (moonAngle - sunAngle + TAU) % TAU;
+          const phaseSymbols = ['●', '◐', '○', '◑']; // New Moon, First Quarter, Full Moon, Last Quarter
+          const phaseIndex = Math.floor((phaseDiff / TAU) * 4) % 4;
+          get('lunar-phase').textContent = phaseSymbols[phaseIndex];
+
+      } else {
+          get('logos-clock-info').style.display = 'none';
+          logosClockTitle.style.display = 'none'; // Hide the fixed title
+      }
+    }
+
+    // === CONTROLS ===
+    document.querySelectorAll('#controls button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.toggle;
+        state[k] = !state[k];
+        btn.classList.toggle('active', state[k]);
+      });
+    });
+
+    const modelSelect = get('model-select');
+    modelSelect.addEventListener('change', (e) => {
+        state.model = e.target.value;
+        // Reset frame and simulated day count when changing modes
+        state.frame = 0;
+        state.simulatedDayCount = 0;
+        state.lastSunAngle = 0;
+        state.lastMoonAngle = 0;
+    });
+
+    // === MAIN ANIMATION LOOP ===
+    function loop(){
+      const phi = schPhase(state.frame);
+      const coh = schCoh(state.frame);
+      const amp = schAmp(state.frame);
+
+      // --- WebGL Pass ---
+      gl.uniform1f(uTime, state.frame * 0.01);
+      gl.uniform1f(uPhase, phi);
+      gl.uniform1f(uCoh, coh);
+      gl.uniform2f(uRes, glCanvas.width, glCanvas.height);
+
+      if (state.model === 'logos-clock') {
+          gl.uniform1i(uIsLogosClockMode, 1); // Tell shader it's Logos Clock mode
+          gl.uniform1f(uFixedZoom, LOGOS_CLOCK_FRACTAL_ZOOM);
+          gl.uniform1f(uFixedCx, LOGOS_CLOCK_FRACTAL_CENTER_X);
+          gl.uniform1f(uFixedCy, LOGOS_CLOCK_FRACTAL_CENTER_Y);
+      } else {
+          gl.uniform1i(uIsLogosClockMode, 0); // Schumann Fractal mode
+      }
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // --- 2D Overlay Pass ---
+      ctx.clearRect(0,0,overlay.width,overlay.height);
+      const cx = overlay.width/2, cy = overlay.height/2;
+      const canvasMaxDim = Math.min(cx, cy);
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      if (state.model === 'schumann-fractal') {
+          ctx.rotate(phi * 0.1); // Rotate sacred geometry with Schumann phase in default mode
+          if(state.mandala){
+            rose(8, canvasMaxDim * 0.25, 'hsl(45 100% 65%)', 0.4, phi);
+            rose(16, canvasMaxDim * 0.40, 'hsl(190 100% 70%)', 0.3, phi * 1.3);
+          }
+          if(state.branches){
+            ctx.strokeStyle = 'hsl(190 100% 80%)';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.6 + 0.2 * coh;
+            for(let i=0;i<12;i++){
+              ctx.save();
+              ctx.rotate(i * 30 * Math.PI / 180 + phi * 0.2);
+              const len = canvasMaxDim * 0.15 * (1 + 0.3 * Math.sin(phi * 2 + i));
+              branch(3, len);
+              ctx.restore();
+            }
+            ctx.globalAlpha = 1;
+          }
+          orbits(cx, cy, phi, coh); // Orbits are already centered
+      } else { // LOGOS CLOCK Mode
+          // Polaris (Fixed center star)
+          ctx.fillStyle = 'var(--c-gold)';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'var(--c-gold)';
+          ctx.beginPath();
+          ctx.arc(0, 0, canvasMaxDim * POLARIS_RADIUS_FACTOR, 0, TAU);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          const simulated_t_days = state.frame / SIMULATED_DAY_FRAMES;
+
+          // Sun
+          ctx.fillStyle = '#ffd65c'; // Sun's color
+          const sunPos = getLuminaryPosition(simulated_t_days, 'sun', canvasMaxDim);
+          ctx.beginPath();
+          ctx.arc(sunPos.x, sunPos.y, 8, 0, TAU); // Sun size
+          ctx.fill();
+          state.lastSunAngle = sunPos.angle; // Store for lunar phase
+
+          // Moon
+          ctx.fillStyle = '#e6e6fa'; // Moon's color
+          const moonPos = getLuminaryPosition(simulated_t_days, 'moon', canvasMaxDim);
+          ctx.beginPath();
+          ctx.arc(moonPos.x, moonPos.y, 5, 0, TAU); // Moon size
+          ctx.fill();
+          state.lastMoonAngle = moonPos.angle; // Store for lunar phase
+
+          // Sacred Geometry layers still available, now centered on Polaris
+          ctx.rotate(phi * 0.1); // Sacred geometry still rotates with Schumann phase
+          if(state.mandala){
+            rose(8, canvasMaxDim * 0.25, 'hsl(45 100% 65%)', 0.4, phi);
+            rose(16, canvasMaxDim * 0.40, 'hsl(190 100% 70%)', 0.3, phi * 1.3);
+          }
+          if(state.branches){
+            ctx.strokeStyle = 'hsl(190 100% 80%)';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.6 + 0.2 * coh;
+            for(let i=0;i<12;i++){
+              ctx.save();
+              ctx.rotate(i * 30 * Math.PI / 180 + phi * 0.2);
+              const len = canvasMaxDim * 0.15 * (1 + 0.3 * Math.sin(phi * 2 + i));
+              branch(3, len);
+              ctx.restore();
+            }
+            ctx.globalAlpha = 1;
+          }
+          orbits(0, 0, phi, coh); // Orbits are already centered
+
+          // Update simulated day count
+          const currentSimulatedDay = Math.floor(simulated_t_days);
+          if (currentSimulatedDay > state.simulatedDayCount) {
+              state.simulatedDayCount = currentSimulatedDay;
+          }
+      }
+      ctx.restore(); // Restore 2D context from initial translate/rotate
+      
+      pulses(cx, cy, phi, coh); // Schumann pulses always emanate from center
+
+      updateHud(phi, coh, amp);
+
+      state.frame++;
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
