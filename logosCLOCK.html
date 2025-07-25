@@ -103,8 +103,8 @@
       <div class="control-group">
           <h3>Cosmic Model</h3>
           <select id="model-select">
-            <option value="schumann-fractal">🌌 Schumann Fractal</option>
             <option value="logos-clock">🧭 LOGOS CLOCK</option>
+            <option value="schumann-fractal">🌌 Schumann Fractal</option>
           </select>
       </div>
 
@@ -152,7 +152,7 @@
         branches: true, 
         orbits: true, 
         pulses: true,
-        model: 'schumann-fractal', // 'schumann-fractal' or 'logos-clock'
+        model: 'logos-clock', // 'schumann-fractal' or 'logos-clock' - LOGOS CLOCK is now default
         simulatedDayCount: 0,
         lastSunAngle: 0,
         lastMoonAngle: 0
@@ -207,16 +207,14 @@
       void main(){
         vec2 uv=(gl_FragCoord.xy - 0.5*u_resolution.xy) / min(u_resolution.y, u_resolution.x);
         
-        float zoom_val;
-        vec2 center_val;
-
-        if (u_is_logos_clock_mode == 0) { // Schumann Fractal mode - slower dynamic zoom/pan
-            zoom_val = 0.8 + 0.3*sin(u_time*0.01); // Slower zoom
-            center_val = vec2(sin(u_time*0.005)*0.1, cos(u_time*0.007)*0.08); // Slower pan
-        } else { // Logos Clock mode - fixed fractal view
-            zoom_val = u_fixed_zoom;
-            center_val = vec2(u_fixed_cx, u_fixed_cy);
+        if (u_is_logos_clock_mode == 1) { // Logos Clock mode - pure black background
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            return;
         }
+        
+        // Schumann Fractal mode - keep the original fractal rendering
+        float zoom_val = 0.8 + 0.3*sin(u_time*0.01); // Slower zoom
+        vec2 center_val = vec2(sin(u_time*0.005)*0.1, cos(u_time*0.007)*0.08); // Slower pan
         
         uv = uv*zoom_val + center_val;
 
