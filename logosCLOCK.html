@@ -179,16 +179,25 @@
     const vSrc = 'attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.);}';
     const fSrc = `precision mediump float;
       uniform float u_time, u_phase, u_coherence, u_fixed_zoom, u_fixed_cx, u_fixed_cy;
-      uniform int u_is_logos_clock_mode; // New uniform to control fractal behavior
+      uniform int u_is_logos_clock_mode; 
       uniform vec2 u_resolution;
       
+      // Simpler, static color palette based on iteration count (t)
       vec3 palette(float t){
-        vec3 a=vec3(.2,.5,.8), b=vec3(.2,.4,.2), c=vec3(2.,1.,1.);
-        return a + b * cos(6.28318*(c*t + u_phase*.1));
+          t = mod(t, 1.0); // Ensure t is between 0 and 1
+          vec3 col;
+          // Interpolate through a fixed set of cosmic colors
+          if (t < 0.2) col = mix(vec3(0.0, 0.0, 0.1), vec3(0.0, 0.2, 0.5), t / 0.2); // Deep blue to brighter blue
+          else if (t < 0.4) col = mix(vec3(0.0, 0.2, 0.5), vec3(0.1, 0.5, 0.8), (t - 0.2) / 0.2); // Brighter blue to cyan-blue
+          else if (t < 0.6) col = mix(vec3(0.1, 0.5, 0.8), vec3(0.8, 0.4, 0.2), (t - 0.4) / 0.2); // Cyan-blue to warm orange-red
+          else if (t < 0.8) col = mix(vec3(0.8, 0.4, 0.2), vec3(1.0, 0.8, 0.0), (t - 0.6) / 0.2); // Orange-red to gold
+          else col = mix(vec3(1.0, 0.8, 0.0), vec3(0.0, 0.0, 0.1), (t - 0.8) / 0.2); // Gold back to deep blue
+          return col;
       }
+
       float mandelbrot(vec2 c){
         vec2 z=vec2(0.0); float iter=0.0;
-        for(int i=0;i<64;i++){
+        for(int i=0;i<64;i++){ // Max iter should be uniform and controllable, but for this fixed context it's fine.
           if(dot(z,z)>4.0) break;
           z=vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
           iter+=1.0;
@@ -198,22 +207,37 @@
       void main(){
         vec2 uv=(gl_FragCoord.xy - 0.5*u_resolution.xy) / min(u_resolution.y, u_resolution.x);
         
-        float zoom = u_fixed_zoom;
-        vec2 offset_center = vec2(u_fixed_cx, u_fixed_cy);
+        float zoom_val;
+        vec2 center_val;
 
-        if (u_is_logos_clock_mode == 0) { // Schumann Fractal mode
-            zoom = 0.8 + 0.3*sin(u_time*0.1);
-            offset_center = vec2(sin(u_time*0.05)*0.3, cos(u_time*0.07)*0.2);
+        if (u_is_logos_clock_mode == 0) { // Schumann Fractal mode - slower dynamic zoom/pan
+            zoom_val = 0.8 + 0.3*sin(u_time*0.01); // Slower zoom
+            center_val = vec2(sin(u_time*0.005)*0.1, cos(u_time*0.007)*0.08); // Slower pan
+        } else { // Logos Clock mode - fixed fractal view
+            zoom_val = u_fixed_zoom;
+            center_val = vec2(u_fixed_cx, u_fixed_cy);
         }
         
-        uv = uv*zoom + offset_center; // Apply zoom and center/offset based on mode
+        uv = uv*zoom_val + center_val;
 
         float m = mandelbrot(uv);
-        vec3 color = palette(m + u_time*0.1);
-        float wave1 = sin(uv.x*10.0 + u_phase)*0.5 + 0.5;
-        float wave2 = sin(uv.y*8.0 + u_phase*1.3)*0.5 + 0.5;
-        color += vec3(0.0,0.2,0.4) * wave1 * wave2 * u_coherence;
-        color *= 0.7 + 0.3*u_coherence;
+        vec3 color = palette(m); // Use the static palette
+
+        // Very subtle, fixed aurora-like pattern (not time-dependent for intensity)
+        float wave_pattern = sin(uv.x * 20.0) * cos(uv.y * 15.0); 
+        color += vec3(0.0, 0.05, 0.1) * wave_pattern * 0.1; 
+        
+        // Removed: color *= 0.7 + 0.3*u_coherence; (This was the main flashing culprit)
+
+        // Interior of the Mandelbrot set (deep space pulsing, but dark)
+        if (m == 0.0) {
+            color = vec3(0.0, 0.0, 0.05) * (0.8 + 0.2 * sin(u_time * 0.02)); // Subtle, dark pulse
+        }
+
+        // Add a subtle vignette effect
+        float vignette = smoothstep(0.6, 1.0, length(uv * 1.5));
+        color *= (1.0 - vignette * 0.3);
+
         gl_FragColor = vec4(color, 1.0);
       }`;
 
