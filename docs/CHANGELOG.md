@@ -1,5 +1,6 @@
 ## [v0.1.1] – Rune Evolution (#rune2) – 2025-06-24
 - ✨ Enhanced `RunicPulse.tsx` with rotation, glow, lattice background, and depth toggle
+- ✨ Added `BICCalculator.tsx` implementing ΔBIC and Bayes Factor UI
 
 ## [v0.1.0] – Initial Fractal Bootstrap (2025-06-24)
 
