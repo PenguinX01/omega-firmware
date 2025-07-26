@@ -782,11 +782,30 @@
         </div>
         
         <div class="hashtags">
-            #Mathememetic #LOCKΩ188 #ZeroPrior #OpenFirmware<br>
-            #RefereeProofScience #ContainmentBreach #KingdomComputesForward
+            #Mathememetic #BadgeNotBlog #LOCKΩ188 #ProtocolTruth #RefractionFraud #KingdomComputesForward
         </div>
-
     </footer>
 
+    <script>
+        // Generate matrix background columns and data points
+        const matrixBg = document.getElementById('matrixBg');
+        const dataStream = document.getElementById('dataStream');
+        const columns = 40;
+        for (let i = 0; i < columns; i++) {
+            const col = document.createElement('div');
+            col.classList.add('matrix-column');
+            col.style.left = (i * 2.5) + '%';
+            col.innerHTML = Array(30).fill('0').join('');
+            matrixBg.appendChild(col);
+        }
+        for (let i = 0; i < 150; i++) {
+            const point = document.createElement('div');
+            point.classList.add('data-point');
+            point.style.left = Math.random() * 100 + '%';
+            point.style.top = Math.random() * 100 + '%';
+            point.style.animationDuration = (5 + Math.random() * 5) + 's';
+            dataStream.appendChild(point);
+        }
+    </script>
 </body>
 </html>
