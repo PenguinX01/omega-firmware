@@ -807,5 +807,195 @@
             dataStream.appendChild(point);
         }
     </script>
+
+    <section id="autonomous-truth-engine" style="background:#000;border:2px solid #00ff88;color:#00ff88;padding:2rem;margin:2rem 0;font-family:'Courier New',monospace;">
+      <h2 style="color:#ff6b35;text-align:center;text-shadow:0 0 10px #ff6b35;">AUTONOMOUS TRUTH ENGINE — ΔBIC / BAYES FACTOR</h2>
+      <p style="text-align:center;margin-bottom:1rem;">Zero‑dependency, AI‑executable. Numbers don’t negotiate. 🐧⚡</p>
+
+      <label for="inputFormat" style="display:block;margin:1rem 0 .5rem 0;">Input format:</label>
+      <select id="inputFormat" style="background:#111;color:#00ff88;border:1px solid #00ff88;padding:.3rem;">
+        <option value="json">JSON</option>
+        <option value="csv">CSV</option>
+      </select>
+
+      <textarea id="dataInput" spellcheck="false" style="width:100%;height:220px;background:#0a0a0a;color:#00ff88;border:1px solid #00ff88;padding:1rem;margin:1rem 0;font-size:.9rem;">
+{
+  "y":[12.1,11.9,12.4,12.0],
+  "models":[
+    {"name":"globe","yhat":[12.0,12.1,12.5,11.9],"k":5},
+    {"name":"plane","yhat":[12.1,11.9,12.4,12.0],"k":3}
+  ]
+}
+      </textarea>
+
+      <button id="runEngine" style="background:#00ff88;color:#000;border:none;padding:.8rem 1.2rem;font-weight:bold;text-transform:uppercase;cursor:pointer;">
+        Run ΔBIC / Bayes Factor
+      </button>
+
+      <div id="engineResult" style="margin-top:2rem;background:#050505;border:1px solid #00ff88;padding:1rem;overflow-x:auto;white-space:pre-wrap;"></div>
+
+      <div id="engineBadge" style="margin-top:1.5rem;text-align:center;font-size:1.2rem;">
+        <span id="badgeText" style="padding:.5rem 1rem;border:2px solid #00ff88;display:inline-block;">SCOREBOARD: PENDING</span>
+      </div>
+    </section>
+
+    <script>
+    (function(){
+      const elData = document.getElementById('dataInput');
+      const elResult = document.getElementById('engineResult');
+      const elBtn = document.getElementById('runEngine');
+      const elBadge = document.getElementById('badgeText');
+      const elFormat = document.getElementById('inputFormat');
+
+      function rss(y, yhat){
+        let s = 0;
+        for(let i=0;i<y.length;i++){
+          const d = y[i] - yhat[i];
+          s += d*d;
+        }
+        return s;
+      }
+
+      // BIC for Gaussian with unknown variance; constants cancel out between models
+      function bic_gaussian_unknown_sigma(n, rss, k){
+        return n * Math.log(rss / n) + k * Math.log(n);
+      }
+
+      function evidenceLabel(deltaBIC){
+        const ad = Math.abs(deltaBIC);
+        if (ad < 2) return "Not worth more than a bare mention";
+        if (ad < 6) return "Positive";
+        if (ad < 10) return "Strong";
+        return "Very strong";
+      }
+
+      function parseCSV(text){
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        const header = lines[0].split(',').map(h => h.trim());
+        const yIdx = header.indexOf('y');
+        if (yIdx === -1) throw new Error("CSV must have a 'y' column");
+
+        const modelNames = header.filter(h => h !== 'y');
+        const y = [];
+        const preds = {};
+        modelNames.forEach(m => preds[m] = []);
+        const kmap = {};
+
+        for (let i = 1; i < lines.length; i++){
+          const line = lines[i];
+          if (line.startsWith('#')) {
+            const m = line.match(/^#k_(\w+)\s*=\s*([0-9]+)$/i);
+            if (m) {
+              kmap[m[1]] = parseInt(m[2],10);
+            }
+            continue;
+          }
+          const parts = line.split(',').map(x => x.trim()).filter(x => x.length>0);
+          if (parts.length !== header.length) continue;
+          y.push(parseFloat(parts[yIdx]));
+          modelNames.forEach((m, idx) => {
+            const col = header.indexOf(m);
+            preds[m].push(parseFloat(parts[col]));
+          });
+        }
+
+        const models = modelNames.map(name => ({
+          name,
+          yhat: preds[name],
+          k: (kmap[name] != null ? kmap[name] : 1)
+        }));
+
+        return { y, models };
+      }
+
+      function parseJSON(text){
+        const obj = JSON.parse(text);
+        if (!Array.isArray(obj.y)) throw new Error("JSON must have array 'y'");
+        if (!Array.isArray(obj.models)) throw new Error("JSON must have array 'models'");
+        obj.models.forEach(m => {
+          if (typeof m.name !== 'string') throw new Error("Each model must have a 'name'");
+          if (!Array.isArray(m.yhat)) throw new Error("Each model must have array 'yhat'");
+          if (typeof m.k !== 'number') throw new Error("Each model must have numeric 'k'");
+        });
+        return obj;
+      }
+
+      function pickWinner(results){
+        let best = results[0];
+        for (let i=1;i<results.length;i++){
+          if (results[i].bic < best.bic) best = results[i];
+        }
+        return best;
+      }
+
+      function run(){
+        let parsed;
+        try{
+          const txt = elData.value.trim();
+          parsed = (elFormat.value === 'csv') ? parseCSV(txt) : parseJSON(txt);
+        }catch(err){
+          elResult.textContent = "Parse error: " + err.message;
+          elBadge.style.borderColor = "#ff0000";
+          elBadge.style.color = "#ff0000";
+          elBadge.textContent = "SCOREBOARD: PARSE ERROR";
+          return;
+        }
+
+        const y = parsed.y;
+        const n = y.length;
+
+        const results = parsed.models.map(m => {
+          if (m.yhat.length !== n) throw new Error(`Model ${m.name}: yhat length != y length`);
+          const r = rss(y, m.yhat);
+          const bic = bic_gaussian_unknown_sigma(n, r, m.k);
+          return { name: m.name, k: m.k, rss: r, bic, n };
+        });
+
+        // Sort by BIC
+        results.sort((a,b) => a.bic - b.bic);
+        const best = results[0];
+        const second = results[1];
+
+        let deltaBIC = null, bayes = null, label = "N/A";
+        if (results.length > 1){
+          deltaBIC = second.bic - best.bic;
+          bayes = Math.exp(-0.5 * deltaBIC);
+          label = evidenceLabel(deltaBIC);
+        }
+
+        const out = {
+          n,
+          results,
+          winner: best.name,
+          ...(deltaBIC !== null ? {
+            deltaBIC: deltaBIC,
+            bayesFactor: bayes,
+            evidence: label
+          } : {})
+        };
+
+        // Pretty print
+        elResult.textContent = JSON.stringify(out, null, 2);
+
+        // SCOREBOARD BADGE
+        elBadge.style.borderColor = "#00ff88";
+        if (results.length > 1){
+          const leader = best.name.toUpperCase();
+          const trailer = second.name.toUpperCase();
+          const color = (leader.includes("PLANE") ? "#00ff88" : "#ff6b35");
+          elBadge.style.color = color;
+          elBadge.style.borderColor = color;
+          elBadge.textContent = `SCOREBOARD: ${leader} LEADS (ΔBIC=${deltaBIC.toFixed(3)}, BF≈${bayes.toExponential(3)})`;
+        } else {
+          elBadge.textContent = `SCOREBOARD: ${best.name.toUpperCase()} (only model provided)`;
+        }
+
+        // Dispatch event for outside listeners/badges
+        window.dispatchEvent(new CustomEvent('engine:updated', { detail: out }));
+      }
+
+      elBtn.addEventListener('click', run);
+    })();
+    </script>
 </body>
 </html>
