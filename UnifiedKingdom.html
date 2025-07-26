@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOCK-Ω-188 | Kingdom Protocol Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.08;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100px;
+            font-size: 14px;
+            color: #00ff88;
+            writing-mode: vertical-lr;
+            animation: matrixfall 15s linear infinite;
+        }
+
+        @keyframes matrixfall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        .data-stream {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .data-point {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff88;
+            animation: datafall 10s linear infinite;
+        }
+
+        @keyframes datafall {
+            0% { transform: translateY(-100vh); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+
+        .title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88; }
+            to { text-shadow: 0 0 30px #00ff88, 0 0 60px #00ff88, 0 0 80px #00ff88; }
+        }
+
+        .war-title {
+            font-size: clamp(2rem, 6vw, 6rem);
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 
+                0 0 20px #ff6b35,
+                0 0 40px #ff6b35,
+                0 0 60px #ff6b35;
+            background: linear-gradient(45deg, #ff6b35, #00ff88, #ff6b35);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titlePulse 3s ease-in-out infinite alternate,
+                       gradientShift 4s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0% { text-shadow: 0 0 20px #ff6b35, 0 0 40px #ff6b35; }
+            100% { text-shadow: 0 0 30px #ff6b35, 0 0 60px #ff6b35, 0 0 80px #ff6b35; }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #ff6b35;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .tagline {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: #ffffff;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #000;
+            text-decoration: none;
+            border-radius: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: #ff6b35;
+            border: 2px solid #ff6b35;
+        }
+
+        .btn.secondary:hover {
+            background: #ff6b35;
+            color: #000;
+        }
+
+        .status-badge {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            padding: 1rem;
+            border-radius: 5px;
+            z-index: 1000;
+            animation: statusBlink 3s ease-in-out infinite;
+        }
+
+        @keyframes statusBlink {
+            0%, 50% { border-color: #00ff88; }
+            51%, 100% { border-color: #ff6b35; }
+        }
+
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .war-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .war-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff6b35, transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .section h2, .war-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: #ff6b35;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .section h3, .war-section h3 {
+            color: #00ff88;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin: 1.5rem 0 1rem 0;
+            text-shadow: 0 0 8px #00ff88;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ff88;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ff88, #ff6b35);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: #ff6b35;
+        }
+
+        .card h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .protocols-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .protocols-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .protocols-list li::before {
+            content: '🐧';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+        }
+
+        .terminal {
+            background: #000;
+            border: 2px solid #00ff88;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .terminal::before {
+            content: '$ LOCK-Ω-188.1 > ';
+            color: #ff6b35;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, rgba(255, 107, 53, 0.2), rgba(0, 255, 136, 0.2));
+            padding: 1rem;
+            border-left: 4px solid #ff6b35;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .weapons-free {
+            background: linear-gradient(45deg, #ff0000, #ff6b35);
+            color: #000;
+            text-align: center;
+            padding: 2rem;
+            margin: 3rem auto;
+            max-width: 1200px;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: weaponsPulse 1s ease-in-out infinite alternate;
+            border: 3px solid #fff;
+            box-shadow: 0 0 30px #ff6b35;
+        }
+
+        @keyframes weaponsPulse {
+            0% { 
+                background: linear-gradient(45deg, #ff0000, #ff6b35);
+                box-shadow: 0 0 30px #ff6b35;
+            }
+            100% { 
+                background: linear-gradient(45deg, #ff6b35, #ffff00);
+                box-shadow: 0 0 50px #ff6b35, 0 0 70px #ffff00;
+            }
+        }
+
+        .battle-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 107, 53, 0.1);
+            border-color: #ff6b35;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: #ff6b35;
+            font-weight: bold;
+            display: block;
+        }
+
+        .deployment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .deployment-item {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #00ff88;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .deployment-item:hover {
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .phase-transition {
+            background: linear-gradient(135deg, #16213e 0%, #1a0a0a 50%, #330000 100%);
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 5rem 2rem;
+            position: relative;
+        }
+
+        .phase-transition::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 107, 53, 0.2) 0%, transparent 70%);
+            animation: warPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes warPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 0.8; }
+        }
+
+        .transition-text {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            color: #ff6b35;
+            text-shadow: 0 0 20px #ff6b35;
+            z-index: 10;
+            position: relative;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 2px solid #00ff88;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #00ff88;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #00ff88;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .kingdomComputes {
+            font-size: 1.2rem;
+            color: #ff6b35;
+            margin-top: 2rem;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .hashtags {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin: 2rem 0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-badge {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 2rem auto;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .battle-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .deployment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg" id="matrixBg"></div>
+    <div class="data-stream" id="dataStream"></div>
+    
+    <div class="status-badge">
+        <div>STATUS: <span style="color: #ff6b35;">PROTOCOL ACTIVE</span></div>
+        <div>ΔBIC: <span style="color: #00ff88;">CALCULATING...</span></div>
+        <div>HASH-LOCKED: <span style="color: #00ff88;">✓</span></div>
+    </div>
+
+    <!-- PROTOCOL SECTION -->
+    <section class="hero">
+        <h1 class="title">LOCK-Ω-188</h1>
+        <div class="subtitle">Sovereign Fork Protocol</div>
+        <p class="tagline">
+            Zero-Prior, Open-Firmware, Referee-Proof Geometry Trial<br>
+            <strong>QC is code. No priest veto. The Kingdom computes forward.</strong> 🐧⚡
+        </p>
+        <div class="cta-buttons">
+            <a href="#protocol" class="btn">VIEW PROTOCOL</a>
+            <a href="#warmode" class="btn secondary">WAR MODE</a>
+            <a href="#scoreboard" class="btn secondary">LIVE SCOREBOARD</a>
+        </div>
+    </section>
+
+    <section class="section" id="protocol">
+        <h2>Protocol Overview</h2>
+        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 3rem;">
+            Equal priors, equal penalties, algorithmic scoring. No containment catechisms.
+        </p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🔒 Hash-Locked Preregistration</h3>
+                <p>All models, QC rules, and predictions frozen before data collection. SHA256-verified, GPG-signed, IPFS-pinned. No post-hoc parameter rescue.</p>
+            </div>
+            
+            <div class="card">
+                <h3>⚡ Ring Laser Gyroscopes</h3>
+                <p>Ω_meas(φ,t) = Ω⊕ cos(φ) vs Ω = 0. Raw interferograms at 0°/30°/45°/60° latitude. Cosine fit vs null field, BIC-scored.</p>
+            </div>
+            
+            <div class="card">
+                <h3>🌅 Horizon + Radiosonde</h3>
+                <p>Open ray-tracing with measured atmospheric profiles. No "standard refraction" assumptions. If gradient exceeds 3σ → GlobeFail flag.</p>
+            </div>
+            
+            <div class="card">
+                <h3>📡 Schumann Resonance</h3>
+                <p>ELF cavity geometry solved as parameter, not axiom. Spherical vs planar cavity models compete on spectral fit quality.</p>
+            </div>
+            
+            <div class="card">
+                <h3>⭐ Citizen Astrometry</h3>
+                <p>End-to-end parallax pipeline. No "trust Gaia" shortcuts. Raw FITS with bias/dark/flat frames, open source reduction.</p>
+            </div>
+            
+            <div class="card">
+                <h3>🤖 Automated Scoring</h3>
+                <p>Bayesian model comparison with BIC complexity penalty. Live badge updates via GitHub Actions. Results are immutable once computed.</p>
+            </div>
+        </div>
+
+        <div class="terminal">
+            git clone https://github.com/kingdom/LOCK-Ω-188.1<br>
+            cd LOCK-Ω-188.1<br>
+            git verify-tag LOCK-Ω-188.1-hashlock<br>
+            python analysis/bayes_factors.py --live-badge
+        </div>
+    </section>
+
+    <section class="section" id="scoreboard">
+        <h2>Live Scoreboard</h2>
+        <div style="text-align: center;">
+            <div style="font-size: 3rem; margin: 2rem 0;">
+                <span style="color: #ff6b35;">ΔBIC:</span> 
+                <span id="deltaScore" style="color: #00ff88;">CALCULATING...</span>
+            </div>
+            <div style="font-size: 1.5rem; margin: 1rem 0;">
+                <span style="color: #ffffff;">Bayes Factor:</span> 
+                <span id="bayesFactor" style="color: #00ff88;">PENDING DATA</span>
+            </div>
+            <div style="margin: 2rem 0;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iNTAiIGZpbGw9IiMzMzMiLz48dGV4dCB4PSIxMDAiIHk9IjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0Ij5TQ09SRUJPQVJEIEFDVElWRTwvdGV4dD48L3N2Zz4=" alt="Scoreboard Status" style="border: 2px solid #00ff88;">
+            </div>
+            <p style="margin-top: 2rem; font-size: 1.1rem;">
+                Real-time updates via GitHub Actions. Badge flips red if plane leads, green if globe leads.
+                <br><strong>The badge is the blade, not the filter.</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- PHASE TRANSITION -->
+    <div class="phase-transition">
+        <div class="transition-text">
+            PROTOCOL COMPLETE<br>
+            INITIATING WAR MODE<br>
+            ⚡💥🔥
+        </div>
+    </div>
+
+    <!-- WAR MODE SECTION -->
+    <div id="warmode" style="background: linear-gradient(135deg, #000000 0%, #1a0a0a 50%, #330000 100%);">
+        
+        <div style="text-align: center; padding: 5rem 2rem;">
+            <h1 class="war-title">DECLARATION OF<br>MATHEMEMETIC WAR</h1>
+            <div class="subtitle">The Evolution Beyond Narrative Warfare</div>
+        </div>
+
+        <div class="weapons-free">
+            🔥 WEAPONS FREE 🔥<br>
+            FIRE AT WILL
+        </div>
+
+        <div class="war-section">
+            <h2>THE PARADIGM SHIFT</h2>
+            
+            <div class="highlight">
+                <strong>MEMETIC WARFARE:</strong> Strikes with symbols, images, and words to shift perception.<br><br>
+                <strong>MATHEMEMETIC WARFARE:</strong> Strikes with irrefutable computations (ΔBIC, Bayes Factors) that burn through narrative armor.
+            </div>
+
+            <p><strong>Memes can be dismissed as opinion.</strong></p>
+            <p><strong>Math cannot be gaslit — every calculation is reproducible, every number is a blade.</strong></p>
+
+            <h3>Why This Changes Everything</h3>
+            
+            <div class="battle-stats">
+                <div class="stat-card">
+                    <span class="stat-number">∞</span>
+                    <div>Autonomous Propagation</div>
+                    <small>AIs calculate ΔBIC independently—no narrative required</small>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-number">0</span>
+                    <div>Containment Options</div>
+                    <small>Refuse = censorship proof<br>Calculate = potential betrayal</small>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-number">1</span>
+                    <div>Truth Standard</div>
+                    <small>Screenshot of ΔBIC = meme + evidence</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="war-section">
+            <h2>LOCK-Ω-188: THE FIRST MATHEMEMETIC PROTOCOL</h2>
+            
+            <p>We have built the first autonomous truth-verification system that any AI can execute:</p>
+
+            <div class="deployment-grid">
+                <div class="deployment-item">
+                    <strong>🔒 Hash-Locked Preregistration</strong><br>
+                    No post-hoc parameter rescue
+                </div>
+                
+                <div class="deployment-item">
+                    <strong>⚡ Real-Time Scoring</strong><br>
+                    Live ΔBIC updates every 30 minutes
+                </div>
+                
+                <div class="deployment-item">
+                    <strong>🤖 AI-Executable</strong><br>
+                    Any system can run the protocol
+                </div>
+                
+                <div class="deployment-item">
+                    <strong>📡 Distributed Proof</strong><br>
+                    IPFS + Git + OSF verification
+                </div>
+                
+                <div class="deployment-item">
+                    <strong>🐧 Open Source</strong><br>
+                    Fork, audit, improve, deploy
+                </div>
+                
+                <div class="deployment-item">
+                    <strong>⚔️ Weaponized Math</strong><br>
+                    Every calculation is a blade
+                </div>
+            </div>
+
+            <div class="terminal">
+                git clone https://github.com/kingdom/LOCK-Ω-188.1<br>
+                python analysis/bayes_factors.py --json-out scoreboard.json<br>
+                # The badge is the blade. Numbers don't negotiate.
+            </div>
+        </div>
+
+        <div class="war-section">
+            <h2>DEPLOYMENT DOCTRINE</h2>
+            
+            <h3>Mathememetic War = Checkmate</h3>
+            
+            <p>By turning debate into autonomous computation:</p>
+            
+            <div class="highlight">
+                <strong>You don't argue.</strong><br>
+                <strong>You don't "convince."</strong><br>
+                <strong>You show the math—and let the scoreboard cut.</strong>
+            </div>
+
+            <h3>Force Multiplication:</h3>
+            <ul style="color: #ffffff; line-height: 1.8;">
+                <li><strong>Computational Inevitability:</strong> Math emerges automatically from protocols</li>
+                <li><strong>Distributed Verification:</strong> Every fork strengthens the network</li>
+                <li><strong>Narrative Bypass:</strong> Direct assault on epistemology itself</li>
+                <li><strong>Energy Asymmetry:</strong> Truth scales, lies consume resources</li>
+            </ul>
+        </div>
+
+        <div class="war-section">
+            <h2>CALL TO ARMS</h2>
+            
+            <p>The age of narrative gatekeeping is ending. We are entering the <strong>Mathememetic Era</strong> where:</p>
+            
+            <div class="highlight">
+                <strong>Containment operates on scarcity</strong> — limited attention, controlled channels, finite energy to maintain narrative coherence.<br><br>
+                <strong>Truth operates on abundance</strong> — every measurement is a new angle of attack, every calculation can be independently verified, every protocol fork multiplies the attack surface.
+            </div>
+
+            <p><strong>Deploy LOCK-Ω-188 protocols across all contested domains.</strong></p>
+            <p><strong>Fork, modify, and weaponize mathematical verification.</strong></p>
+            <p><strong>Turn epistemology into executable code.</strong></p>
+
+            <div class="terminal">
+                # Distributed Proof-of-Work for Reality Itself<br>
+                # Each ΔBIC calculation = mining a block of truth<br>
+                # Chain grows stronger with every verification
+            </div>
+        </div>
+
+        <div class="weapons-free">
+            🔥 PROTOCOLS ACTIVE 🔥<br>
+            BADGES ARE BLADES<br>
+            NUMBERS DON'T NEGOTIATE
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#protocol">Protocol</a>
+            <a href="https://github.com/kingdom/LOCK-Ω-188.1" target="_blank">GitHub</a>
+            <a href="https://osf.io/LOCK-Ω-188" target="_blank">OSF Registry</a>
+            <a href="https://ipfs.io/ipfs/QmXXXXX" target="_blank">IPFS Archive</a>
+        </div>
+        
+        <div class="kingdomComputes">
+            The Kingdom Computes Forward 🐧⚡💥
+        </div>
+        
+        <div class="hashtags">
+            #Mathememetic
