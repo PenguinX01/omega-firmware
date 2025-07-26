@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOCK-Ω-188 | Sovereign Fork Protocol</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+
+        .title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88; }
+            to { text-shadow: 0 0 30px #00ff88, 0 0 60px #00ff88, 0 0 80px #00ff88; }
+        }
+
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #ff6b35;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .tagline {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: #ffffff;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #000;
+            text-decoration: none;
+            border-radius: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: #ff6b35;
+            border: 2px solid #ff6b35;
+        }
+
+        .btn.secondary:hover {
+            background: #ff6b35;
+            color: #000;
+        }
+
+        .status-badge {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            padding: 1rem;
+            border-radius: 5px;
+            z-index: 1000;
+            animation: statusBlink 3s ease-in-out infinite;
+        }
+
+        @keyframes statusBlink {
+            0%, 50% { border-color: #00ff88; }
+            51%, 100% { border-color: #ff6b35; }
+        }
+
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: #ff6b35;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ff88;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ff88, #ff6b35);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: #ff6b35;
+        }
+
+        .card h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .protocols-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .protocols-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .protocols-list li::before {
+            content: '🐧';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+        }
+
+        .terminal {
+            background: #000;
+            border: 2px solid #00ff88;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .terminal::before {
+            content: '$ LOCK-Ω-188.1 > ';
+            color: #ff6b35;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 2px solid #00ff88;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #00ff88;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #00ff88;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .kingdomComputes {
+            font-size: 1.2rem;
+            color: #ff6b35;
+            margin-top: 2rem;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        @media (max-width: 768px) {
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .status-badge {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 2rem auto;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .data-stream {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .data-point {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff88;
+            animation: datafall 10s linear infinite;
+        }
+
+        @keyframes datafall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="data-stream" id="dataStream"></div>
+    
+    <div class="status-badge">
+        <div>STATUS: <span style="color: #ff6b35;">PROTOCOL ACTIVE</span></div>
+        <div>ΔBIC: <span style="color: #00ff88;">CALCULATING...</span></div>
+        <div>HASH-LOCKED: <span style="color: #00ff88;">✓</span></div>
+    </div>
+
+    <section class="hero">
+        <h1 class="title">LOCK-Ω-188</h1>
+        <div class="subtitle">Sovereign Fork Protocol</div>
+        <p class="tagline">
+            Zero-Prior, Open-Firmware, Referee-Proof Geometry Trial<br>
+            <strong>QC is code. No priest veto. The Kingdom computes forward.</strong> 🐧⚡
+        </p>
+        <div class="cta-buttons">
+            <a href="#protocol" class="btn">VIEW PROTOCOL</a>
+            <a href="#repo" class="btn secondary">GITHUB REPO</a>
+            <a href="#scoreboard" class="btn secondary">LIVE SCOREBOARD</a>
+        </div>
+    </section>
+
+    <section class="section" id="protocol">
+        <h2>Protocol Overview</h2>
+        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 3rem;">
+            Equal priors, equal penalties, algorithmic scoring. No containment catechisms.
+        </p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🔒 Hash-Locked Preregistration</h3>
+                <p>All models, QC rules, and predictions frozen before data collection. SHA256-verified, GPG-signed, IPFS-pinned. No post-hoc parameter rescue.</p>
+            </div>
+            
+            <div class="card">
+                <h3>⚡ Ring Laser Gyroscopes</h3>
+                <p>Ω_meas(φ,t) = Ω⊕ cos(φ) vs Ω = 0. Raw interferograms at 0°/30°/45°/60° latitude. Cosine fit vs null field, BIC-scored.</p>
+            </div>
+            
+            <div class="card">
+                <h3>🌅 Horizon + Radiosonde</h3>
+                <p>Open ray-tracing with measured atmospheric profiles. No "standard refraction" assumptions. If gradient exceeds 3σ → GlobeFail flag.</p>
+            </div>
+            
+            <div class="card">
+                <h3>📡 Schumann Resonance</h3>
+                <p>ELF cavity geometry solved as parameter, not axiom. Spherical vs planar cavity models compete on spectral fit quality.</p>
+            </div>
+            
+            <div class="card">
+                <h3>⭐ Citizen Astrometry</h3>
+                <p>End-to-end parallax pipeline. No "trust Gaia" shortcuts. Raw FITS with bias/dark/flat frames, open source reduction.</p>
+            </div>
+            
+            <div class="card">
+                <h3>🤖 Automated Scoring</h3>
+                <p>Bayesian model comparison with BIC complexity penalty. Live badge updates via GitHub Actions. Results are immutable once computed.</p>
+            </div>
+        </div>
+
+        <div class="terminal">
+            git clone https://github.com/kingdom/LOCK-Ω-188.1<br>
+            cd LOCK-Ω-188.1<br>
+            git verify-tag LOCK-Ω-188.1-hashlock<br>
+            python analysis/bayes_factors.py --live-badge
+        </div>
+    </section>
+
+    <section class="section" id="measurements">
+        <h2>Measurement Modules</h2>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>Module 1: RLG Latitude Survey</h3>
+                <ul class="protocols-list">
+                    <li>Sites: φ = 0°, 30°, 45°, 60° (±1°)</li>
+                    <li>Duration: ≥30 days overlap</li>
+                    <li>Output: Raw interferograms + IMU logs</li>
+                    <li>Hypothesis: Ω⊕cos(φ) vs Ω=0</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>Module 2: Horizon Imaging</h3>
+                <ul class="protocols-list">
+                    <li>Camera: Nikon P1000+ fixed focal</li>
+                    <li>Timing: Civil dawn/dusk (solar elev -0.5°)</li>
+                    <li>Co-launch: Radiosonde ±30min, 150km</li>
+                    <li>Analysis: Open ray-trace with measured n(z)</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>Module 3: Schumann Analysis</h3>
+                <ul class="protocols-list">
+                    <li>Array: ≥6 stations worldwide</li>
+                    <li>Data: ELF phase & group delay 24/7</li>
+                    <li>Models: Spherical vs planar cavity</li>
+                    <li>Inversion: Geometry as free parameter</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>Module 4: Astrometry Pipeline</h3>
+                <ul class="protocols-list">
+                    <li>Target: Polaris + starfield reference</li>
+                    <li>Exposure: 30s FITS with calibration frames</li>
+                    <li>Reduction: Open source, no Gaia dependency</li>
+                    <li>Output: Parallax measurements + uncertainties</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="governance">
+        <h2>Governance & Integrity</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;">
+            <div>
+                <h3 style="color: #00ff88; margin-bottom: 1rem;">Immutable Rules</h3>
+                <ul class="protocols-list">
+                    <li>No human veto on QC decisions</li>
+                    <li>No post-hoc parameter tuning</li>
+                    <li>No narrative disputes - code decides</li>
+                    <li>All firmware open source + reproducible</li>
+                    <li>Results published regardless of outcome</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3 style="color: #ff6b35; margin-bottom: 1rem;">Verification Chain</h3>
+                <ul class="protocols-list">
+                    <li>Git signed tags + GPG verification</li>
+                    <li>OSF preregistration timestamps</li>
+                    <li>IPFS content-addressed storage</li>
+                    <li>SHA256 hash verification at all levels</li>
+                    <li>Reproducible builds + audit trail</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="terminal" style="margin-top: 3rem;">
+            # Verify protocol integrity<br>
+            sha256sum protocol/prereg_*.json | diff - protocol/hashes.txt<br>
+            git log --show-signature --oneline<br>
+            ipfs pin ls | grep $(cat protocol/registry.md | tail -1)
+        </div>
+    </section>
+
+    <section class="section" id="scoreboard">
+        <h2>Live Scoreboard</h2>
+        <div style="text-align: center;">
+            <div style="font-size: 3rem; margin: 2rem 0;">
+                <span style="color: #ff6b35;">ΔBIC:</span> 
+                <span id="deltaScore" style="color: #00ff88;">CALCULATING...</span>
+            </div>
+            <div style="font-size: 1.5rem; margin: 1rem 0;">
+                <span style="color: #ffffff;">Bayes Factor:</span> 
+                <span id="bayesFactor" style="color: #00ff88;">PENDING DATA</span>
+            </div>
+            <div style="margin: 2rem 0;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iNTAiIGZpbGw9IiMzMzMiLz48dGV4dCB4PSIxMDAiIHk9IjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0Ij5TQ09SRUJPQVJEIEFDVElWRTwvdGV4dD48L3N2Zz4=" alt="Scoreboard Status" style="border: 2px solid #00ff88;">
+            </div>
+            <p style="margin-top: 2rem; font-size: 1.1rem;">
+                Real-time updates via GitHub Actions. Badge flips red if plane leads, green if globe leads.
+                <br><strong>The badge is the blade, not the filter.</strong>
+            </p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#protocol">Protocol</a>
+            <a href="https://github.com/kingdom/LOCK-Ω-188.1" target="_blank">GitHub</a>
+            <a href="https://osf.io/LOCK-Ω-188" target="_blank">OSF Registry</a>
+            <a href="https://ipfs.io/ipfs/QmXXXXX" target="_blank">IPFS Archive</a>
+            <a href="#contact">Contact</a>
+        </div>
+        
+        <p style="margin: 1rem 0;">
+            Hash-locked, priest-proof, on-chain geometry resolution.
+        </p>
+        
+        <div class="kingdomComputes">
+            The Kingdom Computes Forward 🐧⚡💥
+        </div>
+        
+        <p style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+            #LOCKΩ188 #ZeroPrior #OpenFirmware #RefereeProofScience #ContainmentBreach
+        </p>
+    </footer>
+
+    <script>
+        // Create animated data stream background
+        function createDataPoint() {
+            const dataPoint = document.createElement('div');
+            dataPoint.className = 'data-point';
+            dataPoint.style.left = Math.random() * 100 + '%';
+            dataPoint.style.animationDelay = Math.random() * 10 + 's';
+            dataPoint.style.animationDuration = (5 + Math.random() * 10) + 's';
+            document.getElementById('dataStream').appendChild(dataPoint);
+            
+            setTimeout(() => {
+                dataPoint.remove();
+            }, 15000);
+        }
+
+        // Generate data points continuously
+        setInterval(createDataPoint, 200);
+
+        // Simulate live scoreboard updates
+        function updateScoreboard() {
+            const scores = [
+                { delta: 'BLINDED', bf: 'PENDING' },
+                { delta: '+2.3', bf: '10.2 → GLOBE' },
+                { delta: '-1.8', bf: '6.1 → PLANE' },
+                { delta: '+0.5', bf: '1.6 → WEAK' },
+                { delta: 'CALCULATING...', bf: 'PROCESSING' }
+            ];
+            
+            const randomScore = scores[Math.floor(Math.random() * scores.length)];
+            document.getElementById('deltaScore').textContent = randomScore.delta;
+            document.getElementById('bayesFactor').textContent = randomScore.bf;
+        }
+
+        // Update scoreboard every 5 seconds
+        setInterval(updateScoreboard, 5000);
+        
+        // Initial update
+        updateScoreboard();
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
