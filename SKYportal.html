@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyPortal - Dimensional Ascension Protocol</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #0a0a2e 0%, #16213e 30%, #1a1a3a 60%, #000 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .panel {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+            font-size: 12px;
+            text-shadow: 0 0 5px currentColor;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .portal-status {
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            border-color: #00ffff;
+            color: #00ffff;
+        }
+
+        .ascension-metrics {
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+
+        .dimensional-readings {
+            bottom: 20px;
+            left: 20px;
+            width: 320px;
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .controls {
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px currentColor;
+            min-width: 180px;
+        }
+
+        .btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .btn.active {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+
+        .btn.danger {
+            border-color: #ff4444;
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .btn.danger:hover {
+            background: rgba(255, 68, 68, 0.2);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 8px;
+        }
+
+        .metric-group {
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .frequency-display {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            text-align: center;
+            margin: 10px 0;
+            color: #00ff00;
+            text-shadow: 0 0 15px #00ff00;
+        }
+
+        .warning {
+            color: #ff6600 !important;
+            animation: pulse 1s infinite;
+        }
+
+        .critical {
+            color: #ff0000 !important;
+            animation: flash 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .dimensional-flash {
+            animation: dimensionalShift 0.8s ease-out;
+        }
+
+        @keyframes dimensionalShift {
+            0% { filter: brightness(1) hue-rotate(0deg); }
+            25% { filter: brightness(3) hue-rotate(180deg); }
+            50% { filter: brightness(0.5) hue-rotate(360deg); }
+            100% { filter: brightness(1) hue-rotate(0deg); }
+        }
+
+        .energy-wave {
+            position: absolute;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: energyPulse 3s infinite;
+        }
+
+        @keyframes energyPulse {
+            0% {
+                width: 20px;
+                height: 20px;
+                opacity: 1;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="portalCanvas"></canvas>
+    
+    <div class="hud">
+        <!-- Portal Status Panel -->
+        <div class="panel portal-status">
+            <div class="panel-title">🌌 PORTAL STATUS</div>
+            <div class="metric-group">
+                <div class="metric-label">DIMENSIONAL LAYER</div>
+                <div class="metric-value" id="dimensionalLayer">ATMOSPHERIC</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">RESONANCE STATE</div>
+                <div class="metric-value" id="resonanceState">STABLE</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">ENERGY MATRIX</div>
+                <div class="metric-value" id="energyMatrix">SOLAR ALIGNMENT</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">PORTAL INTEGRITY</div>
+                <div class="metric-value" id="portalIntegrity">100%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="integrityBar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ascension Metrics Panel -->
+        <div class="panel ascension-metrics">
+            <div class="panel-title">✨ ASCENSION PROTOCOL</div>
+            <div class="metric-group">
+                <div class="metric-label">CURRENT PHASE</div>
+                <div class="metric-value" id="currentPhase">INITIALIZATION</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">ASCENSION PROGRESS</div>
+                <div class="metric-value" id="ascensionProgress">0%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">TIME ELAPSED</div>
+                <div class="metric-value" id="timeElapsed">00:00</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">PLASMA CHARGE</div>
+                <div class="metric-value" id="plasmaCharge">0%</div>
+            </div>
+        </div>
+
+        <!-- Dimensional Readings Panel -->
+        <div class="panel dimensional-readings">
+            <div class="panel-title">🔮 DIMENSIONAL READINGS</div>
+            <div class="frequency-display" id="frequencyDisplay">7.83 Hz</div>
+            <div class="metric-group">
+                <div class="metric-label">SPATIAL DISTORTION</div>
+                <div class="metric-value" id="spatialDistortion">0.0%</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">TEMPORAL VARIANCE</div>
+                <div class="metric-value" id="temporalVariance">NOMINAL</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">QUANTUM COHERENCE</div>
+                <div class="metric-value" id="quantumCoherence">LOCKED</div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">REALITY ANCHOR</div>
+                <div class="metric-value" id="realityAnchor">STABLE</div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="controls">
+            <button class="btn" id="initiateBtn" onclick="toggleAscension()">INITIATE ASCENSION</button>
+            <button class="btn" onclick="calibrateFrequency()">CALIBRATE FREQUENCY</button>
+            <button class="btn" onclick="dimensionalShift()">DIMENSIONAL SHIFT</button>
+            <button class="btn danger" onclick="emergencyReturn()">⚠️ EMERGENCY RETURN</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('portalCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height, centerX, centerY;
+        let animationTime = 0;
+        let ascensionActive = false;
+        let ascensionProgress = 0;
+        let currentPhase = 0;
+        let startTime = null;
+        let baseFrequency = 7.83;
+        let plasmaIntensity = 0;
+        let portalStability = 1.0;
+        let spatialDistortionLevel = 0;
+
+        // Ascension phases
+        const phases = [
+            { name: "INITIALIZATION", threshold: 0, layer: "ATMOSPHERIC" },
+            { name: "FREQUENCY LOCK", threshold: 0.2, layer: "IONOSPHERIC" },
+            { name: "DIMENSIONAL BREACH", threshold: 0.5, layer: "ASTRAL PLANE" },
+            { name: "PORTAL MANIFESTATION", threshold: 0.8, layer: "COSMIC THRESHOLD" },
+            { name: "TRANSCENDENCE", threshold: 1.0, layer: "INFINITE REALM" }
+        ];
+
+        // Initialize canvas
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Starfield background
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 2 + 0.5,
+                brightness: Math.random(),
+                twinkle: Math.random() * Math.PI * 2
+            });
+        }
+
+        function drawStars() {
+            stars.forEach(star => {
+                const alpha = star.brightness * (0.3 + 0.7 * Math.sin(star.twinkle + animationTime * 0.01));
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // Portal visualization
+        function drawPortal() {
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // Portal base structure
+            const portalRadius = 150 + Math.sin(animationTime * 0.05) * 20;
+            
+            // Outer energy ring
+            const gradient1 = ctx.createRadialGradient(0, 0, portalRadius * 0.5, 0, 0, portalRadius);
+            gradient1.addColorStop(0, `rgba(0, 255, 255, ${0.1 + plasmaIntensity * 0.3})`);
+            gradient1.addColorStop(0.7, `rgba(255, 0, 255, ${0.3 + plasmaIntensity * 0.4})`);
+            gradient1.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = gradient1;
+            ctx.beginPath();
+            ctx.arc(0, 0, portalRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Inner portal core
+            if (currentPhase >= 2) {
+                const coreGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, portalRadius * 0.6);
+                coreGradient.addColorStop(0, `rgba(255, 255, 255, ${plasmaIntensity})`);
+                coreGradient.addColorStop(0.3, `rgba(0, 255, 255, ${plasmaIntensity * 0.8})`);
+                coreGradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = coreGradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, portalRadius * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Resonance rings
+            for (let i = 0; i < 5; i++) {
+                const ringRadius = portalRadius * (0.3 + i * 0.15);
+                const ringAlpha = (0.5 + 0.5 * Math.sin(animationTime * 0.03 + i * 0.5)) * (0.3 + plasmaIntensity * 0.7);
+                
+                ctx.strokeStyle = `rgba(0, 255, 255, ${ringAlpha})`;
+                ctx.lineWidth = 2 + plasmaIntensity * 3;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+
+            // Energy particles
+            if (ascensionActive) {
+                for (let i = 0; i < 30; i++) {
+                    const angle = (animationTime * 0.02 + i * 0.2) % (Math.PI * 2);
+                    const radius = portalRadius * (0.8 + 0.4 * Math.sin(animationTime * 0.01 + i));
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    
+                    const particleAlpha = 0.5 + 0.5 * Math.sin(animationTime * 0.05 + i);
+                    ctx.fillStyle = `rgba(255, 0, 255, ${particleAlpha * plasmaIntensity})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2 + plasmaIntensity * 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Spatial distortion effect
+            if (spatialDistortionLevel > 0) {
+                for (let i = 0; i < 3; i++) {
+                    const distortionRadius = (animationTime * 2 + i * 50) % 300;
+                    const distortionAlpha = (1 - distortionRadius / 300) * spatialDistortionLevel;
+                    
+                    ctx.strokeStyle = `rgba(255, 255, 0, ${distortionAlpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, distortionRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+
+            ctx.restore();
+        }
+
+        // Update ascension state
+        function updateAscension() {
+            if (!ascensionActive) return;
+
+            if (!startTime) startTime = Date.now();
+            
+            const elapsed = (Date.now() - startTime) / 1000;
+            ascensionProgress = Math.min(elapsed / 120, 1); // 2 minute ascension
+
+            // Update phase
+            let newPhase = 0;
+            for (let i = phases.length - 1; i >= 0; i--) {
+                if (ascensionProgress >= phases[i].threshold) {
+                    newPhase = i;
+                    break;
+                }
+            }
+
+            if (newPhase !== currentPhase) {
+                currentPhase = newPhase;
+                triggerDimensionalShift();
+            }
+
+            // Update parameters based on progress
+            baseFrequency = 7.83 + (ascensionProgress * 50);
+            plasmaIntensity = Math.min(ascensionProgress * 1.5, 1);
+            portalStability = Math.max(0.3, 1 - (ascensionProgress * 0.4) + Math.sin(animationTime * 0.1) * 0.2);
+            spatialDistortionLevel = Math.min(ascensionProgress * 2, 1) * Math.sin(animationTime * 0.05);
+
+            // Complete ascension
+            if (ascensionProgress >= 1) {
+                ascensionActive = false;
+                document.getElementById('initiateBtn').textContent = 'ASCENSION COMPLETE';
+                document.getElementById('initiateBtn').classList.add('active');
+            }
+        }
+
+        // Update UI elements
+        function updateUI() {
+            const phase = phases[currentPhase];
+            
+            document.getElementById('dimensionalLayer').textContent = phase.layer;
+            document.getElementById('currentPhase').textContent = phase.name;
+            document.getElementById('ascensionProgress').textContent = Math.round(ascensionProgress * 100) + '%';
+            document.getElementById('progressBar').style.width = (ascensionProgress * 100) + '%';
+            
+            // Frequency display with color coding
+            const freqDisplay = document.getElementById('frequencyDisplay');
+            freqDisplay.textContent = baseFrequency.toFixed(2) + ' Hz';
+            if (baseFrequency > 30) freqDisplay.className = 'frequency-display critical';
+            else if (baseFrequency > 20) freqDisplay.className = 'frequency-display warning';
+            else freqDisplay.className = 'frequency-display';
+
+            // Portal integrity
+            const integrity = Math.round(portalStability * 100);
+            document.getElementById('portalIntegrity').textContent = integrity + '%';
+            document.getElementById('integrityBar').style.width = integrity + '%';
+            
+            // Other metrics
+            document.getElementById('plasmaCharge').textContent = Math.round(plasmaIntensity * 100) + '%';
+            document.getElementById('spatialDistortion').textContent = (Math.abs(spatialDistortionLevel) * 100).toFixed(1) + '%';
+            
+            // Status indicators
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timeElapsed').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            // Dynamic status updates
+            if (portalStability < 0.5) {
+                document.getElementById('resonanceState').textContent = 'UNSTABLE';
+                document.getElementById('resonanceState').className = 'metric-value critical';
+            } else if (portalStability < 0.8) {
+                document.getElementById('resonanceState').textContent = 'FLUCTUATING';
+                document.getElementById('resonanceState').className = 'metric-value warning';
+            } else {
+                document.getElementById('resonanceState').textContent = 'STABLE';
+                document.getElementById('resonanceState').className = 'metric-value';
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            animationTime++;
+            
+            ctx.fillStyle = `rgba(10, 10, 46, ${0.1 + currentPhase * 0.02})`;
+            ctx.fillRect(0, 0, width, height);
+            
+            drawStars();
+            drawPortal();
+            updateAscension();
+            updateUI();
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Control functions
+        function toggleAscension() {
+            if (ascensionProgress >= 1) return;
+            
+            ascensionActive = !ascensionActive;
+            const btn = document.getElementById('initiateBtn');
+            
+            if (ascensionActive) {
+                btn.textContent = 'HALT ASCENSION';
+                btn.classList.add('active');
+                if (!startTime) startTime = Date.now();
+            } else {
+                btn.textContent = 'RESUME ASCENSION';
+                btn.classList.remove('active');
+            }
+        }
+
+        function calibrateFrequency() {
+            baseFrequency += (Math.random() - 0.5) * 2;
+            baseFrequency = Math.max(7.83, Math.min(baseFrequency, 100));
+            triggerEnergyWave();
+        }
+
+        function dimensionalShift() {
+            if (currentPhase < phases.length - 1) {
+                currentPhase++;
+                ascensionProgress = phases[currentPhase].threshold;
+                triggerDimensionalShift();
+            }
+        }
+
+        function emergencyReturn() {
+            ascensionActive = false;
+            ascensionProgress = 0;
+            currentPhase = 0;
+            startTime = null;
+            baseFrequency = 7.83;
+            plasmaIntensity = 0;
+            portalStability = 1.0;
+            spatialDistortionLevel = 0;
+            
+            document.getElementById('initiateBtn').textContent = 'INITIATE ASCENSION';
+            document.getElementById('initiateBtn').classList.remove('active');
+            
+            document.body.classList.add('dimensional-flash');
+            setTimeout(() => document.body.classList.remove('dimensional-flash'), 800);
+        }
+
+        function triggerDimensionalShift() {
+            document.body.classList.add('dimensional-flash');
+            setTimeout(() => document.body.classList.remove('dimensional-flash'), 800);
+            triggerEnergyWave();
+        }
+
+        function triggerEnergyWave() {
+            const wave = document.createElement('div');
+            wave.className = 'energy-wave';
+            wave.style.left = centerX + 'px';
+            wave.style.top = centerY + 'px';
+            wave.style.marginLeft = '-10px';
+            wave.style.marginTop = '-10px';
+            document.body.appendChild(wave);
+            
+            setTimeout(() => wave.remove(), 3000);
+        }
+
+        // Start the experience
+        animate();
+    </script>
+</body>
+</html>
