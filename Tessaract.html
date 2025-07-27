@@ -715,10 +715,48 @@
 
         // Canvas event listeners for tooltips
         canvas.addEventListener('mousemove', function(e) {
+            // The old tooltip logic was incomplete. Replace it with robust detection for when
+            // the user hovers over key features on the canvas. We calculate distances to the
+            // centre (Kolob), the sun, and, if enabled, the hypercube. Depending on where
+            // the pointer lands we display the appropriate scripture (Kolob, Enoch, Jerusalem).
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
-            // Check if hovering over Kolob
-            const distToKolob = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-            if
+            let tooltipShown = false;
+            // Check proximity to Kolob (central star)
+            const distToKolob = Math.hypot(x - centerX, y - centerY);
+            if (distToKolob < 40) {
+                showTooltip(e.clientX + 15, e.clientY + 15, 'kolob');
+                tooltipShown = true;
+            } else {
+                // Check proximity to the sun
+                const sunDistance = 120;
+                const sunX = centerX + Math.cos(sunRotation) * sunDistance;
+                const sunY = centerY + Math.sin(sunRotation) * sunDistance;
+                const distToSun = Math.hypot(x - sunX, y - sunY);
+                if (distToSun < 30) {
+                    showTooltip(e.clientX + 15, e.clientY + 15, 'enoch');
+                    tooltipShown = true;
+                } else {
+                    // If hypercube mode is active, approximate a hit box around the centre
+                    if (showHypercube) {
+                        const hypercubeSize = 150;
+                        if (Math.abs(x - centerX) < hypercubeSize && Math.abs(y - centerY) < hypercubeSize) {
+                            showTooltip(e.clientX + 15, e.clientY + 15, 'jerusalem');
+                            tooltipShown = true;
+                        }
+                    }
+                }
+            }
+            if (!tooltipShown) {
+                hideTooltip();
+            }
+        });
+        // Hide tooltip when leaving the canvas entirely
+        canvas.addEventListener('mouseout', hideTooltip);
+
+        // Start the animation loop
+        animate();
+    </script>
+</body>
+</html>
