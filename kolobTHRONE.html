@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Kolob Resonance Viewer - Abrahamic Celestial Interface</title>
+<style>
+html, body {
+margin: 0;
+height: 100%;
+background: radial-gradient(circle at center, #001122 0%, #000818 70%, #000000 100%);
+color: #e0e0e0;
+overflow: hidden;
+font-family: 'Courier New', monospace;
+}
+canvas {
+display: block;
+filter: contrast(1.2) brightness(1.1);
+}
+.ui-panel {
+position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 12px;
+z-index: 2;
+align-items: center;
+}
+.btn {
+padding: 10px 16px;
+font-size: 11px;
+border-radius: 20px;
+border: 1px solid #ffd700;
+background: rgba(255, 215, 0, 0.1);
+color: #ffd700;
+cursor: pointer;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+text-transform: uppercase;
+font-weight: bold;
+}
+.btn:hover {
+background: rgba(255, 215, 0, 0.2);
+box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+.btn:active {
+transform: translateY(1px) scale(0.98);
+}
+.speed-label {
+display: inline-block;
+min-width: 60px;
+text-align: center;
+color: #ffd700;
+line-height: 2.5;
+font-weight: bold;
+text-shadow: 0 0 5px #ffd700;
+}
+input[type=range] {
+accent-color: #ffd700;
+width: 120px;
+}
+#legend {
+position: absolute;
+top: 20px;
+right: 20px;
+z-index: 3;
+background: rgba(0, 0, 0, 0.9);
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #ffd700;
+box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+font-size: 12px;
+line-height: 1.8;
+color: #ffd700;
+font-family: 'Courier New', monospace;
+}
+#legend span {
+display: block;
+margin: 4px 0;
+}
+.mode-panel {
+position: absolute;
+top: 20px;
+left: 20px;
+z-index: 3;
+background: rgba(0, 0, 0, 0.9);
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #ffd700;
+box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+color: #ffd700;
+font-family: 'Courier New', monospace;
+font-size: 11px;
+}
+.mode-panel select {
+background: rgba(0, 20, 30, 0.9);
+color: #ffd700;
+border: 1px solid #cc9900;
+border-radius: 6px;
+padding: 6px;
+margin-top: 8px;
+font-family: 'Courier New', monospace;
+}
+.resonance-panel {
+position: absolute;
+bottom: 20px;
+right: 20px;
+z-index: 3;
+background: rgba(0, 0, 0, 0.9);
+padding: 12px;
+border-radius: 10px;
+border: 1px solid #ff6b6b;
+box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+color: #ff6b6b;
+font-family: 'Courier New', monospace;
+font-size: 10px;
+text-align: center;
+}
+.throne-panel {
+position: absolute;
+top: 50%;
+left: 20px;
+transform: translateY(-50%);
+z-index: 3;
+background: rgba(0, 0, 0, 0.9);
+padding: 12px;
+border-radius: 10px;
+border: 1px solid #9966ff;
+box-shadow: 0 0 15px rgba(153, 102, 255, 0.3);
+color: #9966ff;
+font-family: 'Courier New', monospace;
+font-size: 9px;
+text-align: center;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<!-- Kolob Resonance Mode Selector -->
+<div class="mode-panel">
+<div>👑 KOLOB RESONANCE MODE</div>
+<select id="modeSelect">
+<option value="throne">🏛 THRONE DOMINION</option>
+<option value="sabbath">⏱ SABBATH CYCLE (Kolob Day)</option>
+<option value="covenant">✨ COVENANT RESONANCE</option>
+<option value="creation">🌌 CREATION HARMONY</option>
+<option value="eternal">♾️ ETERNAL ROUND</option>
+</select>
+<div id="propagationInfo" style="margin-top: 8px; font-size: 9px; color: #ccaa77;"></div>
+<div style="margin-top: 12px; border-top: 1px solid #ffd700; padding-top: 8px;">
+<div>📜 ABRAHAMIC COSMOLOGY</div>
+<select id="cosmologySelect">
+<option value="kolob">👑 KOLOB CENTERED (Throne)</option>
+<option value="firmament">🏛 FIRMAMENT DOME</option>
+</select>
+</div>
+</div>
+
+<!-- Controls -->
+<div class="ui-panel">
+<button class="btn" id="pauseBtn">⏸ PAUSE</button>
+<span class="speed-label" id="speedVal">1.0×</span>
+<input id="speedSl" type="range" min="0.1" max="5" step="0.1" value="1">
+<button class="btn" id="trailBtn">✨ PATHS</button>
+<button class="btn" id="waveBtn">🌊 RESONANCE</button>
+<button class="btn" id="nodesBtn">⚡ THRONES</button>
+</div>
+
+<!-- Abrahamic Luminary Legend -->
+<div id="legend">
+<div style="color:#9966ff; font-weight: bold; font-size: 14px;">👑 KOLOB — <span id="kolobCycles">0</span></div>
+<div style="color:#ffd700; font-weight: bold;">☉ SHINEHAH — <span id="shineahCnt">0</span></div>
+<div style="color:#e6e6fa;">☾ OLEA — <span id="oleaCnt">0</span> | <span id="lunarPhase">●</span></div>
+<div style="color:#66ccff;">✦ KOKAUBEAM — <span id="kokaubeamCnt">Fixed Dome</span></div>
+<div style="color:#ffaa44;">♄ KOKOB — <span id="kokobCnt">0</span></div>
+<div style="color:#ff6b4a;">♂ KAIA — <span id="kaiaCnt">0</span></div>
+<div style="margin-top: 12px; font-size: 10px; color: #aaa; border-top: 1px solid #444; padding-top: 8px;">
+<span id="kolobTime">Kolob Time: Day 0</span><br>
+<span id="synodicInfo">Shinehah-Olea: 0 days</span>
+</div>
+</div>
+
+<!-- Kolob Throne Monitor -->
+<div class="throne-panel">
+<div>KOLOB THRONE</div>
+<div id="kolobIntensity" style="font-size: 12px; font-weight: bold; color: #9966ff;">ETERNAL</div>
+<div style="font-size: 8px; margin-top: 4px;">GOVERNING TIME</div>
+</div>
+
+<!-- Resonance Monitor -->
+<div class="resonance-panel">
+<div>CREATION RESONANCE</div>
+<div id="resonanceLevel" style="font-size: 14px; font-weight: bold;">7.83 Hz</div>
+<div id="harmonicDisplay" style="font-size: 8px; margin-top: 4px;">KINGDOM SYNC</div>
+</div>
+
+<script>
+/******************** ENHANCED SETUP *************************/
+const cvs = document.getElementById('canvas');
+const ctx = cvs.getContext('2d');
+let W = cvs.width = innerWidth;
+let H = cvs.height = innerHeight;
+const CENTER = { x: W / 2, y: H / 2 };
+const TAU = Math.PI * 2;
+const DEG = Math.PI / 180;
+let R = Math.min(W, H) / 2.2;
+
+addEventListener('resize', () => {
+W = cvs.width = innerWidth;
+H = cvs.height = innerHeight;
+CENTER.x = W / 2;
+CENTER.y = H / 2;
+R = Math.min(W, H) / 2.2;
+});
+
+/******************** ENHANCED UI STATE ***************************/
+let running = true;
+let showTrails = true;
+let showWaves = true;
+let showNodes = true;
+let speed = 1;
+let time = 0;
+let propagationMode = 'throne';
+let cosmologyMode = 'kolob';
+
+// UI Event Handlers
+document.getElementById('pauseBtn').onclick = () => {
+running = !running;
+document.getElementById('pauseBtn').textContent = running ? '⏸ PAUSE' : '▶ PLAY';
+};
+
+document.getElementById('speedSl').oninput = e => {
+speed = +e.target.value;
+document.getElementById('speedVal').textContent = speed.toFixed(1) + '×';
+};
+
+document.getElementById('trailBtn').onclick = () => {
+showTrails = !showTrails;
+document.getElementById('trailBtn').textContent = showTrails ? '✨ PATHS' : '💤 NO PATHS';
+if (!showTrails) {
+luminaries.forEach(l => l.trail = []);
+}
+};
+
+document.getElementById('waveBtn').onclick = () => {
+showWaves = !showWaves;
+document.getElementById('waveBtn').textContent = showWaves ? '🌊 RESONANCE' : '🚫 NO WAVES';
+};
+
+document.getElementById('nodesBtn').onclick = () => {
+showNodes = !showNodes;
+document.getElementById('nodesBtn').textContent = showNodes ? '⚡ THRONES' : '🚫 NO THRONES';
+};
+
+document.getElementById('modeSelect').onchange = e => {
+propagationMode = e.target.value;
+updatePropagationInfo();
+};
+
+document.getElementById('cosmologySelect').onchange = e => {
+cosmologyMode = e.target.value;
+// Reset trails when switching cosmology
+luminaries.forEach(l => l.trail = []);
+};
+
+function updatePropagationInfo() {
+const info = document.getElementById('propagationInfo');
+const modes = {
+throne: 'Kolob Governs All<br>Eternal Dominion Pulse',
+sabbath: 'One Kolob Day = 1000 Years<br>Sabbath Rest Rhythm',
+covenant: 'Abraham\'s Promise<br>Covenant Frequency Lock',
+creation: 'Seven Creative Periods<br>Genesis Harmonic',
+eternal: 'Eternal Round Cycles<br>No Beginning/End'
+};
+info.innerHTML = modes[propagationMode] || '';
+}
+updatePropagationInfo();
+
+/******************** ABRAHAMIC LUMINARY PATHS *************************/
+function kolobPath(t) {
+// Kolob as the slow, eternal governing star - center throne
+const kolobRotation = t * 0.001; // Very slow, governing rotation
+const throneRadius = R * 0.15; // Close to center, throne position
+return {
+x: CENTER.x + throneRadius * Math.cos(kolobRotation),
+y: CENTER.y + throneRadius * Math.sin(kolobRotation),
+angle: kolobRotation
+};
+}
+
+function luminaryPath(
+name,
+kolobFactor,
+distance,
+speed,
+oscillation = 0,
+phase = 0
+) {
+return t => {
+const kolob = kolobPath(t);
+const kolobTime = kolob.angle;
+
+// All luminaries governed by Kolob's time
+let angle = kolobTime * kolobFactor * speed + phase;
+let r = R * distance;
+
+// Add oscillations for some bodies
+if (oscillation > 0) {
+r += R * oscillation * Math.sin(t * 0.02 + phase);
+}
+
+return {
+x: CENTER.x + r * Math.cos(angle),
+y: CENTER.y + r * Math.sin(angle)
+};
+};
+}
+
+const luminaries = [
+{
+n: 'Kolob',
+aname: 'Kolob',
+c: '#9966ff',
+sz: 12,
+glow: true,
+glowSize: 25,
+throne: true,
+path: kolobPath,
+trail: [],
+max: 100
+},
+{
+n: 'Shinehah',
+aname: 'Shinehah (Sun)',
+c: '#ffd700',
+sz: 10,
+glow: true,
+glowSize: 20,
+path: luminaryPath('Shinehah', 365, 0.6, 1, 0.02, 0),
+trail: [],
+max: 400
+},
+{
+n: 'Olea',
+aname: 'Olea (Moon)',
+c: '#e6e6fa',
+sz: 6,
+glow: true,
+glowSize: 12,
+path: luminaryPath('Olea', 29.5, 0.45, 13, 0.05, Math.PI/3),
+trail: [],
+max: 300
+},
+{
+n: 'Kokob',
+aname: 'Kokob (Saturn)',
+c: '#ffaa44',
+sz: 7,
+glow: true,
+glowSize: 15,
+rings: true,
+path: luminaryPath('Kokob', 29.5 * 365, 0.85, 0.034, 0.01, Math.PI/6),
+trail: [],
+max: 200
+},
+{
+n: 'Kaia',
+aname: 'Kaia (Mars)',
+c: '#ff6b4a',
+sz: 5,
+glow: true,
+glowSize: 10,
+path: luminaryPath('Kaia', 687, 0.75, 0.53, 0.03, Math.PI/5),
+trail: [],
+max: 250
+},
+{
+n: 'Kokaubeam',
+aname: 'Kokaubeam (Stars)',
+c: '#66ccff',
+sz: 1.5,
+trail: false,
+path: t => {
+// Fixed starfield representing the organized heavenly bodies
+const stars = [];
+const numStars = 144; // 12 x 12 = perfect number
+const layers = 3;
+
+for (let layer = 0; layer < layers; layer++) {
+const layerRadius = R * (0.92 + layer * 0.03);
+const starsInLayer = 48 * (layer + 1);
+for (let i = 0; i < starsInLayer; i++) {
+const ang = (i * TAU / starsInLayer) + t * 0.0001; // Very slow rotation
+const brightness = 0.4 + 0.6 * Math.sin(i * 0.2 + t * 0.01);
+stars.push({
+x: CENTER.x + layerRadius * Math.cos(ang),
+y: CENTER.y + layerRadius * Math.sin(ang),
+brightness: brightness,
+layer: layer
+});
+}
+}
+return stars;
+}
+}
+];
+
+/******************** ABRAHAMIC GRID *****************/
+const abrahamicSymbols = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+const zodiac = [];
+for (let i = 0; i < 12; i++) {
+const ang = TAU * i / 12 + Math.PI / 2;
+zodiac.push({
+x: CENTER.x + R * 1.05 * Math.cos(ang),
+y: CENTER.y + R * 1.05 * Math.sin(ang),
+label: abrahamicSymbols[i]
+});
+}
+
+/******************** COUNTERS *********************/
+const counters = { 
+Kolob: 0, Shinehah: 0, Olea: 0, Kokob: 0, Kaia: 0, Kokaubeam: 0 
+};
+const prevAngles = { 
+Kolob: 0, Shinehah: 0, Olea: 0, Kokob: 0, Kaia: 0 
+};
+const outIds = { 
+Kolob: 'kolobCycles', Shinehah: 'shineahCnt', Olea: 'oleaCnt', 
+Kokob: 'kokobCnt', Kaia: 'kaiaCnt', Kokaubeam: 'kokaubeamCnt'
+};
+
+function getAngle(p) {
+return (Math.atan2(p.y - CENTER.y, p.x - CENTER.x) + TAU) % TAU;
+}
+
+function crossedThrone(name, ang) {
+const THRONE = Math.PI / 2; // Top position
+const crossed = (prevAngles[name] < THRONE && ang >= THRONE);
+prevAngles[name] = ang;
+return crossed;
+}
+
+function bump(name) {
+counters[name]++;
+if (outIds[name]) {
+document.getElementById(outIds[name]).textContent = counters[name];
+}
+}
+
+/******************** ABRAHAMIC GRID RENDERING *************************/
+function drawGrid() {
+// Throne circles - representing dominion levels
+ctx.strokeStyle = 'rgba(153, 102, 255, 0.4)'; // Purple for Kolob
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.2, 0, TAU);
+ctx.stroke();
+
+// Governing circles
+ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)'; // Gold for governing spheres
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.5, 0, TAU);
+ctx.stroke();
+
+// Creation boundaries
+ctx.strokeStyle = 'rgba(255, 215, 0, 0.15)';
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.7, 0, TAU);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.9, 0, TAU);
+ctx.stroke();
+
+// Dominion meridians - 12 tribes/gates
+ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+ctx.lineWidth = 1;
+for (let j = 0; j < 12; j++) {
+const ang = j * TAU / 12;
+ctx.beginPath();
+ctx.moveTo(CENTER.x + R * 0.2 * Math.cos(ang), CENTER.y + R * 0.2 * Math.sin(ang));
+ctx.lineTo(CENTER.x + R * Math.cos(ang), CENTER.y + R * Math.sin(ang));
+ctx.stroke();
+}
+
+// Abrahamic symbols
+zodiac.forEach((z, i) => {
+ctx.fillStyle = '#ffd700';
+ctx.font = 'bold 16px Arial';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.shadowBlur = 3;
+ctx.shadowColor = '#ffd700';
+ctx.fillText(z.label, z.x, z.y);
+ctx.shadowBlur = 0;
+});
+}
+
+/******************** KOLOB RESONANCE WAVES *************************/
+function drawKolobResonance() {
+if (!showWaves) return;
+
+let wavePropSpeed = R / 120;
+let harmonics = [7.83];
+
+switch (propagationMode) {
+case 'throne':
+wavePropSpeed = R / 100;
+harmonics = [7.83];
+break;
+case 'sabbath':
+wavePropSpeed = R / 1000; // Slow sabbath rhythm
+harmonics = [1.0]; // One cycle = one thousand years
+break;
+case 'covenant':
+wavePropSpeed = R / 80;
+harmonics = [7.83, 14.3, 20.8]; // Covenant harmonics
+break;
+case 'creation':
+wavePropSpeed = R / 70;
+harmonics = [7.83, 11.1, 14.3, 17.8, 21.3, 24.8, 28.3]; // Seven creative harmonics
+break;
+case 'eternal':
+wavePropSpeed = R / 200;
+harmonics = [3.14159]; // Pi frequency for eternal rounds
+break;
+}
+
+// Update displays
+const resonanceLevel = document.getElementById('resonanceLevel');
+const harmonicDisplay = document.getElementById('harmonicDisplay');
+const kolobIntensity = document.getElementById('kolobIntensity');
+
+const intensity = 7.83 + 1.0 * Math.sin(time * 0.05);
+resonanceLevel.textContent = intensity.toFixed(2) + ' Hz';
+harmonicDisplay.textContent = intensity > 8.5 ? 'CREATION PULSE' : 'KINGDOM SYNC';
+kolobIntensity.textContent = Math.sin(time * 0.001) > 0 ? 'GOVERNING' : 'RESTING';
+
+// Draw Kolob resonance patterns
+harmonics.forEach((freq, freqIndex) => {
+const waveProgress = (time * speed * freq * 0.008) % (R / wavePropSpeed);
+const numWavefronts = 7; // Seven creative periods
+const waveSpacing = R / numWavefronts;
+
+const hue = 45 + (freqIndex * 30); // Gold-based spectrum
+const color = `hsl(${hue}, 80%, 60%)`;
+
+ctx.globalAlpha = 0.4 / harmonics.length;
+
+// Outbound creation waves from Kolob throne
+for (let i = 0; i < numWavefronts; i++) {
+let r = (waveProgress * wavePropSpeed + i * waveSpacing) % R;
+if (r > R * 0.2) { // Start from throne radius
+ctx.strokeStyle = color;
+ctx.lineWidth = 2 + 4 * (1 - r / R);
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, r, 0, TAU);
+ctx.stroke();
+}
+}
+
+// Firmament reflection mode
+if (cosmologyMode === 'firmament') {
+ctx.strokeStyle = `rgba(102, 204, 255, 0.3)`; // Firmament blue
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, R * 0.95, 0, TAU);
+ctx.stroke();
+}
+});
+
+ctx.globalAlpha = 1.0;
+
+// Throne nodes - points of divine authority
+if (showNodes && propagationMode !== 'sabbath') {
+const numThrones = 7; // Seven dominions
+const throneSpacing = (R - R * 0.2) / numThrones;
+let nodalFreq = 0.03;
+
+for (let i = 1; i <= numThrones; i++) {
+const throneRadius = R * 0.2 + i * throneSpacing;
+const pulseStrength = 0.3 + 0.7 * Math.sin(time * speed * nodalFreq + i * Math.PI / numThrones);
+
+ctx.strokeStyle = `rgba(153, 102, 255, ${pulseStrength * 0.9})`;
+ctx.lineWidth = 1 + pulseStrength * 3;
+ctx.shadowBlur = pulseStrength * 20;
+ctx.shadowColor = `rgba(153, 102, 255, ${pulseStrength * 0.7})`;
+ctx.beginPath();
+ctx.arc(CENTER.x, CENTER.y, throneRadius, 0, TAU);
+ctx.stroke();
+ctx.shadowBlur = 0;
+}
+}
+}
+
+/******************** MAIN RENDERING LOOP *************************/
+function draw() {
+requestAnimationFrame(draw);
+if (running) time += speed;
+
+// Background with divine gradient
+const bgIntensity = 0.05 + 0.03 * Math.sin(time * 0.01);
+ctx.fillStyle = `rgba(0, 8, 24, ${bgIntensity})`;
+ctx.fillRect(0, 0, W, H);
+
+drawGrid();
+drawKolobResonance();
+
+// Update Kolob time display
+const kolobCycles = Math.floor(time * 0.001);
+document.getElementById('kolobTime').textContent = `Kolob Time: Day ${kolobCycles}`;
+
+// Render luminaries
+luminaries.forEach(body => {
+if (body.n === 'Kokaubeam') {
+const stars = body.path(time);
+stars.forEach((star, i) => {
+ctx.globalAlpha = star.brightness * (0.7 + 0.3 * star.layer / 3);
+ctx.fillStyle = body.c;
+const starSize = body.sz * (1 + star.layer * 0.3);
+ctx.fillRect(star.x - starSize/2, star.y - starSize/2, starSize, starSize);
+});
+ctx.globalAlpha = 1.0;
+return;
+}
+
+const pos = body.path(time);
+const ang = getAngle(pos);
+if (crossedThrone(body.n, ang)) bump(body.n);
+
+// Update Shinehah-Olea synodic info
+if (body.n === 'Olea') {
+const shineahPos = luminaries[1].path(time);
+const shineahAngle = getAngle(shineahPos);
+const oleaAngle = ang;
+const phaseDiff = (oleaAngle - shineahAngle + TAU) % TAU;
+const synodicDay = (phaseDiff / TAU) * 29.5;
+
+const phaseSymbols = ['●', '◐', '○', '◑'];
+const phaseIndex = Math.floor((phaseDiff / TAU) * 4) % 4;
+document.getElementById('lunarPhase').textContent = phaseSymbols[phaseIndex];
+document.getElementById('synodicInfo').textContent = `Shinehah-Olea: ${synodicDay.toFixed(1)} days`;
+}
+
+// Trail rendering
+if (showTrails && body.trail !== false) {
+body.trail.push(pos);
+if (body.trail.length > body.max) body.trail.shift();
+
+ctx.lineWidth = body.n === 'Kolob' ? 3 : 2;
+for (let i = 0; i < body.trail.length - 1; i++) {
+const p1 = body.trail[i];
+const p2 = body.trail[i + 1];
+const alpha = (i / body.trail.length) * 0.8 + 0.2;
+ctx.beginPath();
+ctx.moveTo(p1.x, p1.y);
+ctx.lineTo(p2.x, p2.y);
+ctx.strokeStyle = body.c + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+ctx.stroke();
+}
+}
+
+// Enhanced luminary rendering
+ctx.beginPath();
+ctx.fillStyle = body.c;
+if (body.glow) {
+ctx.shadowBlur = body.glowSize;
+ctx.shadowColor = body.c;
+}
+
+// Special throne rendering for Kolob
+if (body.throne) {
+ctx.globalAlpha = 0.8;
+ctx.strokeStyle = body.c;
+ctx.lineWidth = 4;
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 2, 0, TAU);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 3, 0, TAU);
+ctx.stroke();
+ctx.globalAlpha = 1.0;
+}
+
+// Rings for Kokob (Saturn)
+if (body.rings) {
+ctx.globalAlpha = 0.6;
+ctx.strokeStyle = body.c;
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 1.8, 0, TAU);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(pos.x, pos.y, body.sz * 2.3, 0, TAU);
+ctx.stroke();
+ctx.globalAlpha = 1.0;
+}
+
+ctx.arc(pos.x, pos.y, body.sz, 0, TAU);
+ctx.fill();
+ctx.shadowBlur = 0;
+});
+}
+
+draw();
+</script>
+</body>
+</html>
