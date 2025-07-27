@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan Neural Network - Planetary Consciousness</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #0a0a2e, #16213e, #0f3460);
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            color: #00ffaa;
+        }
+
+        #canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid #00ffaa;
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            background: linear-gradient(45deg, #1a4480, #2d5aa0);
+            border: 1px solid #00ffaa;
+            color: #00ffaa;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            box-shadow: 0 0 15px #00ffaa;
+            transform: scale(1.05);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #00aa55, #00ff77);
+            color: #001122;
+            font-weight: bold;
+        }
+
+        .info-display {
+            margin-top: 15px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .neural-stats {
+            background: rgba(0, 255, 170, 0.1);
+            border-left: 3px solid #00ffaa;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .consciousness-meter {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .consciousness-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0080, #00ffaa, #80ff00);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.5);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid #00ffaa;
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            font-size: 11px;
+            max-width: 250px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="control-panel">
+        <h3>🌲 TITAN NEURAL NETWORK 🧠</h3>
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="neural">🧠 NEURAL NET</button>
+            <button class="mode-btn" data-mode="botanical">🌲 BOTANICAL</button>
+            <button class="mode-btn" data-mode="hybrid">⚡ HYBRID</button>
+        </div>
+        
+        <div class="neural-stats">
+            <div>Consciousness Level: <span id="consciousness-level">73%</span></div>
+            <div class="consciousness-meter">
+                <div class="consciousness-bar" id="consciousness-bar" style="width: 73%"></div>
+            </div>
+            <div>Resonance: <span id="resonance">57.83 Hz</span></div>
+            <div>Active Synapses: <span id="synapses">2,847</span></div>
+            <div>Neural Pulse Rate: <span id="pulse-rate">28 BPM</span></div>
+        </div>
+        
+        <div class="info-display">
+            <div><strong>Primary Neural Nodes:</strong></div>
+            <div id="node-status"></div>
+        </div>
+    </div>
+
+    <div class="legend">
+        <h4>Neural Classifications</h4>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff6b35;"></div>
+            Devil's Tower - Motor Cortex
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f7931e;"></div>
+            Uluru - Hippocampus Core
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4ecdc4;"></div>
+            Giant's Causeway - Cerebellum
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #45b7d1;"></div>
+            Table Mountain - Frontal Lobe
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #96ceb4;"></div>
+            Mt. Roraima - Pineal Interface
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ffeaa7;"></div>
+            Kolob - Central Coordinator
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Neural Network State
+        let currentMode = 'neural';
+        let consciousnessLevel = 73;
+        let time = 0;
+        let neuralPulses = [];
+        let synapticFirings = [];
+
+        // Neural Node Definitions (Ancient Titan Neural Cores)
+        const neuralNodes = [
+            {
+                name: "Devil's Tower",
+                type: "Motor Cortex",
+                x: 0.2,
+                y: 0.3,
+                color: '#ff6b35',
+                synapticDensity: 85,
+                frequency: 28.3,
+                pulseRadius: 0,
+                lastFiring: 0
+            },
+            {
+                name: "Uluru", 
+                type: "Hippocampus Core",
+                x: 0.7,
+                y: 0.6,
+                color: '#f7931e',
+                synapticDensity: 95, // Highest density - memory core
+                frequency: 32.7,
+                pulseRadius: 0,
+                lastFiring: 0
+            },
+            {
+                name: "Giant's Causeway",
+                type: "Cerebellum",
+                x: 0.15,
+                y: 0.7,
+                color: '#4ecdc4',
+                synapticDensity: 78,
+                frequency: 45.2,
+                pulseRadius: 0,
+                lastFiring: 0
+            },
+            {
+                name: "Table Mountain",
+                type: "Frontal Lobe", 
+                x: 0.6,
+                y: 0.2,
+                color: '#45b7d1',
+                synapticDensity: 82,
+                frequency: 38.9,
+                pulseRadius: 0,
+                lastFiring: 0
+            },
+            {
+                name: "Mount Roraima",
+                type: "Pineal Interface",
+                x: 0.8,
+                y: 0.4,
+                color: '#96ceb4',
+                synapticDensity: 91,
+                frequency: 57.83, // Enhanced Schumann resonance
+                pulseRadius: 0,
+                lastFiring: 0
+            },
+            {
+                name: "Kolob",
+                type: "Central Coordinator",
+                x: 0.5,
+                y: 0.5,
+                color: '#ffeaa7',
+                synapticDensity: 100,
+                frequency: 57.83,
+                pulseRadius: 0,
+                lastFiring: 0,
+                isCenter: true
+            }
+        ];
+
+        // Neural Pulse Class
+        class NeuralPulse {
+            constructor(startNode, endNode) {
+                this.startNode = startNode;
+                this.endNode = endNode;
+                this.progress = 0;
+                this.speed = 0.02 + Math.random() * 0.03;
+                this.intensity = 0.5 + Math.random() * 0.5;
+                this.completed = false;
+            }
+
+            update() {
+                this.progress += this.speed;
+                if (this.progress >= 1) {
+                    this.completed = true;
+                    // Trigger synaptic firing at destination
+                    this.endNode.lastFiring = time;
+                    this.endNode.pulseRadius = 30;
+                }
+            }
+
+            draw() {
+                if (this.completed) return;
+
+                const startX = this.startNode.x * canvas.width;
+                const startY = this.startNode.y * canvas.height;
+                const endX = this.endNode.x * canvas.width;
+                const endY = this.endNode.y * canvas.height;
+
+                const currentX = startX + (endX - startX) * this.progress;
+                const currentY = startY + (endY - startY) * this.progress;
+
+                // Draw pulse
+                ctx.save();
+                ctx.globalAlpha = this.intensity;
+                ctx.fillStyle = '#00ffaa';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#00ffaa';
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Generate Fractal Dendrites (28° branching rule)
+        function drawDendrites(x, y, angle, length, depth, maxDepth) {
+            if (depth > maxDepth) return;
+
+            const endX = x + Math.cos(angle) * length;
+            const endY = y + Math.sin(angle) * length;
+
+            ctx.save();
+            ctx.strokeStyle = `rgba(0, 255, 170, ${0.8 - depth * 0.15})`;
+            ctx.lineWidth = Math.max(1, 3 - depth);
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = '#00ffaa';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            ctx.restore();
+
+            // Recursive branching at 28° intervals
+            if (depth < maxDepth) {
+                const branchAngle1 = angle - (28 * Math.PI / 180);
+                const branchAngle2 = angle + (28 * Math.PI / 180);
+                const newLength = length * 0.7;
+                
+                drawDendrites(endX, endY, branchAngle1, newLength, depth + 1, maxDepth);
+                drawDendrites(endX, endY, branchAngle2, newLength, depth + 1, maxDepth);
+            }
+        }
+
+        // Draw Neural Connections
+        function drawNeuralConnections() {
+            for (let i = 0; i < neuralNodes.length; i++) {
+                for (let j = i + 1; j < neuralNodes.length; j++) {
+                    const node1 = neuralNodes[i];
+                    const node2 = neuralNodes[j];
+                    
+                    const x1 = node1.x * canvas.width;
+                    const y1 = node1.y * canvas.height;
+                    const x2 = node2.x * canvas.width;
+                    const y2 = node2.y * canvas.height;
+
+                    // Calculate connection strength based on distance and synaptic density
+                    const distance = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+                    const maxDistance = Math.sqrt(canvas.width**2 + canvas.height**2);
+                    const proximity = 1 - (distance / maxDistance);
+                    const synapticStrength = (node1.synapticDensity + node2.synapticDensity) / 200;
+                    const connectionStrength = proximity * synapticStrength * (consciousnessLevel / 100);
+
+                    // Draw main connection
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(0, 255, 170, ${connectionStrength * 0.6})`;
+                    ctx.lineWidth = 1 + connectionStrength * 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00ffaa';
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Draw fractal dendrites along connection
+                    if (currentMode === 'neural' || currentMode === 'hybrid') {
+                        const midX = (x1 + x2) / 2;
+                        const midY = (y1 + y2) / 2;
+                        const angle = Math.atan2(y2 - y1, x2 - x1);
+                        
+                        drawDendrites(midX, midY, angle + Math.PI/2, 20 * connectionStrength, 0, 2);
+                        drawDendrites(midX, midY, angle - Math.PI/2, 20 * connectionStrength, 0, 2);
+                    }
+                }
+            }
+        }
+
+        // Draw Neural Nodes
+        function drawNeuralNodes() {
+            neuralNodes.forEach(node => {
+                const x = node.x * canvas.width;
+                const y = node.y * canvas.height;
+                const baseRadius = node.isCenter ? 25 : 15;
+                const pulseEffect = Math.sin(time * node.frequency / 10) * 0.3 + 1;
+                const radius = baseRadius * pulseEffect;
+
+                // Draw node core
+                ctx.save();
+                ctx.fillStyle = node.color;
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = node.color;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // Draw synaptic firing effect
+                if (time - node.lastFiring < 60) {
+                    const firingIntensity = 1 - (time - node.lastFiring) / 60;
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${firingIntensity})`;
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + node.pulseRadius * firingIntensity, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Draw node label
+                ctx.save();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.name, x, y - radius - 10);
+                ctx.fillStyle = node.color;
+                ctx.font = '10px Courier New';
+                ctx.fillText(node.type, x, y - radius + 5);
+                ctx.restore();
+
+                // Draw botanical fractals in hybrid mode
+                if (currentMode === 'botanical' || currentMode === 'hybrid') {
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        drawDendrites(x, y, angle, 40, 0, 3);
+                    }
+                }
+            });
+        }
+
+        // Generate thought waves from Kolob
+        function drawThoughtWaves() {
+            const kolob = neuralNodes.find(n => n.isCenter);
+            const x = kolob.x * canvas.width;
+            const y = kolob.y * canvas.height;
+
+            for (let i = 0; i < 3; i++) {
+                const waveRadius = (time * 2 + i * 40) % 200;
+                const opacity = 1 - (waveRadius / 200);
+                
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 234, 167, ${opacity * 0.5})`;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ffeaa7';
+                ctx.beginPath();
+                ctx.arc(x, y, waveRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        // Update neural pulses
+        function updateNeuralPulses() {
+            // Generate new pulses
+            if (Math.random() < 0.02 * (consciousnessLevel / 100)) {
+                const startNode = neuralNodes[Math.floor(Math.random() * neuralNodes.length)];
+                const endNode = neuralNodes[Math.floor(Math.random() * neuralNodes.length)];
+                if (startNode !== endNode) {
+                    neuralPulses.push(new NeuralPulse(startNode, endNode));
+                }
+            }
+
+            // Update existing pulses
+            neuralPulses = neuralPulses.filter(pulse => {
+                pulse.update();
+                pulse.draw();
+                return !pulse.completed;
+            });
+        }
+
+        // Update UI
+        function updateUI() {
+            // Fluctuate consciousness level
+            consciousnessLevel += (Math.random() - 0.5) * 2;
+            consciousnessLevel = Math.max(30, Math.min(100, consciousnessLevel));
+            
+            document.getElementById('consciousness-level').textContent = Math.round(consciousnessLevel) + '%';
+            document.getElementById('consciousness-bar').style.width = consciousnessLevel + '%';
+            
+            const resonance = 57.83 + (Math.sin(time * 0.1) * 0.5);
+            document.getElementById('resonance').textContent = resonance.toFixed(2) + ' Hz';
+            
+            const activeSynapses = Math.floor(2000 + consciousnessLevel * 20 + Math.sin(time * 0.2) * 500);
+            document.getElementById('synapses').textContent = activeSynapses.toLocaleString();
+            
+            const pulseRate = Math.floor(25 + Math.sin(time * 0.15) * 5);
+            document.getElementById('pulse-rate').textContent = pulseRate + ' BPM';
+
+            // Update node status
+            const nodeStatusHtml = neuralNodes.map(node => {
+                const activity = Math.floor(50 + Math.sin(time * node.frequency / 100) * 50);
+                return `<div style="color: ${node.color};">${node.name}: ${activity}% Active</div>`;
+            }).join('');
+            document.getElementById('node-status').innerHTML = nodeStatusHtml;
+        }
+
+        // Main animation loop
+        function animate() {
+            time++;
+            
+            // Clear canvas with fade effect
+            ctx.fillStyle = 'rgba(10, 10, 46, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background grid
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 255, 170, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Draw neural network components
+            drawNeuralConnections();
+            drawNeuralNodes();
+            drawThoughtWaves();
+            updateNeuralPulses();
+            updateUI();
+
+            requestAnimationFrame(animate);
+        }
+
+        // Mode switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.getAttribute('data-mode');
+            });
+        });
+
+        // Mouse interaction
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / canvas.width;
+            const y = (e.clientY - rect.top) / canvas.height;
+            
+            // Find nearest node and trigger firing
+            let nearestNode = null;
+            let minDistance = Infinity;
+            
+            neuralNodes.forEach(node => {
+                const distance = Math.sqrt((x - node.x)**2 + (y - node.y)**2);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestNode = node;
+                }
+            });
+            
+            if (minDistance < 0.1) {
+                nearestNode.lastFiring = time;
+                nearestNode.pulseRadius = 50;
+                consciousnessLevel = Math.min(100, consciousnessLevel + 5);
+            }
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
