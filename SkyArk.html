@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Solar Fractal Ark - Autonomous Sky Vessel</title>
+<style>
+body, html {
+margin: 0;
+padding: 0;
+height: 100%;
+background: linear-gradient(to bottom, #000510 0%, #001a33 20%, #003366 50%, #004488 80%, #0066aa 100%);
+overflow: hidden;
+font-family: 'Courier New', monospace;
+color: #fff;
+}
+
+canvas {
+display: block;
+}
+
+.info-panel {
+position: absolute;
+top: 20px;
+left: 20px;
+background: rgba(0, 0, 0, 0.85);
+padding: 20px;
+border-radius: 12px;
+border: 2px solid #ffd700;
+box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+max-width: 320px;
+backdrop-filter: blur(10px);
+}
+
+.title {
+color: #ffd700;
+font-size: 20px;
+font-weight: bold;
+margin-bottom: 8px;
+text-shadow: 0 0 12px #ffd700;
+text-align: center;
+}
+
+.subtitle {
+color: #66ccff;
+font-size: 11px;
+margin-bottom: 15px;
+text-align: center;
+font-style: italic;
+}
+
+.spec-section {
+margin-bottom: 12px;
+}
+
+.section-title {
+color: #ff9966;
+font-size: 11px;
+font-weight: bold;
+margin-bottom: 6px;
+border-bottom: 1px solid #444;
+padding-bottom: 2px;
+}
+
+.spec-item {
+color: #cccccc;
+font-size: 9px;
+margin: 3px 0;
+line-height: 1.4;
+display: flex;
+justify-content: space-between;
+}
+
+.spec-value {
+color: #66ff66;
+font-weight: bold;
+}
+
+.highlight {
+color: #ffd700;
+font-weight: bold;
+}
+
+.energy-panel {
+position: absolute;
+top: 20px;
+right: 20px;
+background: rgba(0, 0, 0, 0.85);
+padding: 15px;
+border-radius: 10px;
+border: 2px solid #ff9966;
+box-shadow: 0 0 20px rgba(255, 153, 102, 0.3);
+text-align: center;
+backdrop-filter: blur(10px);
+min-width: 150px;
+}
+
+.energy-title {
+color: #ff9966;
+font-size: 12px;
+font-weight: bold;
+margin-bottom: 8px;
+}
+
+.battery-display {
+width: 120px;
+height: 20px;
+border: 2px solid #66ff66;
+border-radius: 4px;
+margin: 8px auto;
+position: relative;
+background: rgba(0, 0, 0, 0.3);
+}
+
+.battery-level {
+height: 100%;
+background: linear-gradient(to right, #66ff66, #ffff66, #ff9966);
+border-radius: 2px;
+transition: width 0.5s ease;
+}
+
+.energy-stats {
+font-size: 8px;
+color: #cccccc;
+margin-top: 8px;
+}
+
+.controls {
+position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: center;
+}
+
+.btn {
+padding: 8px 16px;
+background: rgba(255, 215, 0, 0.15);
+border: 1px solid #ffd700;
+color: #ffd700;
+border-radius: 18px;
+cursor: pointer;
+font-size: 9px;
+text-transform: uppercase;
+font-weight: bold;
+transition: all 0.3s ease;
+backdrop-filter: blur(5px);
+}
+
+.btn:hover {
+background: rgba(255, 215, 0, 0.25);
+box-shadow: 0 0 18px rgba(255, 215, 0, 0.5);
+transform: scale(1.05);
+}
+
+.btn.active {
+background: rgba(255, 215, 0, 0.3);
+box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.status-panel {
+position: absolute;
+bottom: 20px;
+right: 20px;
+background: rgba(0, 0, 0, 0.85);
+padding: 12px;
+border-radius: 8px;
+border: 1px solid #9966ff;
+box-shadow: 0 0 15px rgba(153, 102, 255, 0.3);
+text-align: center;
+font-size: 8px;
+backdrop-filter: blur(5px);
+}
+
+.freq-display {
+color: #9966ff;
+font-size: 14px;
+font-weight: bold;
+margin-bottom: 4px;
+}
+
+.altitude-display {
+color: #66ccff;
+font-size: 10px;
+margin: 2px 0;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div class="info-panel">
+<div class="title">SOLAR FRACTAL ARK</div>
+<div class="subtitle">Autonomous Atmospheric Vessel</div>
+<div class="spec-section">
+<div class="section-title">⚡ POWER SYSTEMS</div>
+<div class="spec-item">Solar Array: <span class="spec-value">12.5 kW Peak</span></div>
+<div class="spec-item">Battery Bank: <span class="spec-value">150 kWh Li-Ion</span></div>
+<div class="spec-item">Endurance: <span class="spec-value">∞ Unlimited</span></div>
+<div class="spec-item">Charging: <span class="spec-value">8hr Full Solar</span></div>
+</div>
+<div class="spec-section">
+<div class="section-title">🏗️ STRUCTURE</div>
+<div class="spec-item">Hull: <span class="spec-value">Graphene Geodesic</span></div>
+<div class="spec-item">Solar Skin: <span class="spec-value">Perovskite Film</span></div>
+<div class="spec-item">Lift: <span class="spec-value">Vacuum Cells</span></div>
+<div class="spec-item">Weight: <span class="spec-value">2.8 Tonnes</span></div>
+</div>
+<div class="spec-section">
+<div class="section-title">🚀 PROPULSION</div>
+<div class="spec-item">Thrust: <span class="spec-value">4x Electric Fans</span></div>
+<div class="spec-item">Max Speed: <span class="spec-value">120 km/h</span></div>
+<div class="spec-item">Cruise: <span class="spec-value">40 km/h Silent</span></div>
+<div class="spec-item">Navigation: <span class="spec-value">EM Resonance</span></div>
+</div>
+<div class="spec-section">
+<div class="section-title">🏠 HABITAT</div>
+<div class="spec-item">Crew: <span class="spec-value">6-8 Souls</span></div>
+<div class="spec-item">Water: <span class="spec-value">Atmospheric Harvest</span></div>
+<div class="spec-item">Food: <span class="spec-value">Hydroponic Bay</span></div>
+<div class="spec-item">Range: <span class="spec-value">Global Nomad</span></div>
+</div>
+</div>
+
+<div class="energy-panel">
+<div class="energy-title">ENERGY STATUS</div>
+<div class="battery-display">
+<div class="battery-level" id="batteryLevel" style="width: 85%;"></div>
+</div>
+<div id="energyOutput" style="color: #ff9966; font-size: 11px; font-weight: bold;">8.7 kW Solar</div>
+<div class="energy-stats">
+<div>Daily Harvest: <span id="dailyHarvest">156 kWh</span></div>
+<div>Consumption: <span id="consumption">2.1 kW</span></div>
+<div>Net Surplus: <span id="surplus" style="color: #66ff66;">+6.6 kW</span></div>
+</div>
+</div>
+
+<div class="status-panel">
+<div class="freq-display" id="frequency">7.83 Hz</div>
+<div class="altitude-display">Alt: <span id="altitude">4,200m</span></div>
+<div class="altitude-display">Mode: <span id="mode">SOLAR CRUISE</span></div>
+<div style="color: #66ff66; font-size: 8px; margin-top: 4px;">THRONE LOCK ✓</div>
+</div>
+
+<div class="controls">
+<button class="btn active" onclick="toggleSolarMode()">☀️ SOLAR MODE</button>
+<button class="btn" onclick="toggleAnimation()">⏸ PAUSE</button>
+<button class="btn" onclick="toggleSolarPanels()">📱 PANELS</button>
+<button class="btn" onclick="toggleResonance()">🌊 RESONANCE</button>
+<button class="btn" onclick="toggleStars()">⭐ STARS</button>
+<button class="btn" onclick="toggleDome()">🏛 DOME</button>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+const centerX = width / 2;
+const centerY = height / 2;
+
+let time = 0;
+let animating = true;
+let showSolarPanels = true;
+let showWaves = true;
+let showStars = true;
+let showDome = true;
+let solarMode = true;
+
+// Dynamic solar conditions
+let sunAngle = Math.PI / 4; // Sun position
+let solarIntensity = 0.8;
+let batteryLevel = 0.85;
+
+window.addEventListener('resize', () => {
+width = canvas.width = window.innerWidth;
+height = canvas.height = window.innerHeight;
+});
+
+// Enhanced starfield with dome reflection
+const stars = [];
+for (let i = 0; i < 300; i++) {
+stars.push({
+x: Math.random() * width,
+y: Math.random() * height * 0.7,
+brightness: Math.random(),
+size: Math.random() * 1.5 + 0.3,
+twinkle: Math.random() * Math.PI * 2
+});
+}
+
+// Atmospheric layers with energy currents
+const atmosphericLayers = [
+{ altitude: 0.9, opacity: 0.05, color: '#66ccff', energy: true },
+{ altitude: 0.8, opacity: 0.1, color: '#4499dd', energy: false },
+{ altitude: 0.7, opacity: 0.15, color: '#2277bb', energy: true },
+{ altitude: 0.6, opacity: 0.2, color: '#0055aa', energy: false },
+{ altitude: 0.5, opacity: 0.25, color: '#003388', energy: true }
+];
+
+class SolarFractalArk {
+constructor(x, y) {
+this.x = x;
+this.y = y;
+this.baseY = y;
+this.size = 90;
+this.angle = 0;
+this.resonancePhase = 0;
+this.solarPhase = 0;
+this.altitude = 0.65;
+this.panelAngle = 0;
+}
+
+update() {
+if (animating) {
+this.y = this.baseY + Math.sin(time * 0.015) * 12;
+this.x += Math.sin(time * 0.006) * 0.3;
+this.angle += 0.001;
+this.resonancePhase += 0.04;
+this.solarPhase += 0.02;
+this.panelAngle += 0.005;
+}
+
+// Update solar conditions
+sunAngle = Math.PI / 6 + Math.sin(time * 0.001) * Math.PI / 8;
+solarIntensity = 0.6 + 0.4 * Math.sin(time * 0.003);
+}
+
+drawSolarPanels() {
+if (!showSolarPanels) return;
+
+ctx.save();
+ctx.translate(this.x, this.y);
+ctx.rotate(this.angle);
+
+// Solar panel segments on hull
+const segments = 16;
+for (let i = 0; i < segments; i++) {
+const segmentAngle = (i / segments) * Math.PI * 2;
+const radius = this.size * 0.9;
+const segmentX = Math.cos(segmentAngle) * radius;
+const segmentY = Math.sin(segmentAngle) * radius * 0.4;
+
+// Solar panel glow based on sun angle
+const sunAlignment = Math.max(0, Math.cos(segmentAngle - sunAngle));
+const panelIntensity = solarIntensity * sunAlignment;
+
+ctx.fillStyle = `rgba(255, 200, 50, ${0.1 + panelIntensity * 0.4})`;
+ctx.strokeStyle = `rgba(255, 215, 0, ${0.3 + panelIntensity * 0.5})`;
+ctx.lineWidth = 1;
+
+ctx.beginPath();
+ctx.arc(segmentX, segmentY, 8, 0, Math.PI * 2);
+ctx.fill();
+ctx.stroke();
+
+// Energy flow lines
+if (panelIntensity > 0.3) {
+ctx.strokeStyle = `rgba(255, 255, 100, ${panelIntensity * 0.6})`;
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.moveTo(segmentX, segmentY);
+ctx.lineTo(segmentX * 0.3, segmentY * 0.3);
+ctx.stroke();
+}
+}
+
+ctx.restore();
+}
+
+draw() {
+ctx.save();
+ctx.translate(this.x, this.y);
+ctx.rotate(this.angle);
+
+// Main hull with solar skin
+ctx.fillStyle = `rgba(255, 215, 0, ${0.05 + solarIntensity * 0.15})`;
+ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 + solarIntensity * 0.3})`;
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.ellipse(0, 0, this.size, this.size * 0.4, 0, 0, Math.PI * 2);
+ctx.fill();
+ctx.stroke();
+
+// Geodesic frame with energy conduits
+ctx.strokeStyle = `rgba(255, 200, 100, ${0.3 + solarIntensity * 0.4})`;
+ctx.lineWidth = 2;
+for (let i = 0; i < 12; i++) {
+const frameAngle = (i / 12) * Math.PI * 2;
+ctx.beginPath();
+ctx.moveTo(0, 0);
+ctx.lineTo(Math.cos(frameAngle) * this.size * 0.85, Math.sin(frameAngle) * this.size * 0.32);
+ctx.stroke();
+}
+
+// Vacuum lift cells with energy glow
+ctx.fillStyle = 'rgba(102, 204, 255, 0.2)';
+ctx.strokeStyle = '#66ccff';
+ctx.lineWidth = 1;
+for (let i = 0; i < 8; i++) {
+const cellAngle = (i / 8) * Math.PI * 2;
+const cellX = Math.cos(cellAngle) * this.size * 0.6;
+const cellY = Math.sin(cellAngle) * this.size * 0.22;
+
+ctx.beginPath();
+ctx.arc(cellX, cellY, 6, 0, Math.PI * 2);
+ctx.fill();
+ctx.stroke();
+}
+
+// Observatory dome with solar concentrator
+ctx.fillStyle = `rgba(255, 215, 0, ${0.1 + solarIntensity * 0.2})`;
+ctx.strokeStyle = `rgba(255, 215, 0, ${0.6 + solarIntensity * 0.4})`;
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(0, -8, 18, 0, Math.PI * 2);
+ctx.fill();
+ctx.stroke();
+
+// Central energy core
+const coreGlow = 0.3 + 0.7 * Math.sin(this.solarPhase);
+ctx.fillStyle = `rgba(255, 255, 150, ${coreGlow * 0.4})`;
+ctx.beginPath();
+ctx.arc(0, 0, 8, 0, Math.PI * 2);
+ctx.fill();
+
+// Resonance rings with energy modulation
+const resonanceIntensity = (0.4 + 0.6 * Math.sin(this.resonancePhase)) * solarIntensity;
+ctx.strokeStyle = `rgba(153, 102, 255, ${resonanceIntensity * 0.7})`;
+ctx.lineWidth = 2 + resonanceIntensity * 2;
+ctx.beginPath();
+ctx.arc(0, 0, this.size * 1.1, 0, Math.PI * 2);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.arc(0, 0, this.size * 1.4, 0, Math.PI * 2);
+ctx.stroke();
+
+// Electric propulsion trails
+ctx.strokeStyle = 'rgba(100, 150, 255, 0.5)';
+ctx.lineWidth = 3;
+for (let i = 0; i < 4; i++) {
+const thrusterAngle = Math.PI + (i - 1.5) * 0.3;
+const thrusterX = Math.cos(thrusterAngle) * this.size * 0.9;
+const thrusterY = Math.sin(thrusterAngle) * this.size * 0.35;
+const trailLength = this.size * 0.8;
+
+ctx.beginPath();
+ctx.moveTo(thrusterX, thrusterY);
+ctx.lineTo(thrusterX - Math.cos(thrusterAngle) * trailLength, 
+           thrusterY - Math.sin(thrusterAngle) * trailLength * 0.3);
+ctx.stroke();
+}
+
+ctx.restore();
+
+// Draw solar panels as overlay
+this.drawSolarPanels();
+}
+}
+
+const ark = new SolarFractalArk(centerX, centerY + 50);
+
+function drawSun() {
+const sunX = width * 0.8;
+const sunY = height * 0.2;
+const sunRadius = 40;
+
+// Sun with corona
+const sunGradient = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunRadius * 2);
+sunGradient.addColorStop(0, `rgba(255, 255, 150, ${solarIntensity})`);
+sunGradient.addColorStop(0.3, `rgba(255, 200, 50, ${solarIntensity * 0.6})`);
+sunGradient.addColorStop(1, 'transparent');
+
+ctx.fillStyle = sunGradient;
+ctx.fillRect(sunX - sunRadius * 2, sunY - sunRadius * 2, sunRadius * 4, sunRadius * 4);
+
+// Sun rays to ark
+if (solarMode) {
+ctx.strokeStyle = `rgba(255, 230, 100, ${solarIntensity * 0.2})`;
+ctx.lineWidth = 2;
+ctx.setLineDash([10, 10]);
+ctx.beginPath();
+ctx.moveTo(sunX, sunY);
+ctx.lineTo(ark.x, ark.y);
+ctx.stroke();
+ctx.setLineDash([]);
+}
+}
+
+function drawFirmament() {
+if (!showDome) return;
+
+// Enhanced dome with energy patterns
+const gradient = ctx.createRadialGradient(centerX, 0, 0, centerX, 0, width);
+gradient.addColorStop(0, 'rgba(153, 102, 255, 0.15)');
+gradient.addColorStop(0.5, 'rgba(102, 204, 255, 0.08)');
+gradient.addColorStop(1, 'transparent');
+
+ctx.fillStyle = gradient;
+ctx.fillRect(0, 0, width, height * 0.35);
+
+// Dome energy grid
+ctx.strokeStyle = `rgba(255, 215, 0, ${0.08 + solarIntensity * 0.05})`;
+ctx.lineWidth = 1;
+
+for (let i = 0; i < 16; i++) {
+const x = (i / 15) * width;
+ctx.beginPath();
+ctx.moveTo(x, 0);
+ctx.quadraticCurveTo(centerX, height * 0.25, x, height * 0.45);
+ctx.stroke();
+}
+
+// Energy flow lines
+ctx.strokeStyle = `rgba(255, 255, 100, ${solarIntensity * 0.1})`;
+ctx.lineWidth = 0.5;
+for (let i = 0; i < 8; i++) {
+const y = (i / 7) * height * 0.35;
+ctx.beginPath();
+ctx.ellipse(centerX, y, width * 0.3, height * 0.03, 0, 0, Math.PI * 2);
+ctx.stroke();
+}
+}
+
+function drawAtmosphericLayers() {
+atmosphericLayers.forEach((layer, index) => {
+const y = height * layer.altitude;
+const waveOffset = Math.sin(time * 0.008 + index) * 25;
+const energyPulse = layer.energy ? Math.sin(time * 0.02 + index) * 0.5 + 0.5 : 0;
+
+ctx.strokeStyle = `rgba(102, 204, 255, ${layer.opacity + energyPulse * 0.1})`;
+ctx.lineWidth = 1 + energyPulse * 2;
+ctx.beginPath();
+ctx.moveTo(0, y);
+for (let x = 0; x <= width; x += 15) {
+const waveY = y + Math.sin((x + waveOffset) * 0.008) * (8 + energyPulse * 5);
+ctx.lineTo(x, waveY);
+}
+ctx.stroke();
+
+// Energy currents in specific layers
+if (layer.energy && energyPulse > 0.3) {
+ctx.strokeStyle = `rgba(255, 255, 100, ${energyPulse * 0.3})`;
+ctx.lineWidth = 1;
+for (let x = 0; x < width; x += 100) {
+ctx.beginPath();
+ctx.moveTo(x, y - 20);
+ctx.lineTo(x + 30, y + 20);
+ctx.stroke();
+}
+}
+});
+}
+
+function drawResonanceField() {
+if (!showWaves) return;
+
+// Primary Schumann resonance
+const waveRadius = (time * 1.5) % (width * 0.9);
+ctx.strokeStyle = `rgba(255, 215, 0, ${0.2 * (1 - waveRadius / (width * 0.9))})`;
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.arc(centerX, centerY, waveRadius, 0, Math.PI * 2);
+ctx.stroke();
+
+// Solar-enhanced resonance harmonics
+if (solarMode && solarIntensity > 0.5) {
+ctx.strokeStyle = `rgba(255, 150, 50, ${solarIntensity * 0.15})`;
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(centerX, centerY, waveRadius * 0.6, 0, Math.PI * 2);
+ctx.stroke();
+}
+}
+
+function drawStarfield() {
+if (!showStars) return;
+
+stars.forEach(star => {
+const twinkle = 0.4 + 0.6 * Math.sin(time * 0.02 + star.twinkle);
+const brightness = star.brightness * twinkle * (0.7 + 0.3 * (1 - solarIntensity));
+ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+ctx.beginPath();
+ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+ctx.fill();
+});
+}
+
+function updateDisplays() {
+// Energy calculations
+const solarOutput = (8.5 + solarIntensity * 4).toFixed(1);
+const dailyHarvest = Math.floor(120 + solarIntensity * 80);
+const consumption = (1.8 + Math.sin(time * 0.01) * 0.6).toFixed(1);
+const surplus = (parseFloat(solarOutput) - parseFloat(consumption)).toFixed(1);
+
+document.getElementById('energyOutput').textContent = `${solarOutput} kW Solar`;
+document.getElementById('dailyHarvest').textContent = `${dailyHarvest} kWh`;
+document.getElementById('consumption').textContent = `${consumption} kW`;
+document.getElementById('surplus').textContent = `+${surplus} kW`;
+document.getElementById('surplus').style.color = surplus > 0 ? '#66ff66' : '#ff6666';
+
+// Battery level animation
+batteryLevel = Math.min(1, batteryLevel + (parseFloat(surplus) * 0.0001));
+document.getElementById('batteryLevel').style.width = `${batteryLevel * 100}%`;
+
+// Frequency and altitude
+const baseFreq = 7.83;
+const variation = 0.15 * Math.sin(time * 0.015);
+document.getElementById('frequency').textContent = (baseFreq + variation).toFixed(2) + ' Hz';
+document.getElementById('altitude').textContent = Math.floor(4000 + Math.sin(time * 0.01) * 500) + 'm';
+document.getElementById('mode').textContent = solarMode ? 'SOLAR CRUISE' : 'BATTERY MODE';
+}
+
+function animate() {
+requestAnimationFrame(animate);
+
+if (animating) time += 1;
+
+// Clear canvas with energy-enhanced background
+const bgIntensity = 0.02 + solarIntensity * 0.03;
+ctx.fillStyle = `rgba(0, 8, 24, ${bgIntensity})`;
+ctx.fillRect(0, 0, width, height);
+
+// Draw layers back to front
+drawFirmament();
+drawStarfield();
+drawAtmosphericLayers();
+drawSun();
+drawResonanceField();
+ark.update();
+ark.draw();
+
+updateDisplays();
+}
+
+// Control functions
+function toggleSolarMode() {
+solarMode = !solarMode;
+const btn = document.querySelector('.controls .btn');
+btn.classList.toggle('active');
+btn.textContent = solarMode ? '☀️ SOLAR MODE' : '🔋 BATTERY MODE';
+}
+
+function toggleAnimation() {
+animating = !animating;
+event.target.textContent = animating ? '⏸ PAUSE' : '▶ RESUME';
+}
+
+function toggleSolarPanels() {
+showSolarPanels = !showSolarPanels;
+event.target.classList.toggle('active');
+}
+
+function toggleResonance() {
+showWaves = !showWaves;
+event.target.classList.toggle('active');
+}
+
+function toggleStars() {
+showStars = !showStars;
+event.target.classList.toggle('active');
+}
+
+function toggleDome() {
+showDome = !showDome;
+event.target.classList.toggle('active');
+}
+
+animate();
+</script>
+</body>
+</html>
