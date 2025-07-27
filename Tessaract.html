@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Jerusalem Cosmic Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at center, #1a0033 0%, #000011 70%, #000000 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main Container */
+        .cosmic-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* Left Panel - Enochian Gates */
+        .enochian-panel {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            width: 300px;
+            background: linear-gradient(135deg, rgba(75, 0, 130, 0.8), rgba(25, 25, 112, 0.8));
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            z-index: 100;
+        }
+
+        .enochian-panel h3 {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .gate-info {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .gate-info .label {
+            color: #87ceeb;
+            font-size: 12px;
+        }
+
+        .gate-info .value {
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Right Panel - New Jerusalem Info */
+        .jerusalem-panel {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 300px;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.8));
+            border: 2px solid #ff6347;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 99, 71, 0.5);
+            z-index: 100;
+        }
+
+        .jerusalem-panel h3 {
+            color: #ff6347;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff6347;
+        }
+
+        /* Bottom Panel - Resonance */
+        .resonance-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            background: linear-gradient(135deg, rgba(0, 100, 0, 0.8), rgba(34, 139, 34, 0.8));
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .resonance-panel h3 {
+            color: #00ff00;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .frequency-display {
+            font-size: 18px;
+            color: #fff;
+            margin: 5px 0;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            width: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+            background: linear-gradient(45deg, #4a0080, #8a2be2);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(45deg, #6a00a0, #aa4bc2);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #000;
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        canvas {
+            border-radius: 50%;
+            box-shadow: 0 0 100px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Scripture Tooltip */
+        .scripture-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 300px;
+            font-size: 12px;
+            color: #fff;
+            z-index: 200;
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .scripture-tooltip h4 {
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        /* Archangel Legend */
+        .archangel-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 100;
+        }
+
+        .archangel-legend h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .archangel-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+
+        .archangel-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .uriel { background: #ffd700; }
+        .raphael { background: #4169e1; }
+        .michael { background: #dc143c; }
+        .gabriel { background: #c0c0c0; }
+
+        /* Time Display */
+        .time-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 10px 20px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .time-display h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .kolob-time {
+            font-size: 18px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="cosmic-container">
+        <!-- Enochian Gates Panel -->
+        <div class="enochian-panel">
+            <h3>🌟 ENOCHIAN GATES</h3>
+            <div class="gate-info">
+                <div class="label">Current Gate:</div>
+                <div class="value" id="current-gate">E1 — Spring Dawn</div>
+            </div>
+            <div class="gate-info">
+                <div class="label">Archangel:</div>
+                <div class="value" id="current-archangel">Uriel</div>
+            </div>
+            <div class="gate-info">
+                <div class="label">Season:</div>
+                <div class="value" id="current-season">Spring Dawn</div>
+            </div>
+            <div class="gate-info">
+                <div class="label">Zodiac Sign:</div>
+                <div class="value" id="current-zodiac">♈ Aries</div>
+            </div>
+        </div>
+
+        <!-- New Jerusalem Panel -->
+        <div class="jerusalem-panel">
+            <h3>🏛️ NEW JERUSALEM</h3>
+            <div class="gate-info">
+                <div class="label">Gates:</div>
+                <div class="value">12 Gates of Pearl</div>
+            </div>
+            <div class="gate-info">
+                <div class="label">Wall Height:</div>
+                <div class="value">144 cubits (12²)</div>
+            </div>
+            <div class="gate-info">
+                <div class="label">City Measure:</div>
+                <div class="value">12,000 stadia</div>
+            </div>
+            <div class="gate-info">
+                <div class="label">Volume:</div>
+                <div class="value">12³ = 1,728</div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <h4 style="color: #ffd700; text-align: center; margin-bottom: 10px;">CONTROLS</h4>
+            <button class="control-btn active" id="gates-toggle">12 Gates Overlay</button>
+            <button class="control-btn active" id="archangels-toggle">Archangels On/Off</button>
+            <button class="control-btn" id="hypercube-toggle">Hypercube Mode</button>
+            <button class="control-btn active" id="resonance-toggle">Resonance Waves</button>
+        </div>
+
+        <!-- Time Display -->
+        <div class="time-display">
+            <h3>KOLOB TIME</h3>
+            <div class="kolob-time" id="kolob-time">1 Day = 1000 Years</div>
+        </div>
+
+        <!-- Resonance Panel -->
+        <div class="resonance-panel">
+            <h3>⚡ CREATION RESONANCE</h3>
+            <div class="frequency-display" id="base-freq">Base: 7.83 Hz</div>
+            <div class="frequency-display" id="harmonic-freq">Harmonic: 14.3 Hz</div>
+            <div class="frequency-display" id="live-gate">LIVE GATE: E3 — Spring Peak</div>
+        </div>
+
+        <!-- Archangel Legend -->
+        <div class="archangel-legend">
+            <h4>ARCHANGELS</h4>
+            <div class="archangel-item">
+                <div class="archangel-color uriel"></div>
+                <span>Uriel (Gold)</span>
+            </div>
+            <div class="archangel-item">
+                <div class="archangel-color raphael"></div>
+                <span>Raphael (Blue)</span>
+            </div>
+            <div class="archangel-item">
+                <div class="archangel-color michael"></div>
+                <span>Michael (Red)</span>
+            </div>
+            <div class="archangel-item">
+                <div class="archangel-color gabriel"></div>
+                <span>Gabriel (Silver)</span>
+            </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="canvas-container">
+            <canvas id="cosmicCanvas" width="600" height="600"></canvas>
+        </div>
+
+        <!-- Scripture Tooltip -->
+        <div class="scripture-tooltip" id="tooltip">
+            <h4>Scripture Reference</h4>
+            <p id="tooltip-text"></p>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('cosmicCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Animation state
+        let animationTime = 0;
+        let kolobRotation = 0;
+        let sunRotation = 0;
+        let moonRotation = 0;
+
+        // Feature toggles
+        let showGates = true;
+        let showArchangels = true;
+        let showHypercube = false;
+        let showResonance = true;
+
+        // Enochian Gates Configuration
+        const enochianGates = [
+            { name: 'E1', season: 'Spring Dawn', archangel: 'Uriel', zodiac: '♈ Aries', color: '#ffd700' },
+            { name: 'E2', season: 'Spring Growth', archangel: 'Raphael', zodiac: '♉ Taurus', color: '#4169e1' },
+            { name: 'E3', season: 'Spring Peak', archangel: 'Michael', zodiac: '♊ Gemini', color: '#dc143c' },
+            { name: 'E4', season: 'Summer Dawn', archangel: 'Gabriel', zodiac: '♋ Cancer', color: '#c0c0c0' },
+            { name: 'E5', season: 'Summer Growth', archangel: 'Uriel', zodiac: '♌ Leo', color: '#ffd700' },
+            { name: 'E6', season: 'Summer Peak', archangel: 'Raphael', zodiac: '♍ Virgo', color: '#4169e1' },
+            { name: 'W1', season: 'Autumn Dawn', archangel: 'Michael', zodiac: '♎ Libra', color: '#dc143c' },
+            { name: 'W2', season: 'Autumn Growth', archangel: 'Gabriel', zodiac: '♏ Scorpio', color: '#c0c0c0' },
+            { name: 'W3', season: 'Autumn Peak', archangel: 'Uriel', zodiac: '♐ Sagittarius', color: '#ffd700' },
+            { name: 'W4', season: 'Winter Dawn', archangel: 'Raphael', zodiac: '♑ Capricorn', color: '#4169e1' },
+            { name: 'W5', season: 'Winter Growth', archangel: 'Michael', zodiac: '♒ Aquarius', color: '#dc143c' },
+            { name: 'W6', season: 'Winter Peak', archangel: 'Gabriel', zodiac: '♓ Pisces', color: '#c0c0c0' }
+        ];
+
+        // Scripture references
+        const scriptures = {
+            kolob: "Abraham 3:2-4 - 'And I saw the stars, that they were very great, and that one of them was nearest unto the throne of God; and there were many great ones which were near unto it; And the Lord said unto me: These are the governing ones; and the name of the great one is Kolob, because it is near unto me, for I am the Lord thy God: I have set this one to govern all those which belong to the same order as that upon which thou standest.'",
+            enoch: "1 Enoch 72 - 'And I saw six portals in which the sun rises, and six portals in which the sun sets and the moon rises and sets in these portals, and the leaders of the stars and those whom they lead: six in the east and six in the west, and all following each other in accurately corresponding order.'",
+            jerusalem: "Revelation 21:12-21 - 'And had a wall great and high, and had twelve gates, and at the gates twelve angels, and names written thereon, which are the names of the twelve tribes of the children of Israel... And the wall of the city had twelve foundations, and in them the names of the twelve apostles of the Lamb.'"
+        };
+
+        // Event listeners for controls
+        document.getElementById('gates-toggle').addEventListener('click', function() {
+            showGates = !showGates;
+            this.classList.toggle('active');
+        });
+
+        document.getElementById('archangels-toggle').addEventListener('click', function() {
+            showArchangels = !showArchangels;
+            this.classList.toggle('active');
+        });
+
+        document.getElementById('hypercube-toggle').addEventListener('click', function() {
+            showHypercube = !showHypercube;
+            this.classList.toggle('active');
+        });
+
+        document.getElementById('resonance-toggle').addEventListener('click', function() {
+            showResonance = !showResonance;
+            this.classList.toggle('active');
+        });
+
+        // Tooltip functions
+        function showTooltip(x, y, type) {
+            const tooltip = document.getElementById('tooltip');
+            const tooltipText = document.getElementById('tooltip-text');
+            
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+            tooltip.style.display = 'block';
+            tooltipText.textContent = scriptures[type] || 'Sacred geometry reference';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+
+        // Drawing functions
+        function drawKolob() {
+            // Kolob - Central governing star
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(kolobRotation);
+            
+            // Main star with pulsing effect
+            const pulse = 1 + 0.2 * Math.sin(animationTime * 0.05);
+            const kolobRadius = 25 * pulse;
+            
+            // Outer glow
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, kolobRadius * 2);
+            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(255, 140, 0, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 69, 0, 0.1)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-kolobRadius * 2, -kolobRadius * 2, kolobRadius * 4, kolobRadius * 4);
+            
+            // Inner star
+            ctx.fillStyle = '#ffd700';
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI) / 4;
+                const x = Math.cos(angle) * kolobRadius;
+                const y = Math.sin(angle) * kolobRadius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        function drawSun() {
+            // Shinehah (Sun)
+            const sunDistance = 120;
+            const sunX = centerX + Math.cos(sunRotation) * sunDistance;
+            const sunY = centerY + Math.sin(sunRotation) * sunDistance;
+            
+            ctx.save();
+            ctx.translate(sunX, sunY);
+            
+            // Sun glow
+            const sunGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 25);
+            sunGradient.addColorStop(0, '#ffff00');
+            sunGradient.addColorStop(0.7, '#ff8c00');
+            sunGradient.addColorStop(1, 'rgba(255, 140, 0, 0)');
+            
+            ctx.fillStyle = sunGradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Sun rays
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * Math.PI) / 6;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(angle) * 15, Math.sin(angle) * 15);
+                ctx.lineTo(Math.cos(angle) * 30, Math.sin(angle) * 30);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawMoon() {
+            // Olea (Moon)
+            const moonDistance = 80;
+            const moonX = centerX + Math.cos(moonRotation) * moonDistance;
+            const moonY = centerY + Math.sin(moonRotation) * moonDistance;
+            
+            ctx.save();
+            ctx.translate(moonX, moonY);
+            
+            // Moon phases effect
+            const phase = (moonRotation % (Math.PI * 2)) / (Math.PI * 2);
+            
+            ctx.fillStyle = '#c0c0c0';
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Phase shadow
+            if (phase > 0.1 && phase < 0.9) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.beginPath();
+                ctx.arc(phase < 0.5 ? -6 : 6, 0, 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawZodiacRing() {
+            // Zodiac ring with 12 sections
+            const ringRadius = 200;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            
+            // Ring outline
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // 12 zodiac positions
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * Math.PI * 2) / 12;
+                const x = Math.cos(angle) * ringRadius;
+                const y = Math.sin(angle) * ringRadius;
+                
+                if (showGates) {
+                    // Gate markers
+                    ctx.fillStyle = enochianGates[i].color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Gate labels
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '12px Courier New';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(enochianGates[i].name, x, y - 15);
+                    ctx.fillText(enochianGates[i].zodiac.split(' ')[0], x, y + 20);
+                }
+                
+                if (showArchangels) {
+                    // Archangel nodes with pulsing effect
+                    const pulse = 1 + 0.3 * Math.sin(animationTime * 0.03 + i);
+                    ctx.save();
+                    ctx.translate(x, y);
+                    
+                    // Pulsing glow
+                    const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 15 * pulse);
+                    glowGradient.addColorStop(0, enochianGates[i].color + '80');
+                    glowGradient.addColorStop(1, enochianGates[i].color + '00');
+                    
+                    ctx.fillStyle = glowGradient;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 15 * pulse, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.restore();
+                }
+            }
+            
+            ctx.restore();
+        }
+
+        function drawHypercube() {
+            if (!showHypercube) return;
+            
+            const size = 150;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(animationTime * 0.01);
+            
+            // Hypercube wireframe (simplified 3D projection)
+            ctx.strokeStyle = 'rgba(255, 99, 71, 0.8)';
+            ctx.lineWidth = 2;
+            
+            // Outer cube
+            const points = [
+                [-size, -size, -size], [size, -size, -size], [size, size, -size], [-size, size, -size],
+                [-size, -size, size], [size, -size, size], [size, size, size], [-size, size, size]
+            ];
+            
+            // Project 3D points to 2D
+            const projected = points.map(p => [
+                p[0] + p[2] * 0.3,
+                p[1] + p[2] * 0.3
+            ]);
+            
+            // Draw cube edges
+            const edges = [
+                [0,1], [1,2], [2,3], [3,0], // back face
+                [4,5], [5,6], [6,7], [7,4], // front face
+                [0,4], [1,5], [2,6], [3,7]  // connecting edges
+            ];
+            
+            edges.forEach(edge => {
+                ctx.beginPath();
+                ctx.moveTo(projected[edge[0]][0], projected[edge[0]][1]);
+                ctx.lineTo(projected[edge[1]][0], projected[edge[1]][1]);
+                ctx.stroke();
+            });
+            
+            // Mark 12 gates on cube edges
+            for (let i = 0; i < 12; i++) {
+                const t = i / 12;
+                const edgeIndex = Math.floor(t * edges.length);
+                const edge = edges[edgeIndex % edges.length];
+                const alpha = (t * edges.length) % 1;
+                
+                const x = projected[edge[0]][0] + (projected[edge[1]][0] - projected[edge[0]][0]) * alpha;
+                const y = projected[edge[0]][1] + (projected[edge[1]][1] - projected[edge[0]][1]) * alpha;
+                
+                ctx.fillStyle = enochianGates[i].color;
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawResonanceWaves() {
+            if (!showResonance) return;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            
+            // Multiple resonance frequencies
+            const frequencies = [7.83, 14.3, 20.8];
+            const colors = ['rgba(0, 255, 0, 0.3)', 'rgba(0, 200, 255, 0.2)', 'rgba(255, 100, 0, 0.1)'];
+            
+            frequencies.forEach((freq, index) => {
+                const waveRadius = 50 + (animationTime * freq * 0.1) % 200;
+                
+                ctx.strokeStyle = colors[index];
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, waveRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+            
+            ctx.restore();
+        }
+
+        function updatePanels() {
+            // Calculate current gate based on sun position
+            const gateIndex = Math.floor(((sunRotation % (Math.PI * 2)) / (Math.PI * 2)) * 12);
+            const currentGate = enochianGates[gateIndex];
+            
+            // Update Enochian panel
+            document.getElementById('current-gate').textContent = `${currentGate.name} — ${currentGate.season}`;
+            document.getElementById('current-archangel').textContent = currentGate.archangel;
+            document.getElementById('current-season').textContent = currentGate.season;
+            document.getElementById('current-zodiac').textContent = currentGate.zodiac;
+            
+            // Update resonance panel
+            const baseFreq = 7.83 + 0.1 * Math.sin(animationTime * 0.02);
+            const harmonicFreq = baseFreq * 1.83;
+            
+            document.getElementById('base-freq').textContent = `Base: ${baseFreq.toFixed(2)} Hz`;
+            document.getElementById('harmonic-freq').textContent = `Harmonic: ${harmonicFreq.toFixed(2)} Hz`;
+            document.getElementById('live-gate').textContent = `LIVE GATE: ${currentGate.name} — ${currentGate.season}`;
+            
+            // Update Kolob time
+            const kolobDay = (animationTime * 0.001) % 1000;
+            document.getElementById('kolob-time').textContent = `Day ${kolobDay.toFixed(0)} of 1000`;
+        }
+
+        function animate() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update rotations
+            animationTime += 1;
+            kolobRotation += 0.002;
+            sunRotation += 0.008;
+            moonRotation += 0.02;
+            
+            // Draw all elements
+            drawResonanceWaves();
+            drawHypercube();
+            drawZodiacRing();
+            drawKolob();
+            drawSun();
+            drawMoon();
+            
+            // Update UI panels
+            updatePanels();
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Canvas event listeners for tooltips
+        canvas.addEventListener('mousemove', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if hovering over Kolob
+            const distToKolob = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+            if
