@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos Core - Merkabah Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at center, #0a0a1a 0%, #000000 100%);
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            color: #00ffff;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logos-core {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.8) 0%,
+                rgba(135, 206, 250, 0.6) 20%,
+                rgba(75, 0, 130, 0.4) 50%,
+                rgba(25, 25, 112, 0.2) 80%,
+                transparent 100%);
+            box-shadow: 
+                0 0 100px rgba(135, 206, 250, 0.8),
+                0 0 200px rgba(75, 0, 130, 0.6),
+                0 0 300px rgba(25, 25, 112, 0.4),
+                inset 0 0 100px rgba(255, 255, 255, 0.2);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .sacred-geometry {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            opacity: 0.6;
+        }
+
+        .flower-of-life {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotate3d 20s linear infinite;
+        }
+
+        .metatron-cube {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            animation: rotate3d-reverse 15s linear infinite;
+        }
+
+        .merkabah {
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+            animation: rotate3d 25s linear infinite;
+        }
+
+        .geometry-circle {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            background: transparent;
+        }
+
+        .geometry-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            transform-origin: left center;
+        }
+
+        .geometry-tetrahedron {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .status-display {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 20px currentColor;
+            transition: all 0.3s ease;
+        }
+
+        .coherent { color: #00ff00; }
+        .partial { color: #ffff00; }
+        .incoherent { color: #ff0000; }
+
+        .intensity-display {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .control-panel {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 10, 20, 0.7);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #00ffff;
+        }
+
+        .control-slider {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .control-btn {
+            background: rgba(0, 40, 80, 0.5);
+            color: #00ffff;
+            border: 1px solid #0088ff;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 60, 120, 0.7);
+            box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes rotate3d {
+            from { transform: translate(-50%, -50%) rotateZ(0deg) rotateY(0deg); }
+            to { transform: translate(-50%, -50%) rotateZ(360deg) rotateY(360deg); }
+        }
+
+        @keyframes rotate3d-reverse {
+            from { transform: rotateZ(0deg) rotateX(0deg); }
+            to { transform: rotateZ(-360deg) rotateX(-360deg); }
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .frequency-display {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 10, 20, 0.7);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .frequency-item {
+            margin-bottom: 10px;
+        }
+
+        .frequency-label {
+            font-size: 14px;
+            color: #00ffff;
+        }
+
+        .frequency-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(360deg); opacity: 0.1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logos-core" id="logosCore">
+            <div class="sacred-geometry">
+                <div class="flower-of-life" id="flowerOfLife"></div>
+                <div class="metatron-cube" id="metatronCube"></div>
+                <div class="merkabah" id="merkabah"></div>
+            </div>
+        </div>
+        
+        <div class="status-display" id="statusDisplay">
+            🔴 Incoherent Field
+        </div>
+        
+        <div class="intensity-display" id="intensityDisplay">
+            Intensity: 3.14
+        </div>
+
+        <div class="frequency-display">
+            <h3>RESONANCE FREQUENCIES</h3>
+            <div class="frequency-item">
+                <div class="frequency-label">Schumann Fundamental:</div>
+                <div class="frequency-value" id="freq1">7.83 Hz</div>
+            </div>
+            <div class="frequency-item">
+                <div class="frequency-label">First Harmonic:</div>
+                <div class="frequency-value" id="freq2">14.3 Hz</div>
+            </div>
+            <div class="frequency-item">
+                <div class="frequency-label">Second Harmonic:</div>
+                <div class="frequency-value" id="freq3">20.8 Hz</div>
+            </div>
+            <div class="frequency-item">
+                <div class="frequency-label">Golden Ratio:</div>
+                <div class="frequency-value" id="freqPhi">12.66 Hz</div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">Core Intensity:</label>
+                <input type="range" min="1" max="5" value="3.14" step="0.01" class="control-slider" id="intensitySlider">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Rotation Speed:</label>
+                <input type="range" min="5" max="50" value="20" class="control-slider" id="rotationSlider">
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="audioToggle">Enable Audio</button>
+                <button class="control-btn" id="resetBtn">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class LogosCore {
+            constructor() {
+                this.core = document.getElementById('logosCore');
+                this.statusDisplay = document.getElementById('statusDisplay');
+                this.intensityDisplay = document.getElementById('intensityDisplay');
+                this.flowerOfLife = document.getElementById('flowerOfLife');
+                this.metatronCube = document.getElementById('metatronCube');
+                this.merkabah = document.getElementById('merkabah');
+                this.audioToggle = document.getElementById('audioToggle');
+                this.intensitySlider = document.getElementById('intensitySlider');
+                this.rotationSlider = document.getElementById('rotationSlider');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.freqDisplays = [
+                    document.getElementById('freq1'),
+                    document.getElementById('freq2'),
+                    document.getElementById('freq3'),
+                    document.getElementById('freqPhi')
+                ];
+                
+                this.time = 0;
+                this.phi = (1 + Math.sqrt(5)) / 2; // Golden ratio
+                this.audioContext = null;
+                this.oscillators = [];
+                this.gainNode = null;
+                this.audioEnabled = false;
+                this.manualControl = false;
+                this.baseIntensity = 3.14159;
+                this.targetIntensity = 3.14159;
+                this.particles = [];
+                
+                this.initializeGeometry();
+                this.setupControls();
+                this.createParticles();
+                this.animate();
+            }
+
+            initializeGeometry() {
+                // Create Flower of Life pattern
+                this.createFlowerOfLife();
+                
+                // Create Metatron's Cube
+                this.createMetatronCube();
+                
+                // Create Merkabah (Star Tetrahedron)
+                this.createMerkabah();
+            }
+
+            createFlowerOfLife() {
+                const circles = 19; // Traditional Flower of Life has 19 circles
+                const radius = 40;
+                const centerX = 200;
+                const centerY = 200;
+
+                for (let i = 0; i < circles; i++) {
+                    const circle = document.createElement('div');
+                    circle.className = 'geometry-circle';
+                    circle.style.width = radius * 2 + 'px';
+                    circle.style.height = radius * 2 + 'px';
+                    
+                    if (i === 0) {
+                        // Center circle
+                        circle.style.left = (centerX - radius) + 'px';
+                        circle.style.top = (centerY - radius) + 'px';
+                    } else if (i <= 6) {
+                        // First ring
+                        const angle = (i - 1) * Math.PI / 3;
+                        const x = centerX + Math.cos(angle) * radius - radius;
+                        const y = centerY + Math.sin(angle) * radius - radius;
+                        circle.style.left = x + 'px';
+                        circle.style.top = y + 'px';
+                    } else {
+                        // Second ring
+                        const angle = (i - 7) * Math.PI / 6;
+                        const x = centerX + Math.cos(angle) * radius * 2 - radius;
+                        const y = centerY + Math.sin(angle) * radius * 2 - radius;
+                        circle.style.left = x + 'px';
+                        circle.style.top = y + 'px';
+                    }
+                    
+                    this.flowerOfLife.appendChild(circle);
+                }
+            }
+
+            createMetatronCube() {
+                const vertices = [
+                    {x: 160, y: 80}, {x: 240, y: 80}, {x: 280, y: 140},
+                    {x: 280, y: 220}, {x: 240, y: 280}, {x: 160, y: 280},
+                    {x: 120, y: 220}, {x: 120, y: 140}, {x: 200, y: 200}
+                ];
+
+                // Create connecting lines
+                const connections = [
+                    [0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,0],
+                    [0,8], [1,8], [2,8], [3,8], [4,8], [5,8], [6,8], [7,8]
+                ];
+
+                connections.forEach(([start, end]) => {
+                    const line = document.createElement('div');
+                    line.className = 'geometry-line';
+                    
+                    const startVertex = vertices[start];
+                    const endVertex = vertices[end];
+                    
+                    const length = Math.sqrt(
+                        Math.pow(endVertex.x - startVertex.x, 2) + 
+                        Math.pow(endVertex.y - startVertex.y, 2)
+                    );
+                    const angle = Math.atan2(
+                        endVertex.y - startVertex.y, 
+                        endVertex.x - startVertex.x
+                    ) * 180 / Math.PI;
+
+                    line.style.width = length + 'px';
+                    line.style.height = '1px';
+                    line.style.left = startVertex.x + 'px';
+                    line.style.top = startVertex.y + 'px';
+                    line.style.transform = `rotate(${angle}deg)`;
+                    
+                    this.metatronCube.appendChild(line);
+                });
+            }
+
+            createMerkabah() {
+                // Create a simple Star Tetrahedron (2 interlocking tetrahedrons)
+                const vertices = [
+                    // First tetrahedron (upward)
+                    {x: 200, y: 80},  // Top
+                    {x: 120, y: 280}, // Bottom left
+                    {x: 280, y: 280}, // Bottom right
+                    
+                    // Second tetrahedron (downward)
+                    {x: 200, y: 320}, // Bottom
+                    {x: 120, y: 120}, // Top left
+                    {x: 280, y: 120}  // Top right
+                ];
+
+                // Create connecting lines
+                const connections = [
+                    // First tetrahedron
+                    [0,1], [0,2], [1,2],
+                    // Second tetrahedron
+                    [3,4], [3,5], [4,5],
+                    // Connecting lines between tetrahedrons
+                    [0,3], [1,4], [2,5]
+                ];
+
+                connections.forEach(([start, end]) => {
+                    const line = document.createElement('div');
+                    line.className = 'geometry-line';
+                    line.style.background = 'rgba(255, 255, 0, 0.4)';
+                    
+                    const startVertex = vertices[start];
+                    const endVertex = vertices[end];
+                    
+                    const length = Math.sqrt(
+                        Math.pow(endVertex.x - startVertex.x, 2) + 
+                        Math.pow(endVertex.y - startVertex.y, 2)
+                    );
+                    const angle = Math.atan2(
+                        endVertex.y - startVertex.y, 
+                        endVertex.x - startVertex.x
+                    ) * 180 / Math.PI;
+
+                    line.style.width = length + 'px';
+                    line.style.height = '1px';
+                    line.style.left = startVertex.x + 'px';
+                    line.style.top = startVertex.y + 'px';
+                    line.style.transform = `rotate(${angle}deg)`;
+                    
+                    this.merkabah.appendChild(line);
+                });
+            }
+
+            setupControls() {
+                this.audioToggle.addEventListener('click', () => {
+                    if (this.audioEnabled) {
+                        this.stopAudio();
+                    } else {
+                        this.startAudio();
+                    }
+                });
+
+                this.intensitySlider.addEventListener('input', (e) => {
+                    this.manualControl = true;
+                    this.targetIntensity = parseFloat(e.target.value);
+                    this.updateFrequencyDisplays();
+                });
+
+                this.rotationSlider.addEventListener('input', (e) => {
+                    const speed = parseInt(e.target.value);
+                    this.flowerOfLife.style.animationDuration = `${speed}s`;
+                    this.metatronCube.style.animationDuration = `${speed * 0.75}s`;
+                    this.merkabah.style.animationDuration = `${speed * 1.25}s`;
+                });
+
+                this.resetBtn.addEventListener('click', () => {
+                    this.manualControl = false;
+                    this.intensitySlider.value = this.baseIntensity;
+                    this.rotationSlider.value = 20;
+                    this.flowerOfLife.style.animationDuration = '20s';
+                    this.metatronCube.style.animationDuration = '15s';
+                    this.merkabah.style.animationDuration = '25s';
+                });
+            }
+
+            startAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create Schumann resonance frequencies
+                    const frequencies = [7.83, 14.3, 20.8, 27.3, 33.8]; // Schumann resonance harmonics
+                    
+                    this.gainNode = this.audioContext.createGain();
+                    this.gainNode.gain.value = 0.1;
+                    this.gainNode.connect(this.audioContext.destination);
+
+                    frequencies.forEach((freq, index) => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gain = this.audioContext.createGain();
+                        
+                        oscillator.frequency.value = freq;
+                        oscillator.type = 'sine';
+                        gain.gain.value = 0.05 / (index + 1); // Decreasing amplitude for harmonics
+                        
+                        oscillator.connect(gain);
+                        gain.connect(this.gainNode);
+                        oscillator.start();
+                        
+                        this.oscillators.push({ oscillator, gain });
+                    });
+                    
+                    this.audioEnabled = true;
+                    this.audioToggle.textContent = 'Disable Audio';
+                    this.updateFrequencyDisplays();
+                } catch (error) {
+                    console.log('Audio not supported in this environment');
+                }
+            }
+
+            stopAudio() {
+                if (this.audioContext) {
+                    this.oscillators.forEach(({ oscillator }) => {
+                        try {
+                            oscillator.stop();
+                        } catch (e) {}
+                    });
+                    this.oscillators = [];
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+                
+                this.audioEnabled = false;
+                this.audioToggle.textContent = 'Enable Audio';
+            }
+
+            calculateIntensity(t) {
+                if (this.manualControl) {
+                    // Smooth transition to target intensity
+                    const diff = this.targetIntensity - this.baseIntensity;
+                    this.baseIntensity += diff * 0.05;
+                    return this.baseIntensity;
+                }
+                
+                return 3.14159 + 
+                       Math.sin(Math.PI * t * 0.01) + 
+                       0.5 * Math.sin(this.phi * t * 0.01) + 
+                       0.25 * Math.cos(2 * Math.PI * t * 0.01);
+            }
+
+            updateStatus(intensity) {
+                let status, className;
+                
+                if (intensity > 4.0) {
+                    status = '🟢 Coherent Resonance Achieved';
+                    className = 'coherent';
+                } else if (intensity >= 3.5) {
+                    status = '🟡 Partial Alignment';
+                    className = 'partial';
+                } else {
+                    status = '🔴 Incoherent Field';
+                    className = 'incoherent';
+                }
+
+                this.statusDisplay.textContent = status;
+                this.statusDisplay.className = 'status-display ' + className;
+                this.intensityDisplay.textContent = `Intensity: ${intensity.toFixed(3)}`;
+            }
+
+            updateFrequencyDisplays() {
+                if (this.oscillators.length >= 3) {
+                    this.freqDisplays[0].textContent = `${this.oscillators[0].oscillator.frequency.value.toFixed(2)} Hz`;
+                    this.freqDisplays[1].textContent = `${this.oscillators[1].oscillator.frequency.value.toFixed(2)} Hz`;
+                    this.freqDisplays[2].textContent = `${this.oscillators[2].oscillator.frequency.value.toFixed(2)} Hz`;
+                    this.freqDisplays[3].textContent = `${(this.oscillators[0].oscillator.frequency.value * this.phi).toFixed(2)} Hz`;
+                } else {
+                    // Update display values even without audio
+                    const baseFreq = 7.83 + Math.sin(this.time * 0.001) * 0.1;
+                    this.freqDisplays[0].textContent = `${baseFreq.toFixed(2)} Hz`;
+                    this.freqDisplays[1].textContent = `${(baseFreq * 1.83).toFixed(2)} Hz`;
+                    this.freqDisplays[2].textContent = `${(baseFreq * 2.66).toFixed(2)} Hz`;
+                    this.freqDisplays[3].textContent = `${(baseFreq * this.phi).toFixed(2)} Hz`;
+                }
+            }
+
+            updateAudio(intensity) {
+                if (this.audioEnabled && this.gainNode) {
+                    // Modulate audio gain based on intensity
+                    const normalizedIntensity = Math.max(0, (intensity - 2.5) / 2.5);
+                    this.gainNode.gain.value = 0.02 + (normalizedIntensity * 0.08);
+                    
+                    // Slightly modulate frequencies based on intensity
+                    if (this.oscillators.length > 0) {
+                        const baseFreq = 7.83 + Math.sin(this.time * 0.001) * 0.1;
+                        this.oscillators[0].oscillator.frequency.value = baseFreq;
+                        if (this.oscillators[1]) this.oscillators[1].oscillator.frequency.value = baseFreq * 1.83;
+                        if (this.oscillators[2]) this.oscillators[2].oscillator.frequency.value = baseFreq * 2.66;
+                    }
+                }
+            }
+
+            createParticles() {
+                for (let i = 0; i < 80; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 150 + Math.random() * 300;
+                    const x = window.innerWidth / 2 + Math.cos(angle) * distance;
+                    const y = window.innerHeight / 2 + Math.sin(angle) * distance;
+                    
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    particle.style.width = `${Math.random() * 3 + 1}px`;
+                    particle.style.height = particle.style.width;
+                    particle.style.opacity = Math.random() * 0.5 + 0.3;
+                    
+                    // Random color (blue, gold, or purple)
+                    const colors = ['#00ffff', '#ffd700', '#8a2be2'];
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    document.body.appendChild(particle);
+                    
+                    // Store particle data for animation
+                    this.particles.push({
+                        element: particle,
+                        x: x,
+                        y: y,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        life: Math.random() * 100
+                    });
+                }
+            }
+
+            animateParticles() {
+                this.particles.forEach(particle => {
+                    particle.life += 1;
+                    
+                    // Update position
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    
+                    // Wrap around screen
+                    if (particle.x < 0) particle.x = window.innerWidth;
+                    if (particle.x > window.innerWidth) particle.x = 0;
+                    if (particle.y < 0) particle.y = window.innerHeight;
+                    if (particle.y > window.innerHeight) particle.y = 0;
+                    
+                    // Update DOM element
+                    particle.element.style.left = particle.x + 'px';
+                    particle.element.style.top = particle.y + 'px';
+                    
+                    // Pulse opacity
+                    const opacity = 0.3 + 0.4 * Math.sin(particle.life * 0.05);
+                    particle.element.style.opacity = opacity;
+                });
+            }
+
+            animate() {
+                this.time++;
+                
+                const intensity = this.calculateIntensity(this.time);
+                this.updateStatus(intensity);
+                this.updateAudio(intensity);
+                this.updateFrequencyDisplays();
+                this.animateParticles();
+                
+                // Update core appearance based on intensity
+                const normalizedIntensity = Math.max(0, (intensity - 2.5) / 2.5);
+                const scale = 1 + normalizedIntensity * 0.2;
+                const opacity = 0.6 + normalizedIntensity * 0.4;
+                
+                this.core.style.transform = `scale(${scale})`;
+                this.core.style.opacity = opacity;
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize the Logos Core when the page loads
+        window.addEventListener('load', () => {
+            new LogosCore();
+        });
+    </script>
+</body>
+</html>
