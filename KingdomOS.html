@@ -314,10 +314,11 @@
             to { transform: rotateX(360deg) rotateY(-360deg) rotateZ(360deg); }
         }
 
+        /* Updated particleFloat to use 3D and custom properties for animation range */
         @keyframes particleFloat {
-            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.3; }
+            0% { transform: translate3d(var(--float-x-start, 0px), var(--float-y-start, 0px), var(--float-z-start, 0px)) rotate(0deg); opacity: 0.3; }
             50% { opacity: 0.8; }
-            100% { transform: translate(var(--dx), var(--dy)) rotate(360deg); opacity: 0.1; }
+            100% { transform: translate3d(var(--float-x-end), var(--float-y-end), var(--float-z-end)) rotate(360deg); opacity: 0.1; }
         }
 
         .frequency-item {
@@ -447,8 +448,8 @@
                 
                 this.initializeGeometry();
                 this.setupControls();
-                this.createParticleField();
-                this.animate();
+                this.createParticleField(); // Call this to create particles
+                this.animate(); // Start the animation loop
             }
 
             initializeGeometry() {
@@ -598,6 +599,65 @@
                 });
             }
 
+            createParticleField() {
+                const numParticles = 150;
+                const container = document.querySelector('.universe-container');
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const minParticleSize = 2;
+                const maxParticleSize = 8;
+                const maxFloatRange = 200; // Max movement range for particles
+
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+
+                    const size = minParticleSize + Math.random() * (maxParticleSize - minParticleSize);
+                    const initialX = Math.random() * vw; 
+                    const initialY = Math.random() * vh; 
+                    const initialZ = Math.random() * 400 - 200; // Z-depth for perspective
+
+                    const colorChoices = ['#00ffff', '#ff00ff', '#ffff00', '#ffffff'];
+                    const color = colorChoices[Math.floor(Math.random() * colorChoices.length)];
+
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${initialX}px`;
+                    particle.style.top = `${initialY}px`;
+                    particle.style.background = color;
+                    particle.style.boxShadow = `0 0 ${size * 1.5}px ${color}`; // Initial shadow
+
+                    // Set initial transform (for z-depth) - this will be combined with animation's transform
+                    particle.style.transform = `translateZ(${initialZ}px)`;
+
+                    // Animation variables for floating movement
+                    const delay = Math.random() * 10; // seconds
+                    const duration = 10 + Math.random() * 20; // seconds
+                    const floatDx = (Math.random() - 0.5) * maxFloatRange; // x-float range
+                    const floatDy = (Math.random() - 0.5) * maxFloatRange; // y-float range
+                    const floatDz = (Math.random() - 0.5) * (maxFloatRange / 2); // z-float range
+
+                    // Set CSS variables for animation
+                    particle.style.setProperty('--float-x-start', `0px`); // Animation starts at relative 0,0,0
+                    particle.style.setProperty('--float-y-start', `0px`);
+                    particle.style.setProperty('--float-z-start', `0px`);
+                    particle.style.setProperty('--float-x-end', `${floatDx}px`);
+                    particle.style.setProperty('--float-y-end', `${floatDy}px`);
+                    particle.style.setProperty('--float-z-end', `${floatDz}px`);
+                    
+                    particle.style.animation = `particleFloat ${duration}s ease-in-out ${delay}s infinite alternate`;
+
+                    // Store initial properties for dynamic updates
+                    particle.dataset.initialZ = initialZ;
+                    particle.dataset.initialSize = size;
+                    particle.dataset.initialColor = color;
+                    particle.dataset.initialDuration = duration; // Store for reset
+
+                    container.appendChild(particle);
+                    this.particles.push(particle);
+                }
+            }
+
             setupControls() {
                 this.audioToggle.addEventListener('click', () => {
                     if (this.audioEnabled) {
@@ -620,7 +680,10 @@
 
                 this.ringSpeedSlider.addEventListener('input', (e) => {
                     const speed = parseInt(e.target.value);
-                    document.documentElement.style.setProperty('--ring-speed', `${speed}s`);
+                    // Apply to individual ring animations using their CSS classes
+                    document.querySelector('.ring-outer').style.animationDuration = `${speed}s`;
+                    document.querySelector('.ring-middle').style.animationDuration = `${speed * 0.8}s`;
+                    document.querySelector('.ring-inner').style.animationDuration = `${speed * 0.6}s`;
                 });
 
                 this.geometrySpeedSlider.addEventListener('input', (e) => {
@@ -639,6 +702,21 @@
                     this.geometrySpeedSlider.value = 25;
                     this.fractalMode.textContent = 'Fractal Mode';
                     this.fractalMode.style.background = 'rgba(0, 40, 80, 0.7)';
+                    
+                    // Reset ring speeds and geometry speeds
+                    document.querySelector('.ring-outer').style.animationDuration = `15s`;
+                    document.querySelector('.ring-middle').style.animationDuration = `12s`;
+                    document.querySelector('.ring-inner').style.animationDuration = `8s`;
+                    this.flowerOfLife.style.animationDuration = `25s`;
+                    this.metatronCube.style.animationDuration = `20s`;
+                    this.merkabah.style.animationDuration = `18s`;
+
+                    // Reset particle durations and visual effects
+                    this.particles.forEach(particle => {
+                        particle.style.animationDuration = `${particle.dataset.initialDuration}s`;
+                        particle.style.filter = ''; // Reset filter
+                        particle.style.boxShadow = `0 0 ${particle.dataset.initialSize * 1.5}px ${particle.dataset.initialColor}`; // Reset shadow
+                    });
                 });
             }
 
@@ -647,41 +725,48 @@
                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     
                     // Unified frequency set combining both systems
-                    const frequencies = [7.83, 14.3, 20.8, 432, 528]; // Hz
+                    const audioFrequencies = [
+                        {name: 'Schumann Base', freq: 7.83},
+                        {name: 'Golden Harmonic 1', freq: 12.66}, 
+                        {name: 'Golden Harmonic 2', freq: 14.3}, 
+                        {name: 'Ezekiel Resonance', freq: 432},
+                        {name: 'Unity Frequency', freq: 528}
+                    ]; 
                     
                     this.gainNode = this.audioContext.createGain();
                     this.gainNode.gain.value = 0.08;
                     this.gainNode.connect(this.audioContext.destination);
 
-                    frequencies.forEach((freq, index) => {
+                    audioFrequencies.forEach((fObj, index) => {
                         const oscillator = this.audioContext.createOscillator();
                         const gain = this.audioContext.createGain();
                         
-                        oscillator.frequency.value = freq;
-                        oscillator.type = index < 3 ? 'sine' : 'triangle';
-                        gain.gain.value = 0.03 / (index + 1);
+                        oscillator.frequency.value = fObj.freq;
+                        oscillator.type = index < 3 ? 'sine' : 'triangle'; // Lower frequencies as sine, higher as triangle
+                        gain.gain.value = 0.03 / (index + 1); // Gradually quieter
                         
                         oscillator.connect(gain);
                         gain.connect(this.gainNode);
                         oscillator.start();
                         
-                        this.oscillators.push({ oscillator, gain, baseFreq: freq });
+                        this.oscillators.push({ oscillator, gain, baseFreq: fObj.freq });
                     });
                     
                     this.audioEnabled = true;
                     this.audioToggle.textContent = 'Disable Audio';
                 } catch (error) {
-                    console.log('Audio not supported');
+                    console.log('Audio not supported or failed to start:', error);
+                    alert('Audio API not supported or failed to start. Please try a different browser or ensure audio is enabled.');
                 }
             }
 
             stopAudio() {
                 if (this.audioContext) {
                     this.oscillators.forEach(({ oscillator }) => {
-                        try { oscillator.stop(); } catch (e) {}
+                        try { oscillator.stop(); } catch (e) { console.warn("Error stopping oscillator:", e); }
                     });
                     this.oscillators = [];
-                    this.audioContext.close();
+                    try { this.audioContext.close(); } catch (e) { console.warn("Error closing audio context:", e); }
                     this.audioContext = null;
                 }
                 
@@ -699,21 +784,23 @@
                 
                 // Smooth transition to target
                 const targetDiff = this.targetIntensity - this.intensity;
-                this.intensity += targetDiff * 0.02;
+                this.intensity += targetDiff * 0.02; // Slower, smoother transition
                 
-                return this.intensity + timeModulation + goldenModulation + fractalModulation;
+                // Ensure intensity stays within a reasonable range (e.g., 1 to 10)
+                let calculated = this.intensity + timeModulation + goldenModulation + fractalModulation;
+                return Math.max(1, Math.min(10, calculated)); // Cap between 1 and 10
             }
 
             updateStatus(intensity) {
                 let status, className;
                 
-                if (intensity > 8.0) {
+                if (intensity > 8.5) { // Adjusted thresholds
                     status = '🌟 Transcendent Unity Achieved';
                     className = 'transcendent';
-                } else if (intensity > 6.0) {
+                } else if (intensity > 6.5) {
                     status = '🟢 Perfect Coherent Resonance';
                     className = 'coherent';
-                } else if (intensity >= 4.5) {
+                } else if (intensity >= 4.0) {
                     status = '🟡 Partial Matrix Alignment';
                     className = 'partial';
                 } else {
@@ -728,4 +815,82 @@
 
             updateFrequencyDisplays() {
                 const time = this.time * 0.001;
-                const modulation = 1 + Math.sin(time
+                const currentIntensity = this.calculateIntensity(this.time); // Get current modulated intensity
+                
+                const displayBaseFrequencies = [
+                    { label: 'Schumann Base:', value: 7.83 },
+                    { label: 'Golden Harmonic:', value: 12.66 },
+                    { label: 'Ezekiel Resonance:', value: 432.0 },
+                    { label: 'Unity Frequency:', value: 528.0 }
+                ];
+
+                displayBaseFrequencies.forEach((freqObj, index) => {
+                    const displayElement = this.freqDisplays[index];
+                    if (displayElement) {
+                        // Subtle modulation based on time and intensity, for display purposes
+                        const modulation = 1 + 0.01 * Math.sin(time * (index + 1) * 0.5) * (currentIntensity / 10);
+                        const modulatedValue = freqObj.value * modulation;
+                        displayElement.textContent = `${modulatedValue.toFixed(2)} Hz`;
+                    }
+                });
+            }
+
+            animate() {
+                this.time++;
+
+                // Smoothly adjust intensity towards target
+                const intensityDiff = this.targetIntensity - this.intensity;
+                this.intensity += intensityDiff * 0.05; // Adjust speed of intensity change
+
+                const currentIntensity = this.calculateIntensity(this.time);
+                this.updateStatus(currentIntensity);
+                this.updateFrequencyDisplays(); 
+
+                // Update audio frequencies and gain based on intensity
+                if (this.audioEnabled && this.oscillators.length > 0) {
+                    this.oscillators.forEach(oscObj => {
+                        // Modulate frequency slightly based on intensity and time for audio
+                        const freqModulation = 1 + (Math.sin(this.time * 0.01) * 0.01 * (currentIntensity / 10));
+                        oscObj.oscillator.frequency.value = oscObj.baseFreq * freqModulation;
+                        
+                        // Modulate gain based on intensity
+                        oscObj.gain.gain.value = 0.03 * (currentIntensity / 10);
+                        if (oscObj.gain.gain.value > 0.1) oscObj.gain.gain.value = 0.1; // Cap max volume
+                    });
+                }
+
+                // Update particle properties based on fractal mode and intensity
+                this.particles.forEach((particle) => {
+                    const intensityFactor = currentIntensity / 10; // Normalized 0-1 for effects
+                    
+                    // Scale brightness based on intensity
+                    const brightness = 0.5 + intensityFactor * 1.5; // From 0.5 to 2.0
+                    
+                    // Hue shift and animation speed in fractal mode
+                    let hueRotate = 0;
+                    if (this.fractalModeActive) {
+                        hueRotate = (this.time * 0.5 + parseFloat(particle.dataset.initialZ || 0) * 0.1) % 360; // Deterministic hue based on initial Z
+                        particle.style.animationDuration = `${5 + Math.random() * 5}s`; // Faster, more chaotic animation
+                    } else {
+                        particle.style.animationDuration = `${particle.dataset.initialDuration}s`; // Revert to initial random duration
+                    }
+                    
+                    // Apply visual effects
+                    particle.style.filter = `brightness(${brightness}) hue-rotate(${hueRotate}deg)`;
+                    
+                    // Modify box-shadow spread based on intensity
+                    const shadowSpread = parseFloat(particle.dataset.initialSize) * (1 + intensityFactor * 1.5); // More dramatic shadow
+                    particle.style.boxShadow = `0 0 ${shadowSpread}px ${particle.dataset.initialColor}`;
+                });
+
+                requestAnimationFrame(this.animate.bind(this));
+            }
+        }
+
+        // Initialize the engine when the DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new UnifiedCoreEngine();
+        });
+    </script>
+</body>
+</html>
