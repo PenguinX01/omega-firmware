@@ -115,6 +115,78 @@
             transform: translate(-50%, -50%) scale(0.8);
         }
 
+        /* Lung Capacity Bar */
+        .lung-capacity-container {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(20, 0, 40, 0.8);
+            border: 1px solid #ff00ff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        .lung-capacity-container h4 {
+            color: #ff88ff;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .lung-capacity-bar {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff00ff;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lung-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, 
+                rgba(255, 0, 0, 0.8) 0%,
+                rgba(255, 100, 100, 0.6) 50%,
+                rgba(255, 200, 200, 0.4) 100%);
+            transition: height 0.1s ease-out;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .lung-fill.exhaling {
+            background: linear-gradient(to top, 
+                rgba(0, 100, 255, 0.8) 0%,
+                rgba(100, 150, 255, 0.6) 50%,
+                rgba(200, 220, 255, 0.4) 100%);
+        }
+
+        .capacity-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+
+        .breath-phase-indicator {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #ff88ff;
+            font-weight: bold;
+        }
+
         /* Breath Instructions */
         .breath-instructions {
             position: absolute;
@@ -466,6 +538,16 @@
             </div>
         </div>
         
+        <!-- Lung Capacity Display -->
+        <div class="lung-capacity-container">
+            <h4>LUNG CAPACITY</h4>
+            <div class="lung-capacity-bar">
+                <div class="lung-fill" id="lungFill"></div>
+                <div class="capacity-percentage" id="capacityPercentage">0%</div>
+            </div>
+            <div class="breath-phase-indicator" id="breathPhaseIndicator">Ready</div>
+        </div>
+
         <!-- Breath Instructions -->
         <div class="breath-instructions" id="breathInstructions">Begin Breath Work</div>
         
@@ -543,6 +625,11 @@
                 this.flowerOfLife = document.getElementById('flowerOfLife');
                 this.metatronCube = document.getElementById('metatronCube');
                 this.merkabah = document.getElementById('merkabah');
+                
+                // Lung capacity elements
+                this.lungFill = document.getElementById('lungFill');
+                this.capacityPercentage = document.getElementById('capacityPercentage');
+                this.breathPhaseIndicator = document.getElementById('breathPhaseIndicator');
                 
                 // Controls
                 this.audioToggle = document.getElementById('audioToggle');
@@ -941,7 +1028,14 @@
             }
 
             updateBreathEngine() {
-                if (!this.breathActive) return;
+                if (!this.breathActive) {
+                    // Reset lung capacity display when not active
+                    this.lungFill.style.height = '0%';
+                    this.capacityPercentage.textContent = '0%';
+                    this.breathPhaseIndicator.textContent = 'Ready';
+                    this.lungFill.classList.remove('exhaling');
+                    return;
+                }
 
                 const currentTime = Date.now();
                 const elapsed = (currentTime - this.breathStartTime) / 1000; // seconds
@@ -952,6 +1046,22 @@
                 const wasInhaling = this.isInhaling;
                 this.isInhaling = this.breathPhase < 0.5;
 
+                // Calculate lung capacity percentage
+                let capacityPercent;
+                if (this.isInhaling) {
+                    // During inhale: 0% to 100% over first half of cycle
+                    capacityPercent = (this.breathPhase * 2) * 100;
+                } else {
+                    // During exhale: 100% to 0% over second half of cycle
+                    capacityPercent = ((1 - this.breathPhase) * 2) * 100;
+                }
+                
+                capacityPercent = Math.max(0, Math.min(100, capacityPercent));
+
+                // Update lung capacity visual
+                this.lungFill.style.height = capacityPercent + '%';
+                this.capacityPercentage.textContent = Math.round(capacityPercent) + '%';
+
                 // Transition detection
                 if (wasInhaling !== this.isInhaling) {
                     if (this.isInhaling) {
@@ -960,12 +1070,23 @@
                         this.breathInstructions.classList.add('inhale');
                         this.logosBreathCore.classList.remove('exhale');
                         this.logosBreathCore.classList.add('inhale');
+                        this.breathPhaseIndicator.textContent = 'Inhaling';
+                        this.lungFill.classList.remove('exhaling');
                     } else {
                         this.breathInstructions.textContent = 'Breathe Out...';
                         this.breathInstructions.classList.remove('inhale');
                         this.breathInstructions.classList.add('exhale');
                         this.logosBreathCore.classList.remove('inhale');
                         this.logosBreathCore.classList.add('exhale');
+                        this.breathPhaseIndicator.textContent = 'Exhaling';
+                        this.lungFill.classList.add('exhaling');
+                    }
+                } else {
+                    // Update phase indicator for current state
+                    if (this.isInhaling) {
+                        this.breathPhaseIndicator.textContent = 'Inhaling';
+                    } else {
+                        this.breathPhaseIndicator.textContent = 'Exhaling';
                     }
                 }
             }
@@ -1072,6 +1193,7 @@
             console.log('🔮 Sacred Geometry Matrices Active');
             console.log('💨 Logos Breath Engine Ready');
             console.log('🎵 Harmonic Resonance System Online');
+            console.log('🫁 Lung Capacity Monitor Active');
         });
     </script>
 </body>
