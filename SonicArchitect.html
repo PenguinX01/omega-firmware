@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ω-STONE SIM ENGINE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ff88;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff88;
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            max-width: 350px;
+            z-index: 100;
+        }
+        
+        .controls h1 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-align: center;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #00ff88;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+            box-shadow: 0 0 5px #00ff88;
+        }
+        
+        .preset-btn {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        .status {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff6b35;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 11px;
+            color: #ff6b35;
+        }
+        
+        .glyph {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #ff6b35;
+            text-shadow: 0 0 20px #ff6b35;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        
+        <div class="controls">
+            <h1>🧬 Ω-STONE SIM ENGINE</h1>
+            
+            <div class="control-group">
+                <label>Base Frequency: <span id="freqValue">432</span> Hz</label>
+                <input type="range" id="frequency" min="200" max="800" value="432">
+            </div>
+            
+            <div class="control-group">
+                <label>Harmonic Complexity: <span id="harmonicsValue">5</span></label>
+                <input type="range" id="harmonics" min="1" max="12" value="5">
+            </div>
+            
+            <div class="control-group">
+                <label>Resonance Intensity: <span id="amplitudeValue">0.8</span></label>
+                <input type="range" id="amplitude" min="0.1" max="2" step="0.1" value="0.8">
+            </div>
+            
+            <div class="control-group">
+                <label>Sacred Ratio: <span id="ratioValue">φ (1.618)</span></label>
+                <input type="range" id="ratio" min="1" max="3" step="0.01" value="1.618">
+            </div>
+            
+            <div class="control-group">
+                <label>Temporal Flow: <span id="speedValue">1.0</span></label>
+                <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1.0">
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <button class="preset-btn" onclick="loadPreset('cathedral')">Cathedral</button>
+                <button class="preset-btn" onclick="loadPreset('pyramid')">Pyramid</button>
+                <button class="preset-btn" onclick="loadPreset('spiral')">Spiral</button>
+                <button class="preset-btn" onclick="loadPreset('mandala')">Mandala</button>
+            </div>
+        </div>
+        
+        <div class="status">
+            <div>SYMBOL-020 ACTIVE</div>
+            <div>Fractal Architecture: <span id="status">GENERATING</span></div>
+        </div>
+        
+        <div class="glyph">💥🧬⚙️</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Core Three.js setup
+        let scene, camera, renderer, geometry, material, mesh;
+        let animationId;
+        let time = 0;
+        
+        // Harmonic parameters
+        let baseFreq = 432;
+        let harmonicCount = 5;
+        let amplitude = 0.8;
+        let sacredRatio = 1.618; // Golden ratio
+        let timeSpeed = 1.0;
+        
+        // Initialize the simulation
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000);
+            
+            // Create initial geometry
+            createHarmonicStructure();
+            
+            // Camera position
+            camera.position.set(0, 5, 15);
+            camera.lookAt(0, 0, 0);
+            
+            // Controls
+            setupControls();
+            
+            // Start animation
+            animate();
+        }
+        
+        function createHarmonicStructure() {
+            // Remove existing mesh
+            if (mesh) {
+                scene.remove(mesh);
+                geometry.dispose();
+                material.dispose();
+            }
+            
+            // Create complex geometry based on harmonic series
+            const vertices = [];
+            const colors = [];
+            const indices = [];
+            
+            const gridSize = 64;
+            const scale = 8;
+            
+            // Generate vertices using harmonic interference patterns
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const x = (i - gridSize/2) * scale / gridSize;
+                    const z = (j - gridSize/2) * scale / gridSize;
+                    
+                    // Calculate harmonic interference at this point
+                    let y = 0;
+                    for (let h = 1; h <= harmonicCount; h++) {
+                        const freq = baseFreq * h;
+                        const harmonicRatio = Math.pow(sacredRatio, h - 1);
+                        
+                        // Multiple wave sources creating interference
+                        const wave1 = Math.sin(Math.sqrt(x*x + z*z) * freq * 0.01 + time * timeSpeed) / h;
+                        const wave2 = Math.sin(x * freq * 0.008 + time * timeSpeed * 1.3) / (h * 1.2);
+                        const wave3 = Math.sin(z * freq * 0.012 + time * timeSpeed * 0.8) / (h * 1.5);
+                        
+                        y += (wave1 + wave2 + wave3) * amplitude * harmonicRatio * 0.3;
+                    }
+                    
+                    // Apply sacred geometry modulation
+                    const distance = Math.sqrt(x*x + z*z);
+                    const goldenSpiral = Math.sin(distance * sacredRatio + time * timeSpeed * 0.5) * 0.5;
+                    y += goldenSpiral * amplitude * 0.2;
+                    
+                    vertices.push(x, y, z);
+                    
+                    // Color based on height and harmonics
+                    const hue = (y + 2) * 0.15 + time * 0.1;
+                    const sat = 0.8;
+                    const lightness = 0.4 + Math.abs(y) * 0.3;
+                    
+                    const color = new THREE.Color().setHSL(hue, sat, lightness);
+                    colors.push(color.r, color.g, color.b);
+                }
+            }
+            
+            // Generate indices for triangulation
+            for (let i = 0; i < gridSize - 1; i++) {
+                for (let j = 0; j < gridSize - 1; j++) {
+                    const a = i * gridSize + j;
+                    const b = i * gridSize + (j + 1);
+                    const c = (i + 1) * gridSize + j;
+                    const d = (i + 1) * gridSize + (j + 1);
+                    
+                    indices.push(a, b, c);
+                    indices.push(b, d, c);
+                }
+            }
+            
+            // Create geometry
+            geometry = new THREE.BufferGeometry();
+            geometry.setIndex(indices);
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.computeVertexNormals();
+            
+            // Create material with custom properties
+            material = new THREE.MeshPhongMaterial({
+                vertexColors: true,
+                wireframe: false,
+                transparent: true,
+                opacity: 0.9,
+                shininess: 100
+            });
+            
+            // Create mesh
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            
+            // Add lights
+            if (!scene.getObjectByName('ambientLight')) {
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+                ambientLight.name = 'ambientLight';
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(10, 10, 5);
+                directionalLight.name = 'directionalLight';
+                scene.add(directionalLight);
+                
+                const pointLight = new THREE.PointLight(0x00ff88, 1, 50);
+                pointLight.position.set(0, 10, 0);
+                pointLight.name = 'pointLight';
+                scene.add(pointLight);
+            }
+        }
+        
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            time += 0.016 * timeSpeed; // ~60fps
+            
+            // Update geometry based on time
+            const positions = geometry.attributes.position.array;
+            const colors = geometry.attributes.color.array;
+            const gridSize = 64;
+            const scale = 8;
+            
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const index = (i * gridSize + j) * 3;
+                    const x = positions[index];
+                    const z = positions[index + 2];
+                    
+                    // Recalculate Y position with harmonic interference
+                    let y = 0;
+                    for (let h = 1; h <= harmonicCount; h++) {
+                        const freq = baseFreq * h;
+                        const harmonicRatio = Math.pow(sacredRatio, h - 1);
+                        
+                        const wave1 = Math.sin(Math.sqrt(x*x + z*z) * freq * 0.01 + time * timeSpeed) / h;
+                        const wave2 = Math.sin(x * freq * 0.008 + time * timeSpeed * 1.3) / (h * 1.2);
+                        const wave3 = Math.sin(z * freq * 0.012 + time * timeSpeed * 0.8) / (h * 1.5);
+                        
+                        y += (wave1 + wave2 + wave3) * amplitude * harmonicRatio * 0.3;
+                    }
+                    
+                    // Apply sacred geometry modulation
+                    const distance = Math.sqrt(x*x + z*z);
+                    const goldenSpiral = Math.sin(distance * sacredRatio + time * timeSpeed * 0.5) * 0.5;
+                    y += goldenSpiral * amplitude * 0.2;
+                    
+                    positions[index + 1] = y;
+                    
+                    // Update colors
+                    const colorIndex = (i * gridSize + j) * 3;
+                    const hue = (y + 2) * 0.15 + time * 0.1;
+                    const color = new THREE.Color().setHSL(hue, 0.8, 0.4 + Math.abs(y) * 0.3);
+                    colors[colorIndex] = color.r;
+                    colors[colorIndex + 1] = color.g;
+                    colors[colorIndex + 2] = color.b;
+                }
+            }
+            
+            geometry.attributes.position.needsUpdate = true;
+            geometry.attributes.color.needsUpdate = true;
+            geometry.computeVertexNormals();
+            
+            // Rotate the structure
+            mesh.rotation.y += 0.002 * timeSpeed;
+            
+            // Update camera orbit
+            const radius = 15;
+            camera.position.x = Math.sin(time * 0.1) * radius;
+            camera.position.z = Math.cos(time * 0.1) * radius;
+            camera.lookAt(0, 0, 0);
+            
+            renderer.render(scene, camera);
+        }
+        
+        function setupControls() {
+            const controls = {
+                frequency: document.getElementById('frequency'),
+                harmonics: document.getElementById('harmonics'),
+                amplitude: document.getElementById('amplitude'),
+                ratio: document.getElementById('ratio'),
+                speed: document.getElementById('speed')
+            };
+            
+            const values = {
+                freqValue: document.getElementById('freqValue'),
+                harmonicsValue: document.getElementById('harmonicsValue'),
+                amplitudeValue: document.getElementById('amplitudeValue'),
+                ratioValue: document.getElementById('ratioValue'),
+                speedValue: document.getElementById('speedValue')
+            };
+            
+            controls.frequency.addEventListener('input', (e) => {
+                baseFreq = parseFloat(e.target.value);
+                values.freqValue.textContent = baseFreq;
+                updateStatus();
+            });
+            
+            controls.harmonics.addEventListener('input', (e) => {
+                harmonicCount = parseInt(e.target.value);
+                values.harmonicsValue.textContent = harmonicCount;
+                updateStatus();
+            });
+            
+            controls.amplitude.addEventListener('input', (e) => {
+                amplitude = parseFloat(e.target.value);
+                values.amplitudeValue.textContent = amplitude;
+                updateStatus();
+            });
+            
+            controls.ratio.addEventListener('input', (e) => {
+                sacredRatio = parseFloat(e.target.value);
+                const ratioNames = {
+                    '1.41': '√2',
+                    '1.62': 'φ (1.618)',
+                    '1.73': '√3',
+                    '2.00': '2:1',
+                    '2.62': 'φ²'
+                };
+                values.ratioValue.textContent = ratioNames[e.target.value.substring(0,4)] || e.target.value;
+                updateStatus();
+            });
+            
+            controls.speed.addEventListener('input', (e) => {
+                timeSpeed = parseFloat(e.target.value);
+                values.speedValue.textContent = timeSpeed;
+                updateStatus();
+            });
+        }
+        
+        function loadPreset(type) {
+            switch(type) {
+                case 'cathedral':
+                    baseFreq = 432;
+                    harmonicCount = 8;
+                    amplitude = 1.2;
+                    sacredRatio = 1.618;
+                    timeSpeed = 0.5;
+                    break;
+                case 'pyramid':
+                    baseFreq = 528;
+                    harmonicCount = 6;
+                    amplitude = 1.5;
+                    sacredRatio = 1.414;
+                    timeSpeed = 0.8;
+                    break;
+                case 'spiral':
+                    baseFreq = 396;
+                    harmonicCount = 12;
+                    amplitude = 0.9;
+                    sacredRatio = 2.618;
+                    timeSpeed = 1.5;
+                    break;
+                case 'mandala':
+                    baseFreq = 741;
+                    harmonicCount = 9;
+                    amplitude = 1.0;
+                    sacredRatio = 1.732;
+                    timeSpeed = 2.0;
+                    break;
+            }
+            
+            // Update UI
+            document.getElementById('frequency').value = baseFreq;
+            document.getElementById('harmonics').value = harmonicCount;
+            document.getElementById('amplitude').value = amplitude;
+            document.getElementById('ratio').value = sacredRatio;
+            document.getElementById('speed').value = timeSpeed;
+            
+            // Update displays
+            document.getElementById('freqValue').textContent = baseFreq;
+            document.getElementById('harmonicsValue').textContent = harmonicCount;
+            document.getElementById('amplitudeValue').textContent = amplitude;
+            document.getElementById('ratioValue').textContent = sacredRatio;
+            document.getElementById('speedValue').textContent = timeSpeed;
+            
+            updateStatus();
+        }
+        
+        function updateStatus() {
+            document.getElementById('status').textContent = `${baseFreq}Hz × ${harmonicCount}H`;
+        }
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
