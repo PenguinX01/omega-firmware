@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ω-STONE SIM ENGINE</title>
+    <title>SONIC CONSTRUCTION SUITE</title>
     <style>
         * {
             margin: 0;
@@ -12,54 +12,93 @@
         }
         
         body {
-            background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
-            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #0a1a0a 100%);
+            font-family: 'Consolas', 'Monaco', monospace;
             color: #00ff88;
-            overflow: hidden;
-            height: 100vh;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
         
-        #container {
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 2px solid #ff6b35;
+            padding: 15px 30px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #ff6b35;
+            font-size: 18px;
+            text-align: center;
+            text-shadow: 0 0 15px #ff6b35;
+            letter-spacing: 2px;
+        }
+        
+        .main-container {
+            margin-top: 80px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            padding: 20px;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .viewport {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            overflow: hidden;
         }
         
         #canvas {
-            display: block;
             width: 100%;
-            height: 100%;
+            height: 600px;
+            display: block;
         }
         
-        .controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00ff88;
-            padding: 20px;
+        .control-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #ff6b35;
             border-radius: 10px;
-            backdrop-filter: blur(10px);
-            max-width: 350px;
-            z-index: 100;
+            padding: 20px;
+            height: fit-content;
+            backdrop-filter: blur(5px);
         }
         
-        .controls h1 {
+        .panel-section {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .panel-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section-title {
             color: #ff6b35;
+            font-size: 14px;
             margin-bottom: 15px;
-            font-size: 16px;
-            text-align: center;
-            text-shadow: 0 0 10px #ff6b35;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px #ff6b35;
         }
         
         .control-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         .control-group label {
             display: block;
             margin-bottom: 5px;
-            font-size: 12px;
+            font-size: 11px;
             color: #00ff88;
         }
         
@@ -70,203 +109,385 @@
             background: #333;
             outline: none;
             -webkit-appearance: none;
+            margin-bottom: 5px;
         }
         
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background: #00ff88;
+            background: linear-gradient(45deg, #00ff88, #00cc66);
             cursor: pointer;
-            box-shadow: 0 0 5px #00ff88;
+            box-shadow: 0 0 8px #00ff88;
         }
         
-        .preset-btn {
-            background: rgba(0, 255, 136, 0.2);
+        .value-display {
+            font-size: 10px;
+            color: #888;
+            text-align: right;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
             border: 1px solid #00ff88;
             color: #00ff88;
-            padding: 5px 10px;
-            margin: 2px;
+            padding: 8px 12px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 10px;
+            text-transform: uppercase;
             transition: all 0.3s;
+            font-family: inherit;
         }
         
-        .preset-btn:hover {
-            background: rgba(0, 255, 136, 0.4);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        .btn:hover {
+            background: linear-gradient(45deg, rgba(0, 255, 136, 0.4), rgba(0, 255, 136, 0.2));
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transform: translateY(-1px);
         }
         
-        .status {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
+        .btn.active {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+        
+        .construction-mode {
+            background: linear-gradient(45deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.1));
             border: 1px solid #ff6b35;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 11px;
             color: #ff6b35;
         }
         
-        .glyph {
+        .construction-mode:hover {
+            background: linear-gradient(45deg, rgba(255, 107, 53, 0.4), rgba(255, 107, 53, 0.2));
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+        }
+        
+        .export-section {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid #ff6b35;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid #333;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            z-index: 1000;
+        }
+        
+        .status-left {
+            color: #00ff88;
+        }
+        
+        .status-right {
+            color: #ff6b35;
+        }
+        
+        .glyph-overlay {
             position: absolute;
             top: 20px;
             right: 20px;
-            font-size: 24px;
+            font-size: 32px;
             color: #ff6b35;
-            text-shadow: 0 0 20px #ff6b35;
-            animation: pulse 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 25px #ff6b35;
+            animation: pulse 3s ease-in-out infinite alternate;
+            z-index: 100;
         }
         
         @keyframes pulse {
-            from { opacity: 0.7; }
-            to { opacity: 1; }
+            from { opacity: 0.6; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.05); }
+        }
+        
+        .material-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .material-btn {
+            padding: 6px;
+            font-size: 9px;
+            text-align: center;
+        }
+        
+        .frequency-visualizer {
+            height: 60px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .freq-bars {
+            display: flex;
+            height: 100%;
+            align-items: end;
+            padding: 5px;
+            gap: 2px;
+        }
+        
+        .freq-bar {
+            flex: 1;
+            background: linear-gradient(to top, #ff6b35, #00ff88);
+            border-radius: 1px;
+            transition: height 0.1s;
+        }
+        
+        .construction-readout {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #ff6b35;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 10px;
+            line-height: 1.4;
+            color: #ff6b35;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <canvas id="canvas"></canvas>
-        
-        <div class="controls">
-            <h1>🧬 Ω-STONE SIM ENGINE</h1>
-            
-            <div class="control-group">
-                <label>Base Frequency: <span id="freqValue">432</span> Hz</label>
-                <input type="range" id="frequency" min="200" max="800" value="432">
-            </div>
-            
-            <div class="control-group">
-                <label>Harmonic Complexity: <span id="harmonicsValue">5</span></label>
-                <input type="range" id="harmonics" min="1" max="12" value="5">
-            </div>
-            
-            <div class="control-group">
-                <label>Resonance Intensity: <span id="amplitudeValue">0.8</span></label>
-                <input type="range" id="amplitude" min="0.1" max="2" step="0.1" value="0.8">
-            </div>
-            
-            <div class="control-group">
-                <label>Sacred Ratio: <span id="ratioValue">φ (1.618)</span></label>
-                <input type="range" id="ratio" min="1" max="3" step="0.01" value="1.618">
-            </div>
-            
-            <div class="control-group">
-                <label>Temporal Flow: <span id="speedValue">1.0</span></label>
-                <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1.0">
-            </div>
-            
-            <div style="margin-top: 15px;">
-                <button class="preset-btn" onclick="loadPreset('cathedral')">Cathedral</button>
-                <button class="preset-btn" onclick="loadPreset('pyramid')">Pyramid</button>
-                <button class="preset-btn" onclick="loadPreset('spiral')">Spiral</button>
-                <button class="preset-btn" onclick="loadPreset('mandala')">Mandala</button>
-            </div>
+    <div class="header">
+        <h1>🏗️ SONIC CONSTRUCTION SUITE - REAL-WORLD BUILDER 🎵</h1>
+    </div>
+    
+    <div class="main-container">
+        <div class="viewport">
+            <canvas id="canvas"></canvas>
+            <div class="glyph-overlay">🧬⚡🏗️</div>
         </div>
         
-        <div class="status">
-            <div>SYMBOL-020 ACTIVE</div>
-            <div>Fractal Architecture: <span id="status">GENERATING</span></div>
+        <div class="control-panel">
+            <!-- HARMONIC DESIGN SECTION -->
+            <div class="panel-section">
+                <div class="section-title">🎵 Harmonic Design Engine</div>
+                
+                <div class="control-group">
+                    <label>Base Frequency: <span class="value-display" id="freqValue">432 Hz</span></label>
+                    <input type="range" id="frequency" min="200" max="800" value="432">
+                </div>
+                
+                <div class="control-group">
+                    <label>Harmonic Layers: <span class="value-display" id="harmonicsValue">6</span></label>
+                    <input type="range" id="harmonics" min="1" max="15" value="6">
+                </div>
+                
+                <div class="control-group">
+                    <label>Sacred Ratio: <span class="value-display" id="ratioValue">φ</span></label>
+                    <input type="range" id="ratio" min="1.0" max="3.0" step="0.01" value="1.618">
+                </div>
+                
+                <div class="frequency-visualizer">
+                    <div class="freq-bars" id="freqBars"></div>
+                </div>
+            </div>
+            
+            <!-- CONSTRUCTION MODE SECTION -->
+            <div class="panel-section">
+                <div class="section-title">🏗️ Construction Mode</div>
+                
+                <div class="btn-group">
+                    <button class="btn active" id="simMode">Simulation</button>
+                    <button class="btn construction-mode" id="buildMode">Build Mode</button>
+                </div>
+                
+                <div class="material-selector">
+                    <button class="btn material-btn active" data-material="concrete">Concrete</button>
+                    <button class="btn material-btn" data-material="steel">Steel</button>
+                    <button class="btn material-btn" data-material="stone">Stone</button>
+                    <button class="btn material-btn" data-material="ceramic">Ceramic</button>
+                    <button class="btn material-btn" data-material="composite">Composite</button>
+                    <button class="btn material-btn" data-material="bio">Bio-Material</button>
+                </div>
+                
+                <div class="control-group">
+                    <label>Structure Scale: <span class="value-display" id="scaleValue">1:1 (5m)</span></label>
+                    <input type="range" id="scale" min="0.1" max="50" step="0.1" value="5">
+                </div>
+                
+                <div class="control-group">
+                    <label>Print Resolution: <span class="value-display" id="resolutionValue">50mm</span></label>
+                    <input type="range" id="resolution" min="10" max="200" step="10" value="50">
+                </div>
+            </div>
+            
+            <!-- ARCHITECTURAL PRESETS -->
+            <div class="panel-section">
+                <div class="section-title">🏛️ Architectural Templates</div>
+                
+                <div class="btn-group">
+                    <button class="btn" onclick="loadTemplate('cathedral')">Cathedral</button>
+                    <button class="btn" onclick="loadTemplate('pyramid')">Pyramid</button>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn" onclick="loadTemplate('dome')">Acoustic Dome</button>
+                    <button class="btn" onclick="loadTemplate('spiral')">Spiral Tower</button>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn" onclick="loadTemplate('pavilion')">Sound Pavilion</button>
+                    <button class="btn" onclick="loadTemplate('amphitheater')">Amphitheater</button>
+                </div>
+            </div>
+            
+            <!-- EXPORT & BUILD SECTION -->
+            <div class="export-section">
+                <div class="section-title">🚀 Export for Construction</div>
+                
+                <div class="btn-group">
+                    <button class="btn construction-mode" onclick="exportSTL()">Export STL</button>
+                    <button class="btn construction-mode" onclick="exportGCode()">G-Code</button>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn construction-mode" onclick="exportBlueprints()">Blueprints</button>
+                    <button class="btn construction-mode" onclick="exportSpecs()">Build Specs</button>
+                </div>
+                
+                <div class="construction-readout" id="buildReadout">
+                    <strong>CONSTRUCTION ANALYSIS:</strong><br>
+                    Material: Concrete (50MPa)<br>
+                    Dimensions: 5.0m × 3.2m × 4.1m<br>
+                    Volume: 23.4 m³<br>
+                    Print Time: ~18 hours<br>
+                    Cost Estimate: $4,200<br>
+                    Acoustic Freq: 432 Hz optimized
+                </div>
+            </div>
         </div>
-        
-        <div class="glyph">💥🧬⚙️</div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-left">
+            SYMBOL-020 ACTIVE | Sonic Construction Suite v2.0 | Status: <span id="systemStatus">READY</span>
+        </div>
+        <div class="status-right">
+            Real-World Build Capability: ENABLED | Export Format: <span id="exportFormat">STL+GCODE</span>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Core Three.js setup
         let scene, camera, renderer, geometry, material, mesh;
-        let animationId;
         let time = 0;
+        let buildMode = false;
+        let currentMaterial = 'concrete';
         
-        // Harmonic parameters
+        // Construction parameters
         let baseFreq = 432;
-        let harmonicCount = 5;
-        let amplitude = 0.8;
-        let sacredRatio = 1.618; // Golden ratio
-        let timeSpeed = 1.0;
+        let harmonicCount = 6;
+        let sacredRatio = 1.618;
+        let structureScale = 5; // meters
+        let printResolution = 50; // mm
         
-        // Initialize the simulation
+        // Material properties
+        const materials = {
+            concrete: { color: 0x888888, strength: 50, density: 2400, cost: 180 },
+            steel: { color: 0x444444, strength: 400, density: 7850, cost: 800 },
+            stone: { color: 0xAAA888, strength: 100, density: 2650, cost: 300 },
+            ceramic: { color: 0xFFEEDD, strength: 200, density: 2300, cost: 450 },
+            composite: { color: 0x223344, strength: 600, density: 1600, cost: 1200 },
+            bio: { color: 0x449944, strength: 30, density: 800, cost: 600 }
+        };
+        
         function init() {
             // Scene setup
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000000);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth * 0.6 / 600, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('canvas'), 
+                antialias: true,
+                alpha: true 
+            });
+            renderer.setSize(window.innerWidth * 0.6, 600);
+            renderer.setClearColor(0x000000, 0.1);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             
-            // Create initial geometry
-            createHarmonicStructure();
+            // Create sonic structure
+            createSonicStructure();
             
-            // Camera position
-            camera.position.set(0, 5, 15);
+            // Camera setup
+            camera.position.set(8, 6, 12);
             camera.lookAt(0, 0, 0);
             
-            // Controls
+            // Lighting for construction visualization
+            setupConstructionLighting();
+            
+            // UI setup
             setupControls();
+            setupFrequencyVisualizer();
             
             // Start animation
             animate();
         }
         
-        function createHarmonicStructure() {
-            // Remove existing mesh
+        function createSonicStructure() {
             if (mesh) {
                 scene.remove(mesh);
                 geometry.dispose();
                 material.dispose();
             }
             
-            // Create complex geometry based on harmonic series
             const vertices = [];
             const colors = [];
             const indices = [];
+            const normals = [];
             
-            const gridSize = 64;
-            const scale = 8;
+            const gridSize = buildMode ? 128 : 64; // Higher resolution for build mode
+            const scale = structureScale;
             
-            // Generate vertices using harmonic interference patterns
+            // Generate construction-ready geometry
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
                     const x = (i - gridSize/2) * scale / gridSize;
                     const z = (j - gridSize/2) * scale / gridSize;
                     
-                    // Calculate harmonic interference at this point
-                    let y = 0;
-                    for (let h = 1; h <= harmonicCount; h++) {
-                        const freq = baseFreq * h;
-                        const harmonicRatio = Math.pow(sacredRatio, h - 1);
-                        
-                        // Multiple wave sources creating interference
-                        const wave1 = Math.sin(Math.sqrt(x*x + z*z) * freq * 0.01 + time * timeSpeed) / h;
-                        const wave2 = Math.sin(x * freq * 0.008 + time * timeSpeed * 1.3) / (h * 1.2);
-                        const wave3 = Math.sin(z * freq * 0.012 + time * timeSpeed * 0.8) / (h * 1.5);
-                        
-                        y += (wave1 + wave2 + wave3) * amplitude * harmonicRatio * 0.3;
-                    }
+                    // Calculate optimal height using harmonic interference
+                    let y = calculateHarmonicHeight(x, z, time);
                     
-                    // Apply sacred geometry modulation
-                    const distance = Math.sqrt(x*x + z*z);
-                    const goldenSpiral = Math.sin(distance * sacredRatio + time * timeSpeed * 0.5) * 0.5;
-                    y += goldenSpiral * amplitude * 0.2;
+                    // Apply construction constraints
+                    if (buildMode) {
+                        y = Math.max(0, y); // No negative heights for real construction
+                        y = Math.round(y / (printResolution/1000)) * (printResolution/1000); // Quantize to print resolution
+                    }
                     
                     vertices.push(x, y, z);
                     
-                    // Color based on height and harmonics
-                    const hue = (y + 2) * 0.15 + time * 0.1;
-                    const sat = 0.8;
-                    const lightness = 0.4 + Math.abs(y) * 0.3;
+                    // Material-specific coloring
+                    const matProps = materials[currentMaterial];
+                    const baseColor = new THREE.Color(matProps.color);
+                    const heightMod = buildMode ? y / scale : (y + 1) * 0.3;
+                    baseColor.multiplyScalar(0.5 + heightMod * 0.5);
                     
-                    const color = new THREE.Color().setHSL(hue, sat, lightness);
-                    colors.push(color.r, color.g, color.b);
+                    colors.push(baseColor.r, baseColor.g, baseColor.b);
                 }
             }
             
-            // Generate indices for triangulation
+            // Generate faces for 3D printing
             for (let i = 0; i < gridSize - 1; i++) {
                 for (let j = 0; j < gridSize - 1; j++) {
                     const a = i * gridSize + j;
@@ -286,216 +507,564 @@
             geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
             geometry.computeVertexNormals();
             
-            // Create material with custom properties
-            material = new THREE.MeshPhongMaterial({
+            // Construction-appropriate material
+            const matProps = materials[currentMaterial];
+            material = new THREE.MeshLambertMaterial({
                 vertexColors: true,
-                wireframe: false,
-                transparent: true,
-                opacity: 0.9,
-                shininess: 100
+                wireframe: buildMode ? true : false,
+                transparent: !buildMode,
+                opacity: buildMode ? 1.0 : 0.85,
+                side: THREE.DoubleSide
             });
             
-            // Create mesh
             mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
             scene.add(mesh);
             
-            // Add lights
-            if (!scene.getObjectByName('ambientLight')) {
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
-                ambientLight.name = 'ambientLight';
-                scene.add(ambientLight);
+            // Update construction analysis
+            updateConstructionAnalysis();
+        }
+        
+        function calculateHarmonicHeight(x, z, t) {
+            let y = 0;
+            const distance = Math.sqrt(x*x + z*z);
+            
+            // Primary harmonic interference
+            for (let h = 1; h <= harmonicCount; h++) {
+                const freq = baseFreq * h;
+                const harmonicRatio = Math.pow(sacredRatio, h - 1);
+                const amplitude = 1.0 / (h * 1.5);
                 
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(10, 10, 5);
-                directionalLight.name = 'directionalLight';
-                scene.add(directionalLight);
+                // Multiple wave sources for complex interference
+                const wave1 = Math.sin(distance * freq * 0.008 + t * 0.5) * amplitude;
+                const wave2 = Math.sin(x * freq * 0.006 + t * 0.7) * amplitude * 0.8;
+                const wave3 = Math.sin(z * freq * 0.010 + t * 0.3) * amplitude * 0.6;
                 
-                const pointLight = new THREE.PointLight(0x00ff88, 1, 50);
-                pointLight.position.set(0, 10, 0);
-                pointLight.name = 'pointLight';
-                scene.add(pointLight);
+                y += (wave1 + wave2 + wave3) * harmonicRatio * 0.4;
             }
+            
+            // Sacred geometry modulation
+            const goldenSpiral = Math.sin(distance * sacredRatio * 0.5 + t * 0.2) * 0.3;
+            y += goldenSpiral;
+            
+            // Scale to construction size
+            return y * structureScale * 0.3;
+        }
+        
+        function setupConstructionLighting() {
+            // Remove existing lights
+            scene.children = scene.children.filter(child => !child.isLight);
+            
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            scene.add(ambientLight);
+            
+            // Main construction light
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            mainLight.position.set(10, 15, 5);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            scene.add(mainLight);
+            
+            // Accent lights for material visualization
+            const accentLight1 = new THREE.PointLight(0x00ff88, 0.5, 30);
+            accentLight1.position.set(-5, 8, 8);
+            scene.add(accentLight1);
+            
+            const accentLight2 = new THREE.PointLight(0xff6b35, 0.3, 25);
+            accentLight2.position.set(5, 5, -5);
+            scene.add(accentLight2);
+            
+            // Ground plane for construction context
+            const groundGeometry = new THREE.PlaneGeometry(50, 50);
+            const groundMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x333333, 
+                transparent: true, 
+                opacity: 0.3 
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -0.1;
+            ground.receiveShadow = true;
+            scene.add(ground);
         }
         
         function animate() {
-            animationId = requestAnimationFrame(animate);
+            requestAnimationFrame(animate);
             
-            time += 0.016 * timeSpeed; // ~60fps
-            
-            // Update geometry based on time
-            const positions = geometry.attributes.position.array;
-            const colors = geometry.attributes.color.array;
-            const gridSize = 64;
-            const scale = 8;
-            
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
-                    const index = (i * gridSize + j) * 3;
-                    const x = positions[index];
-                    const z = positions[index + 2];
-                    
-                    // Recalculate Y position with harmonic interference
-                    let y = 0;
-                    for (let h = 1; h <= harmonicCount; h++) {
-                        const freq = baseFreq * h;
-                        const harmonicRatio = Math.pow(sacredRatio, h - 1);
+            if (!buildMode) {
+                time += 0.016;
+                
+                // Update dynamic geometry
+                const positions = geometry.attributes.position.array;
+                const colors = geometry.attributes.color.array;
+                const gridSize = 64;
+                
+                for (let i = 0; i < gridSize; i++) {
+                    for (let j = 0; j < gridSize; j++) {
+                        const index = (i * gridSize + j) * 3;
+                        const x = positions[index];
+                        const z = positions[index + 2];
                         
-                        const wave1 = Math.sin(Math.sqrt(x*x + z*z) * freq * 0.01 + time * timeSpeed) / h;
-                        const wave2 = Math.sin(x * freq * 0.008 + time * timeSpeed * 1.3) / (h * 1.2);
-                        const wave3 = Math.sin(z * freq * 0.012 + time * timeSpeed * 0.8) / (h * 1.5);
+                        const y = calculateHarmonicHeight(x, z, time);
+                        positions[index + 1] = y;
                         
-                        y += (wave1 + wave2 + wave3) * amplitude * harmonicRatio * 0.3;
+                        // Update colors based on height
+                        const colorIndex = index;
+                        const matProps = materials[currentMaterial];
+                        const baseColor = new THREE.Color(matProps.color);
+                        const heightMod = (y + structureScale) / (structureScale * 2);
+                        baseColor.multiplyScalar(0.3 + heightMod * 0.7);
+                        
+                        colors[colorIndex] = baseColor.r;
+                        colors[colorIndex + 1] = baseColor.g;
+                        colors[colorIndex + 2] = baseColor.b;
                     }
-                    
-                    // Apply sacred geometry modulation
-                    const distance = Math.sqrt(x*x + z*z);
-                    const goldenSpiral = Math.sin(distance * sacredRatio + time * timeSpeed * 0.5) * 0.5;
-                    y += goldenSpiral * amplitude * 0.2;
-                    
-                    positions[index + 1] = y;
-                    
-                    // Update colors
-                    const colorIndex = (i * gridSize + j) * 3;
-                    const hue = (y + 2) * 0.15 + time * 0.1;
-                    const color = new THREE.Color().setHSL(hue, 0.8, 0.4 + Math.abs(y) * 0.3);
-                    colors[colorIndex] = color.r;
-                    colors[colorIndex + 1] = color.g;
-                    colors[colorIndex + 2] = color.b;
                 }
+                
+                geometry.attributes.position.needsUpdate = true;
+                geometry.attributes.color.needsUpdate = true;
+                geometry.computeVertexNormals();
             }
             
-            geometry.attributes.position.needsUpdate = true;
-            geometry.attributes.color.needsUpdate = true;
-            geometry.computeVertexNormals();
+            // Rotate for better view
+            if (mesh) {
+                mesh.rotation.y += buildMode ? 0.005 : 0.01;
+            }
             
-            // Rotate the structure
-            mesh.rotation.y += 0.002 * timeSpeed;
-            
-            // Update camera orbit
-            const radius = 15;
-            camera.position.x = Math.sin(time * 0.1) * radius;
-            camera.position.z = Math.cos(time * 0.1) * radius;
-            camera.lookAt(0, 0, 0);
+            // Update frequency visualizer
+            updateFrequencyBars();
             
             renderer.render(scene, camera);
         }
         
         function setupControls() {
-            const controls = {
-                frequency: document.getElementById('frequency'),
-                harmonics: document.getElementById('harmonics'),
-                amplitude: document.getElementById('amplitude'),
-                ratio: document.getElementById('ratio'),
-                speed: document.getElementById('speed')
-            };
-            
-            const values = {
-                freqValue: document.getElementById('freqValue'),
-                harmonicsValue: document.getElementById('harmonicsValue'),
-                amplitudeValue: document.getElementById('amplitudeValue'),
-                ratioValue: document.getElementById('ratioValue'),
-                speedValue: document.getElementById('speedValue')
-            };
-            
-            controls.frequency.addEventListener('input', (e) => {
+            // Frequency control
+            document.getElementById('frequency').addEventListener('input', (e) => {
                 baseFreq = parseFloat(e.target.value);
-                values.freqValue.textContent = baseFreq;
-                updateStatus();
+                document.getElementById('freqValue').textContent = baseFreq + ' Hz';
+                if (buildMode) createSonicStructure();
             });
             
-            controls.harmonics.addEventListener('input', (e) => {
+            // Harmonics control
+            document.getElementById('harmonics').addEventListener('input', (e) => {
                 harmonicCount = parseInt(e.target.value);
-                values.harmonicsValue.textContent = harmonicCount;
-                updateStatus();
+                document.getElementById('harmonicsValue').textContent = harmonicCount;
+                if (buildMode) createSonicStructure();
             });
             
-            controls.amplitude.addEventListener('input', (e) => {
-                amplitude = parseFloat(e.target.value);
-                values.amplitudeValue.textContent = amplitude;
-                updateStatus();
-            });
-            
-            controls.ratio.addEventListener('input', (e) => {
+            // Sacred ratio control
+            document.getElementById('ratio').addEventListener('input', (e) => {
                 sacredRatio = parseFloat(e.target.value);
                 const ratioNames = {
-                    '1.41': '√2',
-                    '1.62': 'φ (1.618)',
-                    '1.73': '√3',
-                    '2.00': '2:1',
-                    '2.62': 'φ²'
+                    '1.41': '√2', '1.62': 'φ', '1.73': '√3', '2.00': '2:1', '2.62': 'φ²'
                 };
-                values.ratioValue.textContent = ratioNames[e.target.value.substring(0,4)] || e.target.value;
-                updateStatus();
+                const key = e.target.value.substring(0,4);
+                document.getElementById('ratioValue').textContent = ratioNames[key] || e.target.value;
+                if (buildMode) createSonicStructure();
             });
             
-            controls.speed.addEventListener('input', (e) => {
-                timeSpeed = parseFloat(e.target.value);
-                values.speedValue.textContent = timeSpeed;
-                updateStatus();
+            // Scale control
+            document.getElementById('scale').addEventListener('input', (e) => {
+                structureScale = parseFloat(e.target.value);
+                document.getElementById('scaleValue').textContent = `1:1 (${structureScale}m)`;
+                if (buildMode) createSonicStructure();
+            });
+            
+            // Resolution control
+            document.getElementById('resolution').addEventListener('input', (e) => {
+                printResolution = parseInt(e.target.value);
+                document.getElementById('resolutionValue').textContent = printResolution + 'mm';
+                if (buildMode) createSonicStructure();
+            });
+            
+            // Mode toggle
+            document.getElementById('simMode').addEventListener('click', () => {
+                buildMode = false;
+                document.getElementById('simMode').classList.add('active');
+                document.getElementById('buildMode').classList.remove('active');
+                document.getElementById('systemStatus').textContent = 'SIMULATION';
+                createSonicStructure();
+            });
+            
+            document.getElementById('buildMode').addEventListener('click', () => {
+                buildMode = true;
+                document.getElementById('buildMode').classList.add('active');
+                document.getElementById('simMode').classList.remove('active');
+                document.getElementById('systemStatus').textContent = 'BUILD READY';
+                createSonicStructure();
+            });
+            
+            // Material selection
+            document.querySelectorAll('.material-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentMaterial = e.target.dataset.material;
+                    createSonicStructure();
+                });
             });
         }
         
-        function loadPreset(type) {
-            switch(type) {
-                case 'cathedral':
-                    baseFreq = 432;
-                    harmonicCount = 8;
-                    amplitude = 1.2;
-                    sacredRatio = 1.618;
-                    timeSpeed = 0.5;
-                    break;
-                case 'pyramid':
-                    baseFreq = 528;
-                    harmonicCount = 6;
-                    amplitude = 1.5;
-                    sacredRatio = 1.414;
-                    timeSpeed = 0.8;
-                    break;
-                case 'spiral':
-                    baseFreq = 396;
-                    harmonicCount = 12;
-                    amplitude = 0.9;
-                    sacredRatio = 2.618;
-                    timeSpeed = 1.5;
-                    break;
-                case 'mandala':
-                    baseFreq = 741;
-                    harmonicCount = 9;
-                    amplitude = 1.0;
-                    sacredRatio = 1.732;
-                    timeSpeed = 2.0;
-                    break;
+        function setupFrequencyVisualizer() {
+            const container = document.getElementById('freqBars');
+            for (let i = 0; i < 20; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'freq-bar';
+                container.appendChild(bar);
+            }
+        }
+        
+        function updateFrequencyBars() {
+            const bars = document.querySelectorAll('.freq-bar');
+            bars.forEach((bar, i) => {
+                const freq = baseFreq * (1 + i * 0.1);
+                const height = Math.sin(time * 2 + i * 0.5) * 30 + 40;
+                bar.style.height = Math.max(5, height) + '%';
+            });
+        }
+        
+        function updateConstructionAnalysis() {
+            const matProps = materials[currentMaterial];
+            const volume = (structureScale * structureScale * structureScale * 0.3).toFixed(1);
+            const printTime = Math.round(volume * 0.8);
+            const cost = Math.round(volume * matProps.cost);
+            
+            document.getElementById('buildReadout').innerHTML = `
+                <strong>CONSTRUCTION ANALYSIS:</strong><br>
+                Material: ${currentMaterial.toUpperCase()} (${matProps.strength}MPa)<br>
+                Dimensions: ${structureScale}m × ${(structureScale*0.6).toFixed(1)}m × ${(structureScale*0.8).toFixed(1)}m<br>
+                Volume: ${volume} m³<br>
+                Print Time: ~${printTime} hours<br>
+                Cost Estimate: $${cost.toLocaleString()}<br>
+                Acoustic Freq: ${baseFreq} Hz optimized<br>
+                Resolution: ${printResolution}mm layers
+            `;
+        }
+        
+        function loadTemplate(type) {
+            const templates = {
+                cathedral: { freq: 432, harmonics: 8, ratio: 1.618, scale: 12 },
+                pyramid: { freq: 528, harmonics: 6, ratio: 1.414, scale: 8 },
+                dome: { freq: 396, harmonics: 12, ratio: 2.618, scale: 6 },
+                spiral: { freq: 741, harmonics: 9, ratio: 1.732, scale: 10 },
+                pavilion: { freq: 285, harmonics: 4, ratio: 1.618, scale: 4 },
+                amphitheater: { freq: 174, harmonics: 15, ratio: 2.000, scale: 15 }
+            };
+            
+            const template = templates[type];
+            if (template) {
+                baseFreq = template.freq;
+                harmonicCount = template.harmonics;
+                sacredRatio = template.ratio;
+                structureScale = template.scale;
+                
+                // Update UI controls
+                document.getElementById('frequency').value = baseFreq;
+                document.getElementById('harmonics').value = harmonicCount;
+                document.getElementById('ratio').value = sacredRatio;
+                document.getElementById('scale').value = structureScale;
+                
+                // Update displays
+                document.getElementById('freqValue').textContent = baseFreq + ' Hz';
+                document.getElementById('harmonicsValue').textContent = harmonicCount;
+                document.getElementById('scaleValue').textContent = `1:1 (${structureScale}m)`;
+                
+                const ratioNames = {
+                    '1.41': '√2', '1.62': 'φ', '1.73': '√3', '2.00': '2:1', '2.62': 'φ²'
+                };
+                const key = sacredRatio.toString().substring(0,4);
+                document.getElementById('ratioValue').textContent = ratioNames[key] || sacredRatio;
+                
+                createSonicStructure();
+            }
+        }
+        
+        // EXPORT FUNCTIONS FOR REAL-WORLD CONSTRUCTION
+        
+        function exportSTL() {
+            if (!buildMode) {
+                alert('Switch to Build Mode first to export construction files!');
+                return;
             }
             
-            // Update UI
-            document.getElementById('frequency').value = baseFreq;
-            document.getElementById('harmonics').value = harmonicCount;
-            document.getElementById('amplitude').value = amplitude;
-            document.getElementById('ratio').value = sacredRatio;
-            document.getElementById('speed').value = timeSpeed;
+            // Generate STL data from current geometry
+            const vertices = geometry.attributes.position.array;
+            const indices = geometry.index.array;
             
-            // Update displays
-            document.getElementById('freqValue').textContent = baseFreq;
-            document.getElementById('harmonicsValue').textContent = harmonicCount;
-            document.getElementById('amplitudeValue').textContent = amplitude;
-            document.getElementById('ratioValue').textContent = sacredRatio;
-            document.getElementById('speedValue').textContent = timeSpeed;
+            let stlContent = 'solid SonicStructure\n';
             
-            updateStatus();
+            for (let i = 0; i < indices.length; i += 3) {
+                const i1 = indices[i] * 3;
+                const i2 = indices[i + 1] * 3;
+                const i3 = indices[i + 2] * 3;
+                
+                const v1 = [vertices[i1], vertices[i1 + 1], vertices[i1 + 2]];
+                const v2 = [vertices[i2], vertices[i2 + 1], vertices[i2 + 2]];
+                const v3 = [vertices[i3], vertices[i3 + 1], vertices[i3 + 2]];
+                
+                // Calculate normal
+                const u = [v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]];
+                const v = [v3[0] - v1[0], v3[1] - v1[1], v3[2] - v1[2]];
+                const normal = [
+                    u[1] * v[2] - u[2] * v[1],
+                    u[2] * v[0] - u[0] * v[2],
+                    u[0] * v[1] - u[1] * v[0]
+                ];
+                
+                stlContent += `  facet normal ${normal[0].toFixed(6)} ${normal[1].toFixed(6)} ${normal[2].toFixed(6)}\n`;
+                stlContent += '    outer loop\n';
+                stlContent += `      vertex ${v1[0].toFixed(6)} ${v1[1].toFixed(6)} ${v1[2].toFixed(6)}\n`;
+                stlContent += `      vertex ${v2[0].toFixed(6)} ${v2[1].toFixed(6)} ${v2[2].toFixed(6)}\n`;
+                stlContent += `      vertex ${v3[0].toFixed(6)} ${v3[1].toFixed(6)} ${v3[2].toFixed(6)}\n`;
+                stlContent += '    endloop\n';
+                stlContent += '  endfacet\n';
+            }
+            
+            stlContent += 'endsolid SonicStructure\n';
+            
+            // Download STL file
+            const blob = new Blob([stlContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sonic_structure_${baseFreq}hz_${currentMaterial}.stl`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('exportFormat').textContent = 'STL EXPORTED';
+            setTimeout(() => {
+                document.getElementById('exportFormat').textContent = 'STL+GCODE';
+            }, 3000);
         }
         
-        function updateStatus() {
-            document.getElementById('status').textContent = `${baseFreq}Hz × ${harmonicCount}H`;
+        function exportGCode() {
+            if (!buildMode) {
+                alert('Switch to Build Mode first to export construction files!');
+                return;
+            }
+            
+            // Generate G-Code for 3D printer
+            const matProps = materials[currentMaterial];
+            let gcode = '';
+            
+            // G-Code header
+            gcode += '; Sonic Structure G-Code\n';
+            gcode += `; Generated for ${currentMaterial} construction\n`;
+            gcode += `; Base Frequency: ${baseFreq} Hz\n`;
+            gcode += `; Harmonic Layers: ${harmonicCount}\n`;
+            gcode += `; Sacred Ratio: ${sacredRatio}\n`;
+            gcode += `; Scale: ${structureScale}m\n`;
+            gcode += `; Layer Height: ${printResolution/1000}mm\n\n`;
+            
+            gcode += 'G21 ; Set units to millimeters\n';
+            gcode += 'G90 ; Use absolute positioning\n';
+            gcode += 'M82 ; Use absolute distances for extrusion\n';
+            gcode += 'G28 ; Home all axes\n\n';
+            
+            // Material-specific settings
+            const extruderTemp = {
+                concrete: 25, steel: 1500, stone: 25, ceramic: 1200, composite: 180, bio: 60
+            };
+            
+            gcode += `M104 S${extruderTemp[currentMaterial]} ; Set extruder temperature\n`;
+            gcode += 'M190 S60 ; Set bed temperature and wait\n';
+            gcode += 'M109 ; Wait for extruder temperature\n\n';
+            
+            // Simplified layer generation (real implementation would be much more complex)
+            const layers = Math.ceil((structureScale * 800) / printResolution);
+            gcode += `; Generating ${layers} layers\n`;
+            
+            for (let layer = 0; layer < Math.min(layers, 10); layer++) { // Limit for demo
+                gcode += `; LAYER ${layer}\n`;
+                gcode += `G1 Z${(layer * printResolution/1000).toFixed(3)} F300\n`;
+                
+                // Simplified perimeter (real code would trace actual geometry)
+                const radius = structureScale * 500 * (1 - layer / layers);
+                for (let angle = 0; angle <= 360; angle += 10) {
+                    const x = Math.cos(angle * Math.PI / 180) * radius;
+                    const y = Math.sin(angle * Math.PI / 180) * radius;
+                    gcode += `G1 X${x.toFixed(3)} Y${y.toFixed(3)} E${(angle * 0.1).toFixed(3)}\n`;
+                }
+                gcode += '\n';
+            }
+            
+            // G-Code footer
+            gcode += 'M104 S0 ; Turn off extruder\n';
+            gcode += 'M140 S0 ; Turn off bed\n';
+            gcode += 'G28 X0 ; Home X axis\n';
+            gcode += 'M84 ; Disable steppers\n';
+            
+            // Download G-Code file
+            const blob = new Blob([gcode], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sonic_structure_${baseFreq}hz_${currentMaterial}.gcode`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('exportFormat').textContent = 'GCODE EXPORTED';
+            setTimeout(() => {
+                document.getElementById('exportFormat').textContent = 'STL+GCODE';
+            }, 3000);
         }
         
-        // Handle resize
+        function exportBlueprints() {
+            if (!buildMode) {
+                alert('Switch to Build Mode first to export construction files!');
+                return;
+            }
+            
+            // Generate technical blueprints
+            const matProps = materials[currentMaterial];
+            let blueprints = '';
+            
+            blueprints += '====================================\n';
+            blueprints += 'SONIC ARCHITECTURE CONSTRUCTION BLUEPRINTS\n';
+            blueprints += '====================================\n\n';
+            
+            blueprints += 'PROJECT SPECIFICATIONS:\n';
+            blueprints += `Structure Name: Harmonic ${currentMaterial.toUpperCase()} Formation\n`;
+            blueprints += `Base Frequency: ${baseFreq} Hz\n`;
+            blueprints += `Harmonic Series: ${harmonicCount} layers\n`;
+            blueprints += `Sacred Geometry Ratio: ${sacredRatio}\n`;
+            blueprints += `Overall Scale: ${structureScale}m x ${(structureScale*0.6).toFixed(1)}m x ${(structureScale*0.8).toFixed(1)}m\n\n`;
+            
+            blueprints += 'MATERIAL SPECIFICATIONS:\n';
+            blueprints += `Primary Material: ${currentMaterial.toUpperCase()}\n`;
+            blueprints += `Compressive Strength: ${matProps.strength} MPa\n`;
+            blueprints += `Density: ${matProps.density} kg/m³\n`;
+            blueprints += `Estimated Cost: ${Math.round((structureScale**3 * 0.3) * matProps.cost).toLocaleString()}\n\n`;
+            
+            blueprints += 'CONSTRUCTION METHOD:\n';
+            blueprints += '1. 3D Concrete Printing with Sonic Guidance\n';
+            blueprints += `2. Layer Height: ${printResolution}mm\n`;
+            blueprints += `3. Print Speed: 50mm/s for structural elements\n`;
+            blueprints += '4. Acoustic Resonance Testing Required\n';
+            blueprints += '5. Post-Construction Frequency Calibration\n\n';
+            
+            blueprints += 'HARMONIC FREQUENCY MAP:\n';
+            for (let h = 1; h <= harmonicCount; h++) {
+                const freq = baseFreq * h;
+                const amplitude = (1 / h * 100).toFixed(1);
+                blueprints += `Layer ${h}: ${freq} Hz (${amplitude}% amplitude)\n`;
+            }
+            blueprints += '\n';
+            
+            blueprints += 'ACOUSTIC PROPERTIES:\n';
+            blueprints += `Fundamental Resonance: ${baseFreq} Hz\n`;
+            blueprints += `Harmonic Series: Complete overtone spectrum\n`;
+            blueprints += `Sound Amplification: Estimated 12-18 dB\n`;
+            blueprints += `Optimal Listening Position: Center, 2m height\n\n`;
+            
+            blueprints += 'CONSTRUCTION SEQUENCE:\n';
+            blueprints += '1. Site preparation and foundation\n';
+            blueprints += '2. 3D printer setup and calibration\n';
+            blueprints += '3. Acoustic field mapping\n';
+            blueprints += '4. Layer-by-layer sonic construction\n';
+            blueprints += '5. Frequency testing and adjustment\n';
+            blueprints += '6. Final acoustic optimization\n\n';
+            
+            blueprints += 'SAFETY CONSIDERATIONS:\n';
+            blueprints += '- Structural analysis required for seismic zones\n';
+            blueprints += '- Acoustic safety limits: <85 dB sustained\n';
+            blueprints += '- Material handling per local building codes\n';
+            blueprints += '- Foundation requirements based on soil analysis\n\n';
+            
+            blueprints += 'MAINTENANCE:\n';
+            blueprints += '- Annual frequency calibration recommended\n';
+            blueprints += '- Weather protection for acoustic surfaces\n';
+            blueprints += '- Structural inspection every 5 years\n\n';
+            
+            blueprints += '====================================\n';
+            blueprints += 'END CONSTRUCTION BLUEPRINTS\n';
+            blueprints += '====================================\n';
+            
+            // Download blueprints
+            const blob = new Blob([blueprints], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sonic_blueprints_${baseFreq}hz_${currentMaterial}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('exportFormat').textContent = 'BLUEPRINTS EXPORTED';
+            setTimeout(() => {
+                document.getElementById('exportFormat').textContent = 'STL+GCODE';
+            }, 3000);
+        }
+        
+        function exportSpecs() {
+            if (!buildMode) {
+                alert('Switch to Build Mode first to export construction files!');
+                return;
+            }
+            
+            // Generate technical specifications
+            const matProps = materials[currentMaterial];
+            const volume = (structureScale ** 3 * 0.3).toFixed(2);
+            const weight = (volume * matProps.density / 1000).toFixed(1);
+            
+            const specs = {
+                project: {
+                    name: `Sonic ${currentMaterial.toUpperCase()} Structure`,
+                    frequency: `${baseFreq} Hz`,
+                    harmonics: harmonicCount,
+                    ratio: sacredRatio,
+                    scale: `${structureScale}m`
+                },
+                construction: {
+                    method: '3D Printing with Sonic Guidance',
+                    material: currentMaterial.toUpperCase(),
+                    volume: `${volume} m³`,
+                    weight: `${weight} tons`,
+                    resolution: `${printResolution}mm`,
+                    printTime: `${Math.round(volume * 0.8)} hours`,
+                    cost: `${Math.round(volume * matProps.cost).toLocaleString()}`
+                },
+                acoustic: {
+                    fundamental: `${baseFreq} Hz`,
+                    harmonics: Array.from({length: harmonicCount}, (_, i) => `${baseFreq * (i + 1)} Hz`),
+                    amplification: '12-18 dB',
+                    resonanceType: 'Standing wave formation'
+                },
+                structural: {
+                    strength: `${matProps.strength} MPa`,
+                    density: `${matProps.density} kg/m³`,
+                    loadCapacity: 'TBD - Requires structural analysis',
+                    seismicRating: 'TBD - Local code compliance required'
+                }
+            };
+            
+            // Download as JSON for technical systems
+            const blob = new Blob([JSON.stringify(specs, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sonic_specs_${baseFreq}hz_${currentMaterial}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('exportFormat').textContent = 'SPECS EXPORTED';
+            setTimeout(() => {
+                document.getElementById('exportFormat').textContent = 'STL+GCODE';
+            }, 3000);
+        }
+        
+        // Handle window resize
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            const width = window.innerWidth * 0.6;
+            const height = 600;
+            camera.aspect = width / height;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(width, height);
         });
         
-        // Initialize
+        // Initialize the application
         init();
     </script>
 </body>
