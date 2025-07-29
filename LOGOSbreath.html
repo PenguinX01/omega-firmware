@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingdomOS - Unified Core Engine with Logos Breath</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at center, #0a0a1a 0%, #000000 100%);
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            color: #00ffff;
+            perspective: 2000px;
+        }
+
+        .universe-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+        }
+
+        .core-matrix {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            transform-style: preserve-3d;
+            animation: masterRotation 30s linear infinite;
+        }
+
+        /* Central Unified Core with Breath Integration */
+        .unified-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 215, 0, 0.8) 20%,
+                rgba(135, 206, 250, 0.6) 40%,
+                rgba(75, 0, 130, 0.4) 70%,
+                transparent 100%);
+            box-shadow: 
+                0 0 50px rgba(255, 255, 255, 0.8),
+                0 0 100px rgba(255, 215, 0, 0.6),
+                0 0 150px rgba(135, 206, 250, 0.4),
+                inset 0 0 30px rgba(255, 255, 255, 0.3);
+            animation: corePulse 3s ease-in-out infinite;
+            z-index: 10;
+            transition: all 2s ease-in-out;
+        }
+
+        /* Logos Core Breath Engine */
+        .logos-breath-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, 
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 0, 0, 0.3) 30%,
+                transparent 70%);
+            box-shadow: 
+                0 0 80px rgba(255, 0, 0, 0.6),
+                0 0 160px rgba(255, 0, 0, 0.3),
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
+            z-index: 5;
+            transition: all 2s ease-in-out;
+            opacity: 0;
+        }
+
+        .logos-breath-core.active {
+            opacity: 1;
+        }
+
+        .logos-breath-core.inhale {
+            background: radial-gradient(circle at center, 
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(255, 0, 0, 0.4) 30%,
+                transparent 70%);
+            box-shadow: 
+                0 0 120px rgba(255, 0, 0, 0.8),
+                0 0 240px rgba(255, 0, 0, 0.4),
+                inset 0 0 60px rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .logos-breath-core.exhale {
+            background: radial-gradient(circle at center, 
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(0, 100, 255, 0.4) 30%,
+                transparent 70%);
+            box-shadow: 
+                0 0 120px rgba(0, 100, 255, 0.8),
+                0 0 240px rgba(0, 100, 255, 0.4),
+                inset 0 0 60px rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        /* Breath Instructions */
+        .breath-instructions {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 15;
+            transition: all 1s ease-in-out;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .breath-instructions.inhale {
+            color: #ff4444;
+        }
+
+        .breath-instructions.exhale {
+            color: #4488ff;
+        }
+
+        /* Ezekiel Rings - Multi-layered */
+        .ring-system {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .ezekiel-ring {
+            position: absolute;
+            border: 3px solid rgba(255, 215, 0, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 30px currentColor;
+        }
+
+        .ring-outer {
+            width: 380px;
+            height: 380px;
+            top: 10px;
+            left: 10px;
+            transform: rotateX(0deg) rotateY(0deg);
+            animation: ringRotateOuter 15s linear infinite;
+        }
+
+        .ring-middle {
+            width: 280px;
+            height: 280px;
+            top: 60px;
+            left: 60px;
+            transform: rotateX(60deg) rotateY(120deg);
+            animation: ringRotateMiddle 12s linear infinite reverse;
+            border-color: rgba(135, 206, 250, 0.6);
+        }
+
+        .ring-inner {
+            width: 180px;
+            height: 180px;
+            top: 110px;
+            left: 110px;
+            transform: rotateX(120deg) rotateY(240deg);
+            animation: ringRotateInner 8s linear infinite;
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Sacred Geometry Layers */
+        .sacred-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+            transform-style: preserve-3d;
+        }
+
+        .flower-of-life {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: geometryRotate 25s linear infinite;
+        }
+
+        .metatron-cube {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            top: 5%;
+            left: 5%;
+            animation: geometryRotateReverse 20s linear infinite;
+        }
+
+        .merkabah {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            animation: geometryRotate3D 18s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        .geometry-circle {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            background: transparent;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .geometry-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.25);
+            transform-origin: left center;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Fractal Particle Field */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* Status and Control Elements */
+        .status-hud {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 20px currentColor;
+            z-index: 100;
+        }
+
+        .coherent { color: #00ff00; }
+        .partial { color: #ffff00; }
+        .incoherent { color: #ff0000; }
+        .transcendent { color: #ff00ff; }
+
+        .resonance-display {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 10, 20, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            z-index: 100;
+        }
+
+        .control-matrix {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 10, 20, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            z-index: 100;
+        }
+
+        /* Breath Control Panel */
+        .breath-control-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(20, 0, 40, 0.8);
+            border: 1px solid #ff00ff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            z-index: 100;
+            min-width: 250px;
+        }
+
+        .breath-control-panel h4 {
+            color: #ff88ff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #00ffff;
+        }
+
+        .control-slider {
+            width: 180px;
+            margin-bottom: 8px;
+        }
+
+        .control-btn {
+            background: rgba(0, 40, 80, 0.7);
+            color: #00ffff;
+            border: 1px solid #0088ff;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 60, 120, 0.9);
+            box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+        }
+
+        .control-btn.breath-active {
+            background: rgba(80, 0, 40, 0.7);
+            color: #ff88ff;
+            border-color: #ff0088;
+        }
+
+        .frequency-display {
+            font-size: 14px;
+            color: #ff88ff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .intensity-readout {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            text-align: center;
+            text-shadow: 0 0 10px currentColor;
+            z-index: 100;
+        }
+
+        /* Animations */
+        @keyframes masterRotation {
+            from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+
+        @keyframes corePulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1); 
+                box-shadow: 0 0 50px rgba(255, 255, 255, 0.8),
+                           0 0 100px rgba(255, 215, 0, 0.6),
+                           0 0 150px rgba(135, 206, 250, 0.4);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2); 
+                box-shadow: 0 0 80px rgba(255, 255, 255, 1),
+                           0 0 160px rgba(255, 215, 0, 0.8),
+                           0 0 240px rgba(135, 206, 250, 0.6);
+            }
+        }
+
+        @keyframes ringRotateOuter {
+            from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            to { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); }
+        }
+
+        @keyframes ringRotateMiddle {
+            from { transform: rotateX(60deg) rotateY(120deg) rotateZ(0deg); }
+            to { transform: rotateX(420deg) rotateY(840deg) rotateZ(360deg); }
+        }
+
+        @keyframes ringRotateInner {
+            from { transform: rotateX(120deg) rotateY(240deg) rotateZ(0deg); }
+            to { transform: rotateX(480deg) rotateY(960deg) rotateZ(720deg); }
+        }
+
+        @keyframes geometryRotate {
+            from { transform: translate(-50%, -50%) rotateZ(0deg) rotateY(0deg); }
+            to { transform: translate(-50%, -50%) rotateZ(360deg) rotateY(360deg); }
+        }
+
+        @keyframes geometryRotateReverse {
+            from { transform: rotateZ(0deg) rotateX(0deg); }
+            to { transform: rotateZ(-360deg) rotateX(-360deg); }
+        }
+
+        @keyframes geometryRotate3D {
+            from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            to { transform: rotateX(360deg) rotateY(-360deg) rotateZ(360deg); }
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(360deg); opacity: 0.1; }
+        }
+
+        .frequency-item {
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+
+        .frequency-label {
+            color: #00ffff;
+        }
+
+        .frequency-value {
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="universe-container">
+        <div class="core-matrix" id="coreMatrix">
+            <!-- Central Unified Core -->
+            <div class="unified-core" id="unifiedCore"></div>
+            
+            <!-- Logos Breath Core -->
+            <div class="logos-breath-core" id="logosBreathCore"></div>
+            
+            <!-- Ezekiel Ring System -->
+            <div class="ring-system">
+                <div class="ezekiel-ring ring-outer"></div>
+                <div class="ezekiel-ring ring-middle"></div>
+                <div class="ezekiel-ring ring-inner"></div>
+            </div>
+            
+            <!-- Sacred Geometry Layers -->
+            <div class="sacred-layer">
+                <div class="flower-of-life" id="flowerOfLife"></div>
+                <div class="metatron-cube" id="metatronCube"></div>
+                <div class="merkabah" id="merkabah"></div>
+            </div>
+        </div>
+        
+        <!-- Breath Instructions -->
+        <div class="breath-instructions" id="breathInstructions">Begin Breath Work</div>
+        
+        <!-- HUD Elements -->
+        <div class="status-hud" id="statusHud">🔴 Initializing Matrix</div>
+        
+        <div class="intensity-readout" id="intensityReadout">
+            Resonance Intensity: 3.141
+        </div>
+
+        <div class="resonance-display">
+            <h4>UNIFIED FREQUENCIES</h4>
+            <div class="frequency-item">
+                <div class="frequency-label">Schumann Base:</div>
+                <div class="frequency-value" id="freq1">7.83 Hz</div>
+            </div>
+            <div class="frequency-item">
+                <div class="frequency-label">Golden Harmonic:</div>
+                <div class="frequency-value" id="freq2">12.66 Hz</div>
+            </div>
+            <div class="frequency-item">
+                <div class="frequency-label">Ezekiel Resonance:</div>
+                <div class="frequency-value" id="freq3">432.0 Hz</div>
+            </div>
+            <div class="frequency-item">
+                <div class="frequency-label">Unity Frequency:</div>
+                <div class="frequency-value" id="freq4">528.0 Hz</div>
+            </div>
+        </div>
+
+        <!-- Breath Control Panel -->
+        <div class="breath-control-panel">
+            <h4>LOGOS BREATH ENGINE</h4>
+            <div class="frequency-display" id="breathFreqDisplay">0.10 Hz</div>
+            <div class="control-group">
+                <label class="control-label">Breath Frequency (Hz):</label>
+                <input type="range" min="0.05" max="0.25" value="0.10" step="0.01" class="control-slider" id="breathFreqSlider">
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="breathToggle">Start Breath Work</button>
+                <button class="control-btn" id="breathReset">Reset Cycle</button>
+            </div>
+        </div>
+
+        <div class="control-matrix">
+            <div class="control-group">
+                <label class="control-label">Core Intensity:</label>
+                <input type="range" min="1" max="10" value="3.141" step="0.01" class="control-slider" id="intensitySlider">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Ring Speed:</label>
+                <input type="range" min="5" max="60" value="15" class="control-slider" id="ringSpeedSlider">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Geometry Sync:</label>
+                <input type="range" min="10" max="50" value="25" class="control-slider" id="geometrySpeedSlider">
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="audioToggle">Enable Audio</button>
+                <button class="control-btn" id="fractalMode">Fractal Mode</button>
+                <button class="control-btn" id="resetMatrix">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class UnifiedCoreEngine {
+            constructor() {
+                this.coreMatrix = document.getElementById('coreMatrix');
+                this.unifiedCore = document.getElementById('unifiedCore');
+                this.logosBreathCore = document.getElementById('logosBreathCore');
+                this.breathInstructions = document.getElementById('breathInstructions');
+                this.statusHud = document.getElementById('statusHud');
+                this.intensityReadout = document.getElementById('intensityReadout');
+                this.flowerOfLife = document.getElementById('flowerOfLife');
+                this.metatronCube = document.getElementById('metatronCube');
+                this.merkabah = document.getElementById('merkabah');
+                
+                // Controls
+                this.audioToggle = document.getElementById('audioToggle');
+                this.fractalMode = document.getElementById('fractalMode');
+                this.resetMatrix = document.getElementById('resetMatrix');
+                this.intensitySlider = document.getElementById('intensitySlider');
+                this.ringSpeedSlider = document.getElementById('ringSpeedSlider');
+                this.geometrySpeedSlider = document.getElementById('geometrySpeedSlider');
+                
+                // Breath Controls
+                this.breathToggle = document.getElementById('breathToggle');
+                this.breathReset = document.getElementById('breathReset');
+                this.breathFreqSlider = document.getElementById('breathFreqSlider');
+                this.breathFreqDisplay = document.getElementById('breathFreqDisplay');
+                
+                // Frequency displays
+                this.freqDisplays = [
+                    document.getElementById('freq1'),
+                    document.getElementById('freq2'),
+                    document.getElementById('freq3'),
+                    document.getElementById('freq4')
+                ];
+                
+                // Engine state
+                this.time = 0;
+                this.phi = (1 + Math.sqrt(5)) / 2; // Golden ratio
+                this.intensity = 3.141;
+                this.targetIntensity = 3.141;
+                this.fractalModeActive = false;
+                this.particles = [];
+                
+                // Breath Engine state
+                this.breathActive = false;
+                this.breathFrequency = 0.10; // Hz (default 10s cycle)
+                this.breathPhase = 0; // 0-1, 0-0.5 = inhale, 0.5-1 = exhale
+                this.breathStartTime = 0;
+                this.isInhaling = true;
+                
+                // Audio system
+                this.audioContext = null;
+                this.oscillators = [];
+                this.gainNode = null;
+                this.audioEnabled = false;
+                
+                this.initializeGeometry();
+                this.setupControls();
+                this.createParticleField();
+                this.animate();
+            }
+
+            initializeGeometry() {
+                this.createFlowerOfLife();
+                this.createMetatronCube();
+                this.createMerkabah();
+            }
+
+            createFlowerOfLife() {
+                // Enhanced Flower of Life with fractal properties
+                const circles = 37; // Extended pattern
+                const baseRadius = 25;
+                const centerX = 200;
+                const centerY = 200;
+
+                for (let i = 0; i < circles; i++) {
+                    const circle = document.createElement('div');
+                    circle.className = 'geometry-circle';
+                    
+                    let radius, x, y;
+                    
+                    if (i === 0) {
+                        // Center
+                        radius = baseRadius;
+                        x = centerX - radius;
+                        y = centerY - radius;
+                    } else if (i <= 6) {
+                        // First ring
+                        radius = baseRadius;
+                        const angle = (i - 1) * Math.PI / 3;
+                        x = centerX + Math.cos(angle) * baseRadius - radius;
+                        y = centerY + Math.sin(angle) * baseRadius - radius;
+                    } else if (i <= 18) {
+                        // Second ring
+                        radius = baseRadius * 0.8;
+                        const angle = (i - 7) * Math.PI / 6;
+                        x = centerX + Math.cos(angle) * baseRadius * 2 - radius;
+                        y = centerY + Math.sin(angle) * baseRadius * 2 - radius;
+                    } else {
+                        // Outer fractal ring
+                        radius = baseRadius * 0.6;
+                        const angle = (i - 19) * Math.PI / 9;
+                        x = centerX + Math.cos(angle) * baseRadius * 3 - radius;
+                        y = centerY + Math.sin(angle) * baseRadius * 3 - radius;
+                    }
+                    
+                    circle.style.width = radius * 2 + 'px';
+                    circle.style.height = radius * 2 + 'px';
+                    circle.style.left = x + 'px';
+                    circle.style.top = y + 'px';
+                    
+                    this.flowerOfLife.appendChild(circle);
+                }
+            }
+
+            createMetatronCube() {
+                // Enhanced Metatron's Cube with more connections
+                const vertices = [
+                    {x: 160, y: 60}, {x: 240, y: 60}, {x: 300, y: 120},
+                    {x: 320, y: 200}, {x: 300, y: 280}, {x: 240, y: 340},
+                    {x: 160, y: 340}, {x: 100, y: 280}, {x: 80, y: 200},
+                    {x: 100, y: 120}, {x: 200, y: 200}, {x: 200, y: 120},
+                    {x: 260, y: 160}, {x: 260, y: 240}, {x: 200, y: 280},
+                    {x: 140, y: 240}, {x: 140, y: 160}
+                ];
+
+                const connections = [
+                    // Outer ring
+                    [0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,0],
+                    // Inner connections to center
+                    [0,10], [1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10], [9,10],
+                    // Additional sacred geometry connections
+                    [11,12], [12,13], [13,14], [14,15], [15,16], [16,11],
+                    [10,11], [10,12], [10,13], [10,14], [10,15], [10,16]
+                ];
+
+                connections.forEach(([start, end]) => {
+                    const line = document.createElement('div');
+                    line.className = 'geometry-line';
+                    
+                    const startVertex = vertices[start];
+                    const endVertex = vertices[end];
+                    
+                    const length = Math.sqrt(
+                        Math.pow(endVertex.x - startVertex.x, 2) + 
+                        Math.pow(endVertex.y - startVertex.y, 2)
+                    );
+                    const angle = Math.atan2(
+                        endVertex.y - startVertex.y, 
+                        endVertex.x - startVertex.x
+                    ) * 180 / Math.PI;
+
+                    line.style.width = length + 'px';
+                    line.style.height = '1px';
+                    line.style.left = startVertex.x + 'px';
+                    line.style.top = startVertex.y + 'px';
+                    line.style.transform = `rotate(${angle}deg)`;
+                    
+                    this.metatronCube.appendChild(line);
+                });
+            }
+
+            createMerkabah() {
+                // Enhanced Star Tetrahedron with additional fractal elements
+                const vertices = [
+                    // Primary tetrahedron (upward)
+                    {x: 200, y: 60},  {x: 100, y: 300}, {x: 300, y: 300},
+                    // Secondary tetrahedron (downward)
+                    {x: 200, y: 340}, {x: 100, y: 100}, {x: 300, y: 100},
+                    // Inner tetrahedron vertices
+                    {x: 200, y: 150}, {x: 150, y: 250}, {x: 250, y: 250}
+                ];
+
+                const connections = [
+                    // Outer tetrahedrons
+                    [0,1], [0,2], [1,2], [3,4], [3,5], [4,5],
+                    // Interconnections
+                    [0,3], [1,4], [2,5], [0,4], [0,5], [1,3], [2,3], [1,5], [2,4],
+                    // Inner sacred connections
+                    [6,7], [6,8], [7,8], [0,6], [3,6], [1,7], [4,7], [2,8], [5,8]
+                ];
+
+                connections.forEach(([start, end]) => {
+                    const line = document.createElement('div');
+                    line.className = 'geometry-line';
+                    line.style.background = 'rgba(255, 215, 0, 0.4)';
+                    
+                    const startVertex = vertices[start];
+                    const endVertex = vertices[end];
+                    
+                    const length = Math.sqrt(
+                        Math.pow(endVertex.x - startVertex.x, 2) + 
+                        Math.pow(endVertex.y - startVertex.y, 2)
+                    );
+                    const angle = Math.atan2(
+                        endVertex.y - startVertex.y, 
+                        endVertex.x - startVertex.x
+                    ) * 180 / Math.PI;
+
+                    line.style.width = length + 'px';
+                    line.style.height = '1px';
+                    line.style.left = startVertex.x + 'px';
+                    line.style.top = startVertex.y + 'px';
+                    line.style.transform = `rotate(${angle}deg)`;
+                    
+                    this.merkabah.appendChild(line);
+                });
+            }
+
+            createParticleField() {
+                // Create fractal particle field around the core
+                const particleCount = 144; // Sacred number
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Golden ratio based positioning
+                    const angle = i * this.phi * Math.PI * 2;
+                    const radius = 50 + (i / particleCount) * 300;
+                    const size = Math.random() * 3 + 1;
+                    
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = (200 + Math.cos(angle) * radius) + 'px';
+                    particle.style.top = (200 + Math.sin(angle) * radius) + 'px';
+                    
+                    // Assign random movement
+                    const dx = (Math.random() - 0.5) * 200;
+                    const dy = (Math.random() - 0.5) * 200;
+                    particle.style.setProperty('--dx', dx + 'px');
+                    particle.style.setProperty('--dy', dy + 'px');
+                    
+                    // Random animation delay and duration
+                    const delay = Math.random() * 10;
+                    const duration = 15 + Math.random() * 10;
+                    particle.style.animation = `particleFloat ${duration}s ${delay}s infinite ease-in-out`;
+                    
+                    this.particles.push(particle);
+                    this.coreMatrix.appendChild(particle);
+                }
+            }
+
+            setupControls() {
+                // Intensity control
+                this.intensitySlider.addEventListener('input', (e) => {
+                    this.targetIntensity = parseFloat(e.target.value);
+                    this.intensityReadout.textContent = `Resonance Intensity: ${this.targetIntensity.toFixed(3)}`;
+                });
+
+                // Ring speed control
+                this.ringSpeedSlider.addEventListener('input', (e) => {
+                    const speed = parseInt(e.target.value);
+                    document.documentElement.style.setProperty('--ring-speed', speed + 's');
+                });
+
+                // Geometry speed control
+                this.geometrySpeedSlider.addEventListener('input', (e) => {
+                    const speed = parseInt(e.target.value);
+                    document.documentElement.style.setProperty('--geometry-speed', speed + 's');
+                });
+
+                // Audio toggle
+                this.audioToggle.addEventListener('click', () => {
+                    this.toggleAudio();
+                });
+
+                // Fractal mode toggle
+                this.fractalMode.addEventListener('click', () => {
+                    this.toggleFractalMode();
+                });
+
+                // Reset matrix
+                this.resetMatrix.addEventListener('click', () => {
+                    this.resetToDefault();
+                });
+
+                // Breath controls
+                this.breathToggle.addEventListener('click', () => {
+                    this.toggleBreathWork();
+                });
+
+                this.breathReset.addEventListener('click', () => {
+                    this.resetBreathCycle();
+                });
+
+                this.breathFreqSlider.addEventListener('input', (e) => {
+                    this.breathFrequency = parseFloat(e.target.value);
+                    this.breathFreqDisplay.textContent = this.breathFrequency.toFixed(2) + ' Hz';
+                });
+            }
+
+            toggleAudio() {
+                if (!this.audioEnabled) {
+                    this.initializeAudio();
+                } else {
+                    this.destroyAudio();
+                }
+            }
+
+            initializeAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.gainNode = this.audioContext.createGain();
+                    this.gainNode.gain.value = 0.1;
+                    this.gainNode.connect(this.audioContext.destination);
+
+                    // Create harmonic oscillators
+                    const frequencies = [7.83, 12.66, 432, 528];
+                    
+                    frequencies.forEach((freq, index) => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gain = this.audioContext.createGain();
+                        
+                        oscillator.frequency.value = freq;
+                        oscillator.type = 'sine';
+                        gain.gain.value = 0.02;
+                        
+                        oscillator.connect(gain);
+                        gain.connect(this.gainNode);
+                        oscillator.start();
+                        
+                        this.oscillators.push({ osc: oscillator, gain: gain, baseFreq: freq });
+                    });
+
+                    this.audioEnabled = true;
+                    this.audioToggle.textContent = 'Disable Audio';
+                    this.audioToggle.style.background = 'rgba(80, 40, 0, 0.7)';
+                } catch (error) {
+                    console.log('Audio initialization failed:', error);
+                }
+            }
+
+            destroyAudio() {
+                if (this.audioContext) {
+                    this.oscillators.forEach(osc => osc.osc.stop());
+                    this.oscillators = [];
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+                this.audioEnabled = false;
+                this.audioToggle.textContent = 'Enable Audio';
+                this.audioToggle.style.background = 'rgba(0, 40, 80, 0.7)';
+            }
+
+            toggleFractalMode() {
+                this.fractalModeActive = !this.fractalModeActive;
+                
+                if (this.fractalModeActive) {
+                    this.fractalMode.textContent = 'Exit Fractal';
+                    this.fractalMode.style.background = 'rgba(80, 0, 80, 0.7)';
+                    this.coreMatrix.style.transform += ' scale(1.5)';
+                } else {
+                    this.fractalMode.textContent = 'Fractal Mode';
+                    this.fractalMode.style.background = 'rgba(0, 40, 80, 0.7)';
+                    this.coreMatrix.style.transform = this.coreMatrix.style.transform.replace(' scale(1.5)', '');
+                }
+            }
+
+            toggleBreathWork() {
+                this.breathActive = !this.breathActive;
+                
+                if (this.breathActive) {
+                    this.breathStartTime = Date.now();
+                    this.breathToggle.textContent = 'Stop Breath Work';
+                    this.breathToggle.classList.add('breath-active');
+                    this.logosBreathCore.classList.add('active');
+                    this.breathInstructions.textContent = 'Breathe In...';
+                    this.breathInstructions.classList.add('inhale');
+                } else {
+                    this.breathToggle.textContent = 'Start Breath Work';
+                    this.breathToggle.classList.remove('breath-active');
+                    this.logosBreathCore.classList.remove('active', 'inhale', 'exhale');
+                    this.breathInstructions.textContent = 'Begin Breath Work';
+                    this.breathInstructions.classList.remove('inhale', 'exhale');
+                }
+            }
+
+            resetBreathCycle() {
+                this.breathPhase = 0;
+                this.breathStartTime = Date.now();
+                this.isInhaling = true;
+                if (this.breathActive) {
+                    this.breathInstructions.textContent = 'Breathe In...';
+                    this.breathInstructions.classList.remove('exhale');
+                    this.breathInstructions.classList.add('inhale');
+                }
+            }
+
+            resetToDefault() {
+                this.intensity = 3.141;
+                this.targetIntensity = 3.141;
+                this.intensitySlider.value = 3.141;
+                this.ringSpeedSlider.value = 15;
+                this.geometrySpeedSlider.value = 25;
+                this.breathFrequency = 0.10;
+                this.breathFreqSlider.value = 0.10;
+                this.breathFreqDisplay.textContent = '0.10 Hz';
+                this.intensityReadout.textContent = 'Resonance Intensity: 3.141';
+                
+                if (this.fractalModeActive) {
+                    this.toggleFractalMode();
+                }
+                
+                if (this.breathActive) {
+                    this.toggleBreathWork();
+                }
+            }
+
+            updateBreathEngine() {
+                if (!this.breathActive) return;
+
+                const currentTime = Date.now();
+                const elapsed = (currentTime - this.breathStartTime) / 1000; // seconds
+                const cycleDuration = 1 / this.breathFrequency; // seconds per cycle
+                
+                this.breathPhase = (elapsed % cycleDuration) / cycleDuration; // 0-1
+
+                const wasInhaling = this.isInhaling;
+                this.isInhaling = this.breathPhase < 0.5;
+
+                // Transition detection
+                if (wasInhaling !== this.isInhaling) {
+                    if (this.isInhaling) {
+                        this.breathInstructions.textContent = 'Breathe In...';
+                        this.breathInstructions.classList.remove('exhale');
+                        this.breathInstructions.classList.add('inhale');
+                        this.logosBreathCore.classList.remove('exhale');
+                        this.logosBreathCore.classList.add('inhale');
+                    } else {
+                        this.breathInstructions.textContent = 'Breathe Out...';
+                        this.breathInstructions.classList.remove('inhale');
+                        this.breathInstructions.classList.add('exhale');
+                        this.logosBreathCore.classList.remove('inhale');
+                        this.logosBreathCore.classList.add('exhale');
+                    }
+                }
+            }
+
+            updateResonanceDisplay() {
+                // Update frequency displays with coherent modulation
+                const baseFreqs = [7.83, 12.66, 432.0, 528.0];
+                const modulation = Math.sin(this.time * 0.01) * 0.1 + Math.sin(this.time * 0.03) * 0.05;
+                
+                baseFreqs.forEach((freq, index) => {
+                    const modulated = freq * (1 + modulation * this.intensity * 0.01);
+                    this.freqDisplays[index].textContent = modulated.toFixed(2) + ' Hz';
+                });
+            }
+
+            updateStatusHud() {
+                let status = '';
+                let className = '';
+
+                if (this.intensity < 2) {
+                    status = '🔴 Incoherent Field';
+                    className = 'incoherent';
+                } else if (this.intensity < 4) {
+                    status = '🟡 Partial Coherence';
+                    className = 'partial';
+                } else if (this.intensity < 7) {
+                    status = '🟢 Coherent Resonance';
+                    className = 'coherent';
+                } else {
+                    status = '🟣 Transcendent Unity';
+                    className = 'transcendent';
+                }
+
+                if (this.breathActive) {
+                    status += ' • Logos Breath Active';
+                }
+
+                this.statusHud.textContent = status;
+                this.statusHud.className = 'status-hud ' + className;
+            }
+
+            updateAudio() {
+                if (!this.audioEnabled || this.oscillators.length === 0) return;
+
+                const modulation = Math.sin(this.time * 0.01) * 0.1;
+                
+                this.oscillators.forEach((osc, index) => {
+                    const freqMod = osc.baseFreq * (1 + modulation * this.intensity * 0.01);
+                    osc.osc.frequency.setValueAtTime(freqMod, this.audioContext.currentTime);
+                    
+                    // Breath-synchronized volume modulation
+                    let breathMod = 1;
+                    if (this.breathActive) {
+                        breathMod = this.isInhaling ? 1.2 : 0.8;
+                    }
+                    
+                    osc.gain.gain.setValueAtTime(0.02 * breathMod * this.intensity * 0.1, this.audioContext.currentTime);
+                });
+            }
+
+            animate() {
+                this.time += 1;
+                
+                // Smooth intensity interpolation
+                if (Math.abs(this.intensity - this.targetIntensity) > 0.001) {
+                    this.intensity += (this.targetIntensity - this.intensity) * 0.02;
+                }
+
+                // Update all systems
+                this.updateBreathEngine();
+                this.updateResonanceDisplay();
+                this.updateStatusHud();
+                this.updateAudio();
+
+                // Core pulsation based on intensity
+                const pulseScale = 1 + Math.sin(this.time * 0.05) * 0.1 * this.intensity;
+                const coreStyle = `translate(-50%, -50%) scale(${pulseScale})`;
+                this.unifiedCore.style.transform = coreStyle;
+
+                // Particle field updates in fractal mode
+                if (this.fractalModeActive) {
+                    this.particles.forEach((particle, index) => {
+                        const phase = (this.time + index * 10) * 0.01;
+                        const spiralRadius = 100 + Math.sin(phase) * 50;
+                        const spiralAngle = phase * this.phi;
+                        
+                        const x = 200 + Math.cos(spiralAngle) * spiralRadius;
+                        const y = 200 + Math.sin(spiralAngle) * spiralRadius;
+                        
+                        particle.style.left = x + 'px';
+                        particle.style.top = y + 'px';
+                        particle.style.opacity = (Math.sin(phase * 2) + 1) * 0.4;
+                    });
+                }
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize the Unified Core Engine
+        document.addEventListener('DOMContentLoaded', () => {
+            const engine = new UnifiedCoreEngine();
+            console.log('🌟 KingdomOS Unified Core Engine Initialized');
+            console.log('🔮 Sacred Geometry Matrices Active');
+            console.log('💨 Logos Breath Engine Ready');
+            console.log('🎵 Harmonic Resonance System Online');
+        });
+    </script>
+</body>
+</html>
