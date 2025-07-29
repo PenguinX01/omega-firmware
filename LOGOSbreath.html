@@ -187,27 +187,7 @@
             font-weight: bold;
         }
 
-        /* Breath Instructions */
-        .breath-instructions {
-            position: absolute;
-            top: 60%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            z-index: 15;
-            transition: all 1s ease-in-out;
-            text-shadow: 0 0 20px currentColor;
-        }
 
-        .breath-instructions.inhale {
-            color: #ff4444;
-        }
-
-        .breath-instructions.exhale {
-            color: #4488ff;
-        }
 
         /* Ezekiel Rings - Multi-layered */
         .ring-system {
@@ -349,17 +329,7 @@
             z-index: 100;
         }
 
-        .control-matrix {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(0, 10, 20, 0.8);
-            border: 1px solid #00ffff;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            z-index: 100;
-        }
+
 
         /* Breath Control Panel */
         .breath-control-panel {
@@ -548,8 +518,7 @@
             <div class="breath-phase-indicator" id="breathPhaseIndicator">Ready</div>
         </div>
 
-        <!-- Breath Instructions -->
-        <div class="breath-instructions" id="breathInstructions">Begin Breath Work</div>
+
         
         <!-- HUD Elements -->
         <div class="status-hud" id="statusHud">🔴 Initializing Matrix</div>
@@ -592,25 +561,7 @@
             </div>
         </div>
 
-        <div class="control-matrix">
-            <div class="control-group">
-                <label class="control-label">Core Intensity:</label>
-                <input type="range" min="1" max="10" value="3.141" step="0.01" class="control-slider" id="intensitySlider">
-            </div>
-            <div class="control-group">
-                <label class="control-label">Ring Speed:</label>
-                <input type="range" min="5" max="60" value="15" class="control-slider" id="ringSpeedSlider">
-            </div>
-            <div class="control-group">
-                <label class="control-label">Geometry Sync:</label>
-                <input type="range" min="10" max="50" value="25" class="control-slider" id="geometrySpeedSlider">
-            </div>
-            <div class="control-group">
-                <button class="control-btn" id="audioToggle">Enable Audio</button>
-                <button class="control-btn" id="fractalMode">Fractal Mode</button>
-                <button class="control-btn" id="resetMatrix">Reset</button>
-            </div>
-        </div>
+
     </div>
 
     <script>
@@ -619,7 +570,6 @@
                 this.coreMatrix = document.getElementById('coreMatrix');
                 this.unifiedCore = document.getElementById('unifiedCore');
                 this.logosBreathCore = document.getElementById('logosBreathCore');
-                this.breathInstructions = document.getElementById('breathInstructions');
                 this.statusHud = document.getElementById('statusHud');
                 this.intensityReadout = document.getElementById('intensityReadout');
                 this.flowerOfLife = document.getElementById('flowerOfLife');
@@ -631,13 +581,13 @@
                 this.capacityPercentage = document.getElementById('capacityPercentage');
                 this.breathPhaseIndicator = document.getElementById('breathPhaseIndicator');
                 
-                // Controls
-                this.audioToggle = document.getElementById('audioToggle');
-                this.fractalMode = document.getElementById('fractalMode');
-                this.resetMatrix = document.getElementById('resetMatrix');
-                this.intensitySlider = document.getElementById('intensitySlider');
-                this.ringSpeedSlider = document.getElementById('ringSpeedSlider');
-                this.geometrySpeedSlider = document.getElementById('geometrySpeedSlider');
+                // Controls (removed control matrix elements)
+                this.audioToggle = null;
+                this.fractalMode = null;
+                this.resetMatrix = null;
+                this.intensitySlider = null;
+                this.ringSpeedSlider = null;
+                this.geometrySpeedSlider = null;
                 
                 // Breath Controls
                 this.breathToggle = document.getElementById('breathToggle');
@@ -862,39 +812,8 @@
             }
 
             setupControls() {
-                // Intensity control
-                this.intensitySlider.addEventListener('input', (e) => {
-                    this.targetIntensity = parseFloat(e.target.value);
-                    this.intensityReadout.textContent = `Resonance Intensity: ${this.targetIntensity.toFixed(3)}`;
-                });
-
-                // Ring speed control
-                this.ringSpeedSlider.addEventListener('input', (e) => {
-                    const speed = parseInt(e.target.value);
-                    document.documentElement.style.setProperty('--ring-speed', speed + 's');
-                });
-
-                // Geometry speed control
-                this.geometrySpeedSlider.addEventListener('input', (e) => {
-                    const speed = parseInt(e.target.value);
-                    document.documentElement.style.setProperty('--geometry-speed', speed + 's');
-                });
-
-                // Audio toggle
-                this.audioToggle.addEventListener('click', () => {
-                    this.toggleAudio();
-                });
-
-                // Fractal mode toggle
-                this.fractalMode.addEventListener('click', () => {
-                    this.toggleFractalMode();
-                });
-
-                // Reset matrix
-                this.resetMatrix.addEventListener('click', () => {
-                    this.resetToDefault();
-                });
-
+                // Removed intensity, ring speed, geometry speed, audio, fractal, and reset controls
+                
                 // Breath controls
                 this.breathToggle.addEventListener('click', () => {
                     this.toggleBreathWork();
@@ -985,14 +904,10 @@
                     this.breathToggle.textContent = 'Stop Breath Work';
                     this.breathToggle.classList.add('breath-active');
                     this.logosBreathCore.classList.add('active');
-                    this.breathInstructions.textContent = 'Breathe In...';
-                    this.breathInstructions.classList.add('inhale');
                 } else {
                     this.breathToggle.textContent = 'Start Breath Work';
                     this.breathToggle.classList.remove('breath-active');
                     this.logosBreathCore.classList.remove('active', 'inhale', 'exhale');
-                    this.breathInstructions.textContent = 'Begin Breath Work';
-                    this.breathInstructions.classList.remove('inhale', 'exhale');
                 }
             }
 
@@ -1000,27 +915,15 @@
                 this.breathPhase = 0;
                 this.breathStartTime = Date.now();
                 this.isInhaling = true;
-                if (this.breathActive) {
-                    this.breathInstructions.textContent = 'Breathe In...';
-                    this.breathInstructions.classList.remove('exhale');
-                    this.breathInstructions.classList.add('inhale');
-                }
             }
 
             resetToDefault() {
                 this.intensity = 3.141;
                 this.targetIntensity = 3.141;
-                this.intensitySlider.value = 3.141;
-                this.ringSpeedSlider.value = 15;
-                this.geometrySpeedSlider.value = 25;
                 this.breathFrequency = 0.10;
                 this.breathFreqSlider.value = 0.10;
                 this.breathFreqDisplay.textContent = '0.10 Hz';
                 this.intensityReadout.textContent = 'Resonance Intensity: 3.141';
-                
-                if (this.fractalModeActive) {
-                    this.toggleFractalMode();
-                }
                 
                 if (this.breathActive) {
                     this.toggleBreathWork();
@@ -1065,17 +968,11 @@
                 // Transition detection
                 if (wasInhaling !== this.isInhaling) {
                     if (this.isInhaling) {
-                        this.breathInstructions.textContent = 'Breathe In...';
-                        this.breathInstructions.classList.remove('exhale');
-                        this.breathInstructions.classList.add('inhale');
                         this.logosBreathCore.classList.remove('exhale');
                         this.logosBreathCore.classList.add('inhale');
                         this.breathPhaseIndicator.textContent = 'Inhaling';
                         this.lungFill.classList.remove('exhaling');
                     } else {
-                        this.breathInstructions.textContent = 'Breathe Out...';
-                        this.breathInstructions.classList.remove('inhale');
-                        this.breathInstructions.classList.add('exhale');
                         this.logosBreathCore.classList.remove('inhale');
                         this.logosBreathCore.classList.add('exhale');
                         this.breathPhaseIndicator.textContent = 'Exhaling';
