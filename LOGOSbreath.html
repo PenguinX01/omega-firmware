@@ -712,6 +712,11 @@
             </div>
             
             <div class="control-row">
+                <label class="control-label">Audio Volume:</label>
+                <input type="range" min="0" max="100" value="30" class="control-slider" id="volumeSlider">
+            </div>
+            
+            <div class="control-row">
                 <button class="btn" id="breathToggle">Begin Session</button>
                 <button class="btn" id="resetBtn">Reset</button>
             </div>
@@ -730,11 +735,64 @@
             constructor() {
                 this.initializeElements();
                 this.initializeState();
+                this.initializeAudio();
                 this.createStarField();
                 this.createGeometry();
                 this.createParticles();
                 this.setupEventListeners();
                 this.animate();
+            }
+
+            initializeAudio() {
+                // Initialize Web Audio API
+                try {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.masterGain = this.audioCtx.createGain();
+                    this.masterGain.connect(this.audioCtx.destination);
+                    this.masterGain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+                    
+                    // Audio nodes for different layers
+                    this.breathOscillator = null;
+                    this.breathGain = null;
+                    this.droneOscillator = null;
+                    this.droneGain = null;
+                    this.subBassOscillator = null;
+                    this.subBassGain = null;
+                    
+                    // Harmonic frequencies for different breath states
+                    this.frequencies = {
+                        normal: {
+                            base: 220,      // A3
+                            inhaleMax: 440, // A4
+                            droneFreq: 136.1, // OM frequency
+                            subBass: 40
+                        },
+                        throne: {
+                            base: 256,      // C4 (256 Hz = spiritual awakening)
+                            inhaleMax: 512, // C5
+                            droneFreq: 144, // Platonic frequency
+                            subBass: 32     // Deep throne bass
+                        },
+                        cosmic: {
+                            base: 432,      // A4 (432 Hz = cosmic pitch)
+                            inhaleMax: 864, // 432 * 2
+                            droneFreq: 528, // 528 Hz = love frequency
+                            subBass: 36     // Schumann harmonics
+                        },
+                        advanced: {
+                            base: 174,      // 174 Hz = pain relief solfeggio
+                            inhaleMax: 417, // 417 Hz = change facilitation
+                            droneFreq: 396, // 396 Hz = liberation
+                            subBass: 28     // Deep healing
+                        }
+                    };
+                    
+                    this.audioInitialized = true;
+                    console.log('🔊 Sacred Audio Engine Initialized');
+                } catch (error) {
+                    console.log('Audio not available:', error);
+                    this.audioInitialized = false;
+                }
             }
 
             initializeElements() {
@@ -747,6 +805,7 @@
                 this.resetBtn = document.getElementById('resetBtn');
                 this.breathRateSlider = document.getElementById('breathRateSlider');
                 this.breathRateDisplay = document.getElementById('breathRateDisplay');
+                this.volumeSlider = document.getElementById('volumeSlider');
                 this.meditationGuide = document.getElementById('meditationGuide');
                 this.guidePhase = document.getElementById('guidePhase');
                 this.guideText = document.getElementById('guideText');
@@ -898,6 +957,13 @@
                     this.updateBreathStateClassification();
                     this.breathRateDisplay.textContent = `${this.breathRate} breaths/min`;
                 });
+
+                this.volumeSlider.addEventListener('input', (e) => {
+                    const volume = parseInt(e.target.value) / 100;
+                    if (this.audioInitialized) {
+                        this.masterGain.gain.setValueAtTime(volume, this.audioCtx.currentTime);
+                    }
+                });
             }
 
             updateBreathStateClassification() {
@@ -956,12 +1022,20 @@
             }
 
             startBreathingSession() {
+                // Resume audio context if suspended (browser autoplay policy)
+                if (this.audioInitialized && this.audioCtx.state === 'suspended') {
+                    this.audioCtx.resume();
+                }
+                
                 this.cycleStartTime = Date.now();
                 this.currentPhase = 'inhale';
                 this.breathToggle.textContent = 'End Session';
                 this.breathToggle.classList.add('active');
                 this.breathAura.classList.add('active');
                 this.meditationGuide.classList.add('show');
+                
+                // Start background drone based on breath state
+                this.startBackgroundDrone();
                 
                 // Update status based on breath state
                 switch (this.breathState) {
@@ -988,6 +1062,9 @@
                 this.lungCapacity = 0;
                 this.updateMainStatus('Sacred Breath Engine Ready', 'status-inactive');
                 this.updateLungDisplay();
+                
+                // Stop all audio
+                this.stopAllAudio();
             }
 
             reset() {
@@ -1035,10 +1112,16 @@
                     this.currentPhase = newPhase;
                     this.updateBreathVisuals();
                     this.updateMeditationGuide();
+                    this.updateBreathAudio(newPhase, cycleProgress); // Add audio updates
                 }
 
                 this.lungCapacity = Math.max(0, Math.min(100, capacity));
                 this.updateLungDisplay();
+                
+                // Continuous audio modulation during active phases
+                if (this.isActive && this.audioInitialized) {
+                    this.modulateBreathTone(cycleProgress);
+                }
             }
 
             updateBreathVisuals() {
@@ -1272,6 +1355,216 @@
                     }
                 }, 2000);
             }
+
+            // 🔊 AUDIO FUNCTIONS 🔊
+            
+            startBackgroundDrone() {
+                if (!this.audioInitialized) return;
+                
+                const freqSet = this.frequencies[this.breathState] || this.frequencies.normal;
+                
+                try {
+                    // Stop existing drone
+                    this.stopDrone();
+                    
+                    // Create new drone oscillator
+                    this.droneOscillator = this.audioCtx.createOscillator();
+                    this.droneGain = this.audioCtx.createGain();
+                    
+                    this.droneOscillator.type = 'sine';
+                    this.droneOscillator.frequency.setValueAtTime(freqSet.droneFreq, this.audioCtx.currentTime);
+                    
+                    // Gentle fade in
+                    this.droneGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+                    this.droneGain.gain.linearRampToValueAtTime(0.1, this.audioCtx.currentTime + 2);
+                    
+                    this.droneOscillator.connect(this.droneGain);
+                    this.droneGain.connect(this.masterGain);
+                    this.droneOscillator.start();
+                    
+                } catch (error) {
+                    console.log('Error starting drone:', error);
+                }
+            }
+            
+            updateBreathAudio(phase, cycleProgress) {
+                if (!this.audioInitialized) return;
+                
+                const freqSet = this.frequencies[this.breathState] || this.frequencies.normal;
+                
+                switch (phase) {
+                    case 'inhale':
+                        this.stopSubBass();
+                        this.startBreathTone('inhale', freqSet);
+                        break;
+                    case 'hold':
+                        this.stopBreathTone();
+                        // Drone continues, maybe add harmonic layer
+                        break;
+                    case 'exhale':
+                        this.stopSubBass();
+                        this.startBreathTone('exhale', freqSet);
+                        break;
+                    case 'pause':
+                        this.stopBreathTone();
+                        this.startSubBass(freqSet);
+                        break;
+                }
+            }
+            
+            modulateBreathTone(cycleProgress) {
+                if (!this.audioInitialized || !this.breathOscillator) return;
+                
+                const freqSet = this.frequencies[this.breathState] || this.frequencies.normal;
+                
+                try {
+                    if (this.currentPhase === 'inhale') {
+                        // Rising tone during inhale
+                        const inhaleProgress = Math.min(1, cycleProgress / this.phaseTimings.inhale);
+                        const frequency = freqSet.base + (freqSet.inhaleMax - freqSet.base) * Math.sin(inhaleProgress * Math.PI / 2);
+                        this.breathOscillator.frequency.setValueAtTime(frequency, this.audioCtx.currentTime);
+                        
+                        // Volume follows breath capacity
+                        const volume = 0.15 * Math.sin(inhaleProgress * Math.PI / 2);
+                        this.breathGain.gain.setValueAtTime(volume, this.audioCtx.currentTime);
+                        
+                    } else if (this.currentPhase === 'exhale') {
+                        // Falling tone during exhale
+                        const exhaleStart = this.phaseTimings.inhale + this.phaseTimings.hold;
+                        const exhaleProgress = Math.min(1, (cycleProgress - exhaleStart) / this.phaseTimings.exhale);
+                        const frequency = freqSet.inhaleMax - (freqSet.inhaleMax - freqSet.base) * Math.sin(exhaleProgress * Math.PI / 2);
+                        this.breathOscillator.frequency.setValueAtTime(frequency, this.audioCtx.currentTime);
+                        
+                        // Volume follows breath release
+                        const volume = 0.15 * Math.sin((1 - exhaleProgress) * Math.PI / 2);
+                        this.breathGain.gain.setValueAtTime(volume, this.audioCtx.currentTime);
+                    }
+                } catch (error) {
+                    console.log('Error modulating breath tone:', error);
+                }
+            }
+            
+            startBreathTone(type, freqSet) {
+                if (!this.audioInitialized) return;
+                
+                try {
+                    // Stop existing breath tone
+                    this.stopBreathTone();
+                    
+                    // Create new breath oscillator
+                    this.breathOscillator = this.audioCtx.createOscillator();
+                    this.breathGain = this.audioCtx.createGain();
+                    
+                    // Different waveforms for different breath states
+                    switch (this.breathState) {
+                        case 'throne':
+                            this.breathOscillator.type = 'triangle'; // Sacred geometry
+                            break;
+                        case 'cosmic':
+                            this.breathOscillator.type = 'sawtooth'; // Celestial harmonics
+                            break;
+                        case 'advanced':
+                            this.breathOscillator.type = 'sine'; // Pure healing tone
+                            break;
+                        default:
+                            this.breathOscillator.type = 'sine';
+                    }
+                    
+                    const startFreq = type === 'inhale' ? freqSet.base : freqSet.inhaleMax;
+                    this.breathOscillator.frequency.setValueAtTime(startFreq, this.audioCtx.currentTime);
+                    
+                    this.breathGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+                    
+                    this.breathOscillator.connect(this.breathGain);
+                    this.breathGain.connect(this.masterGain);
+                    this.breathOscillator.start();
+                    
+                } catch (error) {
+                    console.log('Error starting breath tone:', error);
+                }
+            }
+            
+            startSubBass(freqSet) {
+                if (!this.audioInitialized) return;
+                
+                try {
+                    this.stopSubBass();
+                    
+                    this.subBassOscillator = this.audioCtx.createOscillator();
+                    this.subBassGain = this.audioCtx.createGain();
+                    
+                    this.subBassOscillator.type = 'sine';
+                    this.subBassOscillator.frequency.setValueAtTime(freqSet.subBass, this.audioCtx.currentTime);
+                    
+                    // Very gentle sub-bass
+                    this.subBassGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+                    this.subBassGain.gain.linearRampToValueAtTime(0.08, this.audioCtx.currentTime + 1);
+                    
+                    this.subBassOscillator.connect(this.subBassGain);
+                    this.subBassGain.connect(this.masterGain);
+                    this.subBassOscillator.start();
+                    
+                } catch (error) {
+                    console.log('Error starting sub bass:', error);
+                }
+            }
+            
+            stopBreathTone() {
+                if (this.breathOscillator) {
+                    try {
+                        this.breathGain.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + 0.1);
+                        setTimeout(() => {
+                            if (this.breathOscillator) {
+                                this.breathOscillator.stop();
+                                this.breathOscillator.disconnect();
+                                this.breathOscillator = null;
+                            }
+                        }, 100);
+                    } catch (error) {
+                        console.log('Error stopping breath tone:', error);
+                    }
+                }
+            }
+            
+            stopDrone() {
+                if (this.droneOscillator) {
+                    try {
+                        this.droneGain.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + 1);
+                        setTimeout(() => {
+                            if (this.droneOscillator) {
+                                this.droneOscillator.stop();
+                                this.droneOscillator.disconnect();
+                                this.droneOscillator = null;
+                            }
+                        }, 1000);
+                    } catch (error) {
+                        console.log('Error stopping drone:', error);
+                    }
+                }
+            }
+            
+            stopSubBass() {
+                if (this.subBassOscillator) {
+                    try {
+                        this.subBassGain.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + 0.5);
+                        setTimeout(() => {
+                            if (this.subBassOscillator) {
+                                this.subBassOscillator.stop();
+                                this.subBassOscillator.disconnect();
+                                this.subBassOscillator = null;
+                            }
+                        }, 500);
+                    } catch (error) {
+                        console.log('Error stopping sub bass:', error);
+                    }
+                }
+            }
+            
+            stopAllAudio() {
+                this.stopBreathTone();
+                this.stopDrone();
+                this.stopSubBass();
+            }
         }
 
         // Initialize the Sacred Breath Engine when page loads
@@ -1279,11 +1572,18 @@
             const engine = new SacredBreathEngine();
             
             console.log('🌟 Sacred Breath Engine Initialized');
+            console.log('🔊 BREATH-DRIVEN AUDIO MODULATION ACTIVE');
             console.log('🟣 THRONE-STATE BREATHING PROTOCOLS LOADED');
             console.log('💫 COSMIC SYNC FREQUENCIES CALIBRATED');
             console.log('🧘 ADVANCED PRACTITIONER STATES READY');
             console.log('🌌 Sacred geometry patterns loaded');
             console.log('✨ Ready for transcendental breathing');
+            console.log('');
+            console.log('🔊 SACRED AUDIO FREQUENCIES:');
+            console.log('   🟣 THRONE STATE: 256-512 Hz (Spiritual awakening)');
+            console.log('   💫 COSMIC SYNC: 432-864 Hz (Universal harmony)');
+            console.log('   🧘 ADVANCED: 174-417 Hz (Solfeggio healing)');
+            console.log('   ⚡ STANDARD: 220-440 Hz (Classical tuning)');
             console.log('');
             console.log('🟣 BREATH RATE CLASSIFICATIONS:');
             console.log('   2 BPM → THRONE STATE (Divine Computation)');
