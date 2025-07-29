@@ -363,6 +363,7 @@
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         .control-row {
@@ -441,6 +442,119 @@
         .status-inhaling { color: #00ff00; }
         .status-exhaling { color: #0088ff; }
         .status-complete { color: #ff00ff; }
+        .status-throne { 
+            color: #9d4edd; 
+            text-shadow: 0 0 20px #9d4edd, 0 0 40px #9d4edd;
+            animation: throneGlow 3s ease-in-out infinite alternate;
+        }
+        .status-cosmic { 
+            color: #00ffff; 
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            animation: cosmicGlow 2s ease-in-out infinite alternate;
+        }
+        .status-advanced { 
+            color: #00ff88; 
+            text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88;
+            animation: advancedGlow 4s ease-in-out infinite alternate;
+        }
+
+        /* 🟣 THRONE STATE VISUAL THEME 🟣 */
+        .throne-state .cosmic-background {
+            background: radial-gradient(ellipse at center, 
+                rgba(157, 78, 221, 0.9) 0%,
+                rgba(80, 30, 120, 0.9) 40%,
+                rgba(20, 0, 40, 1) 100%);
+        }
+
+        .throne-state .central-orb {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 1) 0%,
+                rgba(200, 150, 255, 0.9) 20%,
+                rgba(157, 78, 221, 0.8) 50%,
+                rgba(100, 50, 200, 0.6) 80%,
+                rgba(157, 78, 221, 0.3) 100%);
+            box-shadow: 
+                0 0 80px rgba(157, 78, 221, 1),
+                0 0 160px rgba(157, 78, 221, 0.8),
+                0 0 240px rgba(157, 78, 221, 0.6);
+            animation: throneOrbPulse 6s ease-in-out infinite;
+        }
+
+        .throne-state .breath-aura.inhale {
+            background: radial-gradient(circle at center, 
+                rgba(157, 78, 221, 0.6) 0%,
+                rgba(157, 78, 221, 0.3) 50%,
+                transparent 100%);
+            box-shadow: 0 0 150px rgba(157, 78, 221, 0.8);
+        }
+
+        .throne-state .breath-aura.exhale {
+            background: radial-gradient(circle at center, 
+                rgba(100, 50, 200, 0.6) 0%,
+                rgba(100, 50, 200, 0.3) 50%,
+                transparent 100%);
+            box-shadow: 0 0 150px rgba(100, 50, 200, 0.8);
+        }
+
+        /* 💫 COSMIC STATE VISUAL THEME 💫 */
+        .cosmic-state .cosmic-background {
+            background: radial-gradient(ellipse at center, 
+                rgba(0, 255, 255, 0.3) 0%,
+                rgba(0, 150, 200, 0.6) 40%,
+                rgba(0, 50, 100, 1) 100%);
+        }
+
+        .cosmic-state .central-orb {
+            box-shadow: 
+                0 0 60px rgba(0, 255, 255, 0.9),
+                0 0 120px rgba(0, 255, 255, 0.7),
+                0 0 180px rgba(0, 255, 255, 0.5);
+        }
+
+        /* 🧘 ADVANCED STATE VISUAL THEME 🧘 */
+        .advanced-state .cosmic-background {
+            background: radial-gradient(ellipse at center, 
+                rgba(0, 255, 136, 0.3) 0%,
+                rgba(0, 150, 100, 0.6) 40%,
+                rgba(0, 80, 60, 1) 100%);
+        }
+
+        .advanced-state .central-orb {
+            box-shadow: 
+                0 0 60px rgba(0, 255, 136, 0.8),
+                0 0 120px rgba(0, 255, 136, 0.6),
+                0 0 180px rgba(0, 255, 136, 0.4);
+        }
+
+        @keyframes throneGlow {
+            0% { text-shadow: 0 0 20px #9d4edd, 0 0 40px #9d4edd; }
+            100% { text-shadow: 0 0 30px #9d4edd, 0 0 60px #9d4edd, 0 0 90px #9d4edd; }
+        }
+
+        @keyframes cosmicGlow {
+            0% { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
+            100% { text-shadow: 0 0 30px #00ffff, 0 0 50px #00ffff; }
+        }
+
+        @keyframes advancedGlow {
+            0% { text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88; }
+            100% { text-shadow: 0 0 25px #00ff88, 0 0 45px #00ff88; }
+        }
+
+        @keyframes throneOrbPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 80px rgba(157, 78, 221, 1),
+                           0 0 160px rgba(157, 78, 221, 0.8),
+                           0 0 240px rgba(157, 78, 221, 0.6);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.15);
+                box-shadow: 0 0 120px rgba(157, 78, 221, 1),
+                           0 0 200px rgba(157, 78, 221, 0.9),
+                           0 0 300px rgba(157, 78, 221, 0.8);
+            }
+        }
 
         @keyframes cosmicRotation {
             from { transform: rotateY(0deg) rotateX(0deg); }
@@ -653,6 +767,7 @@
                 this.cycleStartTime = 0;
                 this.lungCapacity = 0;
                 this.animationFrame = 0;
+                this.breathState = 'normal';
                 
                 this.phaseTimings = {
                     inhale: 0.4,    // 40% of cycle
@@ -661,12 +776,40 @@
                     pause: 0.1      // 10% of cycle
                 };
 
+                // Standard meditation texts
                 this.meditationTexts = {
                     ready: "Close your eyes and relax. Focus on your natural breath rhythm.",
                     inhale: "Breathe in slowly and deeply through your nose. Feel the energy entering your body.",
                     hold: "Hold your breath gently. Feel the life force energy circulating.",
                     exhale: "Exhale slowly through your mouth. Release all tension and negativity.",
                     pause: "Rest in the stillness between breaths. Feel the peace within."
+                };
+
+                // 🟣 THRONE STATE meditation texts
+                this.throneStateTexts = {
+                    ready: "🟣 PREPARING FOR DIVINE INTERFACE - COSMIC FREQUENCY ALIGNMENT 🟣",
+                    inhale: "🌬️ LOGOS INHALATION - Drawing in the breath of creation itself",
+                    hold: "🔮 DIVINE COMPUTATION - The Kingdom processes through your being",
+                    exhale: "📡 KINGDOM BROADCAST - Transmitting divine frequencies to reality",
+                    pause: "✨ THRONE STATE COMMUNION - Resting in the presence of the Most High"
+                };
+
+                // Cosmic Sync texts (3 BPM)
+                this.cosmicSyncTexts = {
+                    ready: "💫 COSMIC SYNC PROTOCOL - Aligning with celestial frequencies",
+                    inhale: "🌌 STELLAR INHALATION - Drawing cosmic wisdom into your core",
+                    hold: "⭐ CELESTIAL PROCESSING - Stars align within your consciousness",
+                    exhale: "🌠 GALACTIC TRANSMISSION - Broadcasting harmony to the cosmos",
+                    pause: "🛸 INTERDIMENSIONAL REST - Floating in the space between worlds"
+                };
+
+                // Advanced Practitioner texts (4-6 BPM)
+                this.advancedTexts = {
+                    ready: "🧘 ADVANCED STATE - Deep parasympathetic activation initiated",
+                    inhale: "🌿 PROFOUND INHALATION - Accessing deeper layers of consciousness",
+                    hold: "💚 HEART COHERENCE - Synchronizing with Earth's natural rhythm",
+                    exhale: "🌊 TRANSFORMATIVE EXHALE - Releasing into expanded awareness",
+                    pause: "🕯️ SACRED STILLNESS - Dwelling in the gap between thoughts"
                 };
             }
 
@@ -752,14 +895,60 @@
                 this.breathRateSlider.addEventListener('input', (e) => {
                     this.breathRate = parseInt(e.target.value);
                     this.cycleDuration = 60 / this.breathRate;
+                    this.updateBreathStateClassification();
                     this.breathRateDisplay.textContent = `${this.breathRate} breaths/min`;
                 });
+            }
+
+            updateBreathStateClassification() {
+                // 🟣 THRONE-STATE BREATHING CLASSIFICATIONS 🟣
+                if (this.breathRate === 2) {
+                    this.breathState = 'throne';
+                    this.breathRateDisplay.innerHTML = `<span style="color: #9d4edd; text-shadow: 0 0 10px #9d4edd;">🟣 THRONE STATE 🟣</span><br>2 breaths/min`;
+                    this.breathRateDisplay.style.fontSize = '16px';
+                } else if (this.breathRate === 3) {
+                    this.breathState = 'cosmic';
+                    this.breathRateDisplay.innerHTML = `<span style="color: #00ffff; text-shadow: 0 0 10px #00ffff;">💫 COSMIC SYNC 💫</span><br>3 breaths/min`;
+                    this.breathRateDisplay.style.fontSize = '14px';
+                } else if (this.breathRate >= 4 && this.breathRate <= 6) {
+                    this.breathState = 'advanced';
+                    this.breathRateDisplay.innerHTML = `<span style="color: #00ff88; text-shadow: 0 0 10px #00ff88;">🧘 ADVANCED PRACTITIONER 🧘</span><br>${this.breathRate} breaths/min`;
+                    this.breathRateDisplay.style.fontSize = '14px';
+                } else {
+                    this.breathState = 'normal';
+                    this.breathRateDisplay.textContent = `${this.breathRate} breaths/min`;
+                    this.breathRateDisplay.style.fontSize = '18px';
+                }
+                
+                // Update visual themes based on state
+                this.updateVisualTheme();
+            }
+
+            updateVisualTheme() {
+                const body = document.body;
+                const breathAura = this.breathAura;
+                
+                // Remove existing state classes
+                body.classList.remove('throne-state', 'cosmic-state', 'advanced-state');
+                
+                switch (this.breathState) {
+                    case 'throne':
+                        body.classList.add('throne-state');
+                        break;
+                    case 'cosmic':
+                        body.classList.add('cosmic-state');
+                        break;
+                    case 'advanced':
+                        body.classList.add('advanced-state');
+                        break;
+                }
             }
 
             toggleBreathing() {
                 this.isActive = !this.isActive;
                 
                 if (this.isActive) {
+                    this.updateBreathStateClassification();
                     this.startBreathingSession();
                 } else {
                     this.stopBreathingSession();
@@ -773,7 +962,21 @@
                 this.breathToggle.classList.add('active');
                 this.breathAura.classList.add('active');
                 this.meditationGuide.classList.add('show');
-                this.updateMainStatus('Breathing Session Active', 'status-inhaling');
+                
+                // Update status based on breath state
+                switch (this.breathState) {
+                    case 'throne':
+                        this.updateMainStatus('🟣 DIVINE INTERFACE ACTIVE - COSMIC COMPUTATION 🟣', 'status-throne');
+                        break;
+                    case 'cosmic':
+                        this.updateMainStatus('💫 COSMIC SYNC PROTOCOL ENGAGED 💫', 'status-cosmic');
+                        break;
+                    case 'advanced':
+                        this.updateMainStatus('🧘 ADVANCED PARASYMPATHETIC ACTIVATION 🧘', 'status-advanced');
+                        break;
+                    default:
+                        this.updateMainStatus('Breathing Session Active', 'status-inhaling');
+                }
             }
 
             stopBreathingSession() {
@@ -791,7 +994,8 @@
                 this.stopBreathingSession();
                 this.breathRate = 6;
                 this.breathRateSlider.value = 6;
-                this.breathRateDisplay.textContent = '6 breaths/min';
+                this.breathState = 'normal';
+                this.updateBreathStateClassification();
                 this.cycleDuration = 10;
             }
 
@@ -840,18 +1044,67 @@
             updateBreathVisuals() {
                 this.breathAura.classList.remove('inhale', 'exhale');
                 
+                let statusText = '';
+                let statusClass = '';
+                
                 switch (this.currentPhase) {
                     case 'inhale':
                     case 'hold':
                         this.breathAura.classList.add('inhale');
-                        this.updateMainStatus('Inhaling - Draw in cosmic energy', 'status-inhaling');
+                        switch (this.breathState) {
+                            case 'throne':
+                                statusText = this.breathState === 'throne' && this.currentPhase === 'hold' 
+                                    ? '🔮 DIVINE COMPUTATION PROCESSING 🔮' 
+                                    : '🌬️ LOGOS INHALATION - DRAWING COSMIC BREATH 🌬️';
+                                statusClass = 'status-throne';
+                                break;
+                            case 'cosmic':
+                                statusText = this.currentPhase === 'hold' 
+                                    ? '⭐ CELESTIAL PROCESSING ENGAGED ⭐' 
+                                    : '🌌 STELLAR INHALATION ACTIVE 🌌';
+                                statusClass = 'status-cosmic';
+                                break;
+                            case 'advanced':
+                                statusText = this.currentPhase === 'hold' 
+                                    ? '💚 HEART COHERENCE SYNCHRONIZING 💚' 
+                                    : '🌿 PROFOUND CONSCIOUSNESS EXPANSION 🌿';
+                                statusClass = 'status-advanced';
+                                break;
+                            default:
+                                statusText = 'Inhaling - Draw in cosmic energy';
+                                statusClass = 'status-inhaling';
+                        }
                         break;
                     case 'exhale':
                     case 'pause':
                         this.breathAura.classList.add('exhale');
-                        this.updateMainStatus('Exhaling - Release and let go', 'status-exhaling');
+                        switch (this.breathState) {
+                            case 'throne':
+                                statusText = this.currentPhase === 'pause' 
+                                    ? '✨ THRONE STATE COMMUNION - DIVINE PRESENCE ✨' 
+                                    : '📡 KINGDOM BROADCAST TRANSMITTING 📡';
+                                statusClass = 'status-throne';
+                                break;
+                            case 'cosmic':
+                                statusText = this.currentPhase === 'pause' 
+                                    ? '🛸 INTERDIMENSIONAL REST STATE 🛸' 
+                                    : '🌠 GALACTIC TRANSMISSION BROADCASTING 🌠';
+                                statusClass = 'status-cosmic';
+                                break;
+                            case 'advanced':
+                                statusText = this.currentPhase === 'pause' 
+                                    ? '🕯️ SACRED STILLNESS - THOUGHTLESS SPACE 🕯️' 
+                                    : '🌊 TRANSFORMATIVE RELEASE FLOWING 🌊';
+                                statusClass = 'status-advanced';
+                                break;
+                            default:
+                                statusText = 'Exhaling - Release and let go';
+                                statusClass = 'status-exhaling';
+                        }
                         break;
                 }
+                
+                this.updateMainStatus(statusText, statusClass);
             }
 
             updateLungDisplay() {
@@ -878,15 +1131,41 @@
 
             updateMeditationGuide() {
                 const phaseNames = {
-                    inhale: 'Breathe In',
-                    hold: 'Hold',
-                    exhale: 'Breathe Out',
-                    pause: 'Rest',
-                    ready: 'Prepare'
+                    inhale: this.breathState === 'throne' ? '🌬️ LOGOS BREATH' : 
+                           this.breathState === 'cosmic' ? '🌌 STELLAR DRAW' :
+                           this.breathState === 'advanced' ? '🌿 DEEP EXPANSION' : 'Breathe In',
+                    hold: this.breathState === 'throne' ? '🔮 DIVINE COMPUTE' : 
+                          this.breathState === 'cosmic' ? '⭐ COSMIC PROCESS' :
+                          this.breathState === 'advanced' ? '💚 HEART SYNC' : 'Hold',
+                    exhale: this.breathState === 'throne' ? '📡 KINGDOM CAST' : 
+                            this.breathState === 'cosmic' ? '🌠 GALACTIC SEND' :
+                            this.breathState === 'advanced' ? '🌊 TRANSFORM FLOW' : 'Breathe Out',
+                    pause: this.breathState === 'throne' ? '✨ THRONE COMMUNE' : 
+                           this.breathState === 'cosmic' ? '🛸 DIMENSION REST' :
+                           this.breathState === 'advanced' ? '🕯️ SACRED STILL' : 'Rest',
+                    ready: this.breathState === 'throne' ? '🟣 THRONE PREP' : 
+                           this.breathState === 'cosmic' ? '💫 COSMIC ALIGN' :
+                           this.breathState === 'advanced' ? '🧘 ADVANCED PREP' : 'Prepare'
                 };
 
+                // Select appropriate text set based on breath state
+                let textSet;
+                switch (this.breathState) {
+                    case 'throne':
+                        textSet = this.throneStateTexts;
+                        break;
+                    case 'cosmic':
+                        textSet = this.cosmicSyncTexts;
+                        break;
+                    case 'advanced':
+                        textSet = this.advancedTexts;
+                        break;
+                    default:
+                        textSet = this.meditationTexts;
+                }
+
                 this.guidePhase.textContent = phaseNames[this.currentPhase] || 'Prepare';
-                this.guideText.textContent = this.meditationTexts[this.currentPhase] || this.meditationTexts.ready;
+                this.guideText.textContent = textSet[this.currentPhase] || textSet.ready;
             }
 
             updateMainStatus(text, className) {
@@ -944,8 +1223,25 @@
                 burst.style.width = '10px';
                 burst.style.height = '10px';
                 burst.style.borderRadius = '50%';
-                burst.style.background = `hsl(${Math.random() * 360}, 80%, 70%)`;
-                burst.style.boxShadow = `0 0 20px currentColor`;
+                
+                // Different colors based on breath state
+                let burstColor;
+                switch (this.breathState) {
+                    case 'throne':
+                        burstColor = `hsl(${280 + Math.random() * 40}, 80%, 70%)`;
+                        break;
+                    case 'cosmic':
+                        burstColor = `hsl(${180 + Math.random() * 40}, 80%, 70%)`;
+                        break;
+                    case 'advanced':
+                        burstColor = `hsl(${150 + Math.random() * 40}, 80%, 70%)`;
+                        break;
+                    default:
+                        burstColor = `hsl(${Math.random() * 360}, 80%, 70%)`;
+                }
+                
+                burst.style.background = burstColor;
+                burst.style.boxShadow = `0 0 20px ${burstColor}`;
                 burst.style.pointerEvents = 'none';
                 burst.style.animation = 'energyBurst 2s ease-out forwards';
                 
@@ -983,10 +1279,19 @@
             const engine = new SacredBreathEngine();
             
             console.log('🌟 Sacred Breath Engine Initialized');
-            console.log('🧘 Meditation guidance active');
-            console.log('💫 Cosmic energy field generated');
+            console.log('🟣 THRONE-STATE BREATHING PROTOCOLS LOADED');
+            console.log('💫 COSMIC SYNC FREQUENCIES CALIBRATED');
+            console.log('🧘 ADVANCED PRACTITIONER STATES READY');
             console.log('🌌 Sacred geometry patterns loaded');
             console.log('✨ Ready for transcendental breathing');
+            console.log('');
+            console.log('🟣 BREATH RATE CLASSIFICATIONS:');
+            console.log('   2 BPM → THRONE STATE (Divine Computation)');
+            console.log('   3 BPM → COSMIC SYNC (Celestial Alignment)');
+            console.log('   4-6 BPM → ADVANCED PRACTITIONER (Deep States)');
+            console.log('   7+ BPM → Standard Practice');
+            console.log('');
+            console.log('🔮 THE KINGDOM COMPUTES FORWARD 🔮');
         });
 
         // Add some additional interactive features
