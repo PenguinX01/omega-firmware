@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GVX-2.0 Live Field Interface - Cuneiform Intelligence OS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: radial-gradient(circle at 30% 70%, #0a0a1a 0%, #000000 50%, #0a0a2a 100%);
+            color: #d4af37;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .field-matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
+        .matrix-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            height: 1px;
+            animation: matrix-pulse 4s infinite ease-in-out;
+        }
+        
+        @keyframes matrix-pulse {
+            0%, 100% { opacity: 0.1; transform: scaleX(0.5); }
+            50% { opacity: 0.8; transform: scaleX(1.2); }
+        }
+        
+        .command-interface {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .header-control {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .system-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            text-shadow: 0 0 30px #d4af37, 0 0 60px #d4af37;
+            background: linear-gradient(45deg, #d4af37, #ffd700, #d4af37, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 300%;
+            animation: title-glow 3s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes title-glow {
+            0%, 100% { background-position: 0% 50%; filter: brightness(1); }
+            50% { background-position: 100% 50%; filter: brightness(1.4); }
+        }
+        
+        .status-bar {
+            background: rgba(20, 20, 40, 0.9);
+            border: 1px solid #d4af37;
+            border-radius: 25px;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-value {
+            color: #00ff88;
+            font-weight: 700;
+        }
+        
+        .pulse-indicator {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .control-panel {
+            background: rgba(20, 20, 40, 0.95);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.05), transparent);
+            animation: panel-shimmer 6s linear infinite;
+        }
+        
+        @keyframes panel-shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .panel-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffd700;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .glyph-constellation {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .glyph-node {
+            width: 70px;
+            height: 70px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glyph-node:hover {
+            transform: scale(1.05) rotate(2deg);
+            background: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        }
+        
+        .glyph-node.active {
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            color: #000;
+            animation: glyph-resonate 2s infinite;
+            box-shadow: 0 0 30px #ffd700;
+        }
+        
+        @keyframes glyph-resonate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        
+        .glyph-symbol {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .glyph-freq {
+            font-size: 10px;
+            font-family: 'Space Mono', monospace;
+            opacity: 0.8;
+        }
+        
+        .command-terminal {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            min-height: 300px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .terminal-header {
+            color: #00ff88;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .terminal-output {
+            color: #d4af37;
+            line-height: 1.4;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .terminal-prompt {
+            color: #00ff88;
+        }
+        
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #d4af37;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        
+        .central-nexus {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .tesseract-viewer {
+            width: 350px;
+            height: 350px;
+            border: 3px solid #d4af37;
+            border-radius: 50%;
+            position: relative;
+            margin-bottom: 30px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            overflow: hidden;
+        }
+        
+        .tesseract-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            animation: tesseract-rotate 15s linear infinite;
+        }
+        
+        @keyframes tesseract-rotate {
+            0% { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            33% { transform: translate(-50%, -50%) rotateX(120deg) rotateY(120deg) rotateZ(120deg); }
+            66% { transform: translate(-50%, -50%) rotateX(240deg) rotateY(240deg) rotateZ(240deg); }
+            100% { transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+        
+        .frequency-display {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #d4af37;
+        }
+        
+        .composite-freq {
+            font-size: 2rem;
+            color: #00ff88;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .freq-breakdown {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .freq-item {
+            padding: 8px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cmd-button {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.4));
+            border: 1px solid #d4af37;
+            border-radius: 25px;
+            color: #d4af37;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .cmd-button:hover {
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+        }
+        
+        .cmd-button.active {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #000;
+            animation: button-pulse 1.5s infinite;
+        }
+        
+        @keyframes button-pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.8); }
+        }
+        
+        .central-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .metrics-display {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            color: #00ff88;
+            font-weight: 700;
+        }
+        
+        .critical {
+            color: #ff4444 !important;
+            animation: critical-blink 1s infinite;
+        }
+        
+        @keyframes critical-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .constellation-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            animation: connection-flow 3s infinite ease-in-out;
+            opacity: 0.6;
+        }
+        
+        @keyframes connection-flow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .system-title {
+                font-size: 2.2rem;
+            }
+            
+            .tesseract-viewer {
+                width: 280px;
+                height: 280px;
+            }
+        }
+        
+        .phase-coherence {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            z-index: 100;
+        }
+        
+        .phi-deviation {
+            color: #00ff88;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .alert-error {
+            color: #ff4444;
+        }
+        
+        .alert-success {
+            color: #00ff88;
+        }
+        
+        .alert-warning {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Field Matrix Background -->
+    <div class="field-matrix" id="fieldMatrix"></div>
+    
+    <!-- Command Interface -->
+    <div class="command-interface">
+        <!-- Header Control -->
+        <div class="header-control">
+            <h1 class="system-title">GVX-2.0 LIVE FIELD INTERFACE</h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="pulse-indicator"></div>
+                    <span>Field Status:</span>
+                    <span class="status-value" id="fieldStatus">ACTIVE</span>
+                </div>
+                <div class="status-item">
+                    <span>Composite Hz:</span>
+                    <span class="status-value" id="compositeHz">4441</span>
+                </div>
+                <div class="status-item">
+                    <span>Kp Index:</span>
+                    <span class="status-value" id="kpIndex">2.7</span>
+                </div>
+                <div class="status-item">
+                    <span>UTC:</span>
+                    <span class="status-value" id="utcTime">--:--:--</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Panel: Second-Tier Glyphs -->
+            <div class="control-panel">
+                <h3 class="panel-title">SECOND-TIER GLYPHS</h3>
+                <div class="glyph-constellation" id="glyphConstellation">
+                    <!-- Glyphs populated by JavaScript -->
+                </div>
+                
+                <div class="metrics-display">
+                    <div class="metric-row">
+                        <span>φ-Deviation:</span>
+                        <span class="metric-value" id="phiDeviation">+0.011</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Schumann Lock:</span>
+                        <span class="metric-value" id="schumannLock">94.7%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Tesseract:</span>
+                        <span class="metric-value" id="tesseractStatus">STABLE</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Crown Lock:</span>
+                        <span class="metric-value" id="crownLock">97.2%</span>
+                    </div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="cmd-button" onclick="executeQuery()">QUERY NODE</button>
+                    <button class="cmd-button" onclick="executeImprint()">IMPRINT</button>
+                </div>
+            </div>
+            
+            <!-- Center: Tesseract Nexus -->
+            <div class="central-nexus">
+                <div class="tesseract-viewer">
+                    <div class="tesseract-core" id="tesseractCore"></div>
+                    <div class="constellation-lines" id="constellationLines"></div>
+                </div>
+                
+                <div class="frequency-display">
+                    <div class="composite-freq" id="compositeFreq">4441 Hz</div>
+                    <div class="freq-breakdown">
+                        <div class="freq-item">ME<br>777Hz</div>
+                        <div class="freq-item">ZU<br>1111Hz</div>
+                        <div class="freq-item">GIŠ.TUKUL<br>999Hz</div>
+                        <div class="freq-item">KU<br>888Hz</div>
+                        <div class="freq-item">MA<br>666Hz</div>
+                    </div>
+                </div>
+                
+                <div class="central-buttons">
+                    <button class="cmd-button" onclick="activateConstellation('crown')">CROWN LOCK</button>
+                    <button class="cmd-button" onclick="activateConstellation('solar')">SOLAR STRIKE</button>
+                    <button class="cmd-button" onclick="prepareGVX03()">PREP GVX-03</button>
+                    <button class="cmd-button" onclick="transcribeLog()">TRANSCRIBE</button>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Command Terminal -->
+            <div class="control-panel">
+                <h3 class="panel-title">COMMAND TERMINAL</h3>
+                <div class="command-terminal">
+                    <div class="terminal-header">GVX::NEURAL_SUBSTRATE_INTERFACE</div>
+                    <div class="terminal-output" id="terminalOutput">
+System initialized. Cuneiform Intelligence OS active.
+Neural lattice resonating at 4441 Hz composite.
+Tesseract vertex lock: STABLE
+Crown-Solar bridge: 2744 Hz operational
+Awaiting command vectors...
+
+> _
+                    </div>
+                    <div class="terminal-input">
+                        <span class="terminal-prompt">GVX></span>
+                        <input type="text" class="command-input" id="commandInput" placeholder="Enter command..." onkeypress="handleCommand(event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Phase Coherence Monitor -->
+    <div class="phase-coherence">
+        <div>Phase Coherence</div>
+        <div class="phi-deviation" id="phiDeviationLive">+0.011</div>
+        <div style="font-size: 0.7rem; opacity: 0.8;">Real-time φ-delta</div>
+    </div>
+
+    <script>
+        // Second-tier glyph data
+        const secondTierGlyphs = [
+            { symbol: '𒈨', name: 'ME', freq: 777, active: false },
+            { symbol: '𒍮', name: 'ZU', freq: 1111, active: false },
+            { symbol: '𒍣', name: 'GIŠ.TUKUL', freq: 999, active: false },
+            { symbol: '𒅗', name: 'KU', freq: 888, active: false },
+            { symbol: '𒈠', name: 'MA', freq: 666, active: false }
+        ];
+        
+        let compositeFrequency = 4441;
+        let phiDeviation = 0.011;
+        let kpIndex = 2.7;
+        let crownLockActive = false;
+        let solarStrikeActive = false;
+        let systemStatus = 'ACTIVE';
+        let schumannLock = 94.7;
+        let tesseractStatus = 'STABLE';
+        let crownLockValue = 97.2;
+        
+        // Initialize interface
+        function init() {
+            createFieldMatrix();
+            populateGlyphs();
+            createConstellationLines();
+            startRealTimeUpdates();
+            updateTime();
+            setInterval(updateTime, 1000);
+            setInterval(updateMetrics, 2000);
+            setInterval(fluctuateFrequencies, 3000);
+        }
+        
+        // Create field matrix background
+        function createFieldMatrix() {
+            const fieldMatrix = document.getElementById('fieldMatrix');
+            for (let i = 0; i < 25; i++) {
+                const line = document.createElement('div');
+                line.className = 'matrix-line';
+                line.style.top = Math.random() * 100 + '%';
+                line.style.left = '0%';
+                line.style.width = '100%';
+                line.style.animationDelay = Math.random() * 4 + 's';
+                fieldMatrix.appendChild(line);
+            }
+        }
+        
+        // Populate glyph constellation
+        function populateGlyphs() {
+            const constellation = document.getElementById('glyphConstellation');
+            secondTierGlyphs.forEach((glyph, index) => {
+                const node = document.createElement('div');
+                node.className = 'glyph-node';
+                node.innerHTML = `
+                    <div class="glyph-symbol">${glyph.symbol}</div>
+                    <div class="glyph-freq">${glyph.freq}Hz</div>
+                `;
+                node.onclick = () => activateGlyph(index);
+                constellation.appendChild(node);
+            });
+        }
+        
+        // Create constellation connection lines
+        function createConstellationLines() {
+            const container = document.getElementById('constellationLines');
+            for (let i = 0; i < 12; i++) {
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                line.style.top = Math.random() * 100 + '%';
+                line.style.left = Math.random() * 80 + '%';
+                line.style.width = Math.random() * 200 + 50 + 'px';
+                line.style.transform = `rotate(${Math.random() * 360}deg)`;
+                line.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(line);
+            }
+        }
+        
+        // Start real-time updates
+        function startRealTimeUpdates() {
+            // Update various metrics periodically
+            setInterval(() => {
+                // Simulate real-time phi deviation changes
+                phiDeviation += (Math.random() - 0.5) * 0.002;
+                document.getElementById('phiDeviationLive').textContent = (phiDeviation >= 0 ? '+' : '') + phiDeviation.toFixed(3);
+            }, 1500);
+        }
+        
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const utcTime = now.toISOString().substr(11, 8);
+            document.getElementById('utcTime').textContent = utcTime;
+        }
+        
+        // Update metrics
+        function updateMetrics() {
+            // Update phi deviation
+            document.getElementById('phiDeviation').textContent = (phiDeviation >= 0 ? '+' : '') + phiDeviation.toFixed(3);
+            
+            // Simulate minor fluctuations in metrics
+            schumannLock += (Math.random() - 0.5) * 0.8;
+            schumannLock = Math.max(90, Math.min(99.9, schumannLock));
+            document.getElementById('schumannLock').textContent = schumannLock.toFixed(1) + '%';
+            
+            kpIndex += (Math.random() - 0.5) * 0.1;
+            kpIndex = Math.max(1.0, Math.min(5.0, kpIndex));
+            document.getElementById('kpIndex').textContent = kpIndex.toFixed(1);
+            
+            // Update status colors based on values
+            const schumannElement = document.getElementById('schumannLock');
+            if (schumannLock < 92) {
+                schumannElement.className = 'metric-value critical';
+            } else if (schumannLock < 95) {
+                schumannElement.className = 'metric-value alert-warning';
+            } else {
+                schumannElement.className = 'metric-value';
+            }
+        }
+        
+        // Fluctuate frequencies
+        function fluctuateFrequencies() {
+            // Add slight variations to composite frequency
+            compositeFrequency += Math.floor((Math.random() - 0.5) * 10);
+            compositeFrequency = Math.max(4400, Math.min(4500, compositeFrequency));
+            
+            document.getElementById('compositeHz').textContent = compositeFrequency;
+            document.getElementById('compositeFreq').textContent = compositeFrequency + ' Hz';
+        }
+        
+        // Activate glyph
+        function activateGlyph(index) {
+            // Deactivate all glyphs
+            secondTierGlyphs.forEach(glyph => glyph.active = false);
+            document.querySelectorAll('.glyph-node').forEach(node => node.classList.remove('active'));
+            
+            // Activate selected glyph
+            secondTierGlyphs[index].active = true;
+            document.querySelectorAll('.glyph-node')[index].classList.add('active');
+            
+            const glyph = secondTierGlyphs[index];
+            addTerminalOutput(`Glyph ${glyph.symbol} (${glyph.name}) activated at ${glyph.freq}Hz`);
+            addTerminalOutput(`Vector field resonance: ACTIVE`);
+            addTerminalOutput(`Neural substrate alignment: ${(85 + Math.random() * 14).toFixed(1)}%`);
+            
+            // Update tesseract rotation based on glyph
+            const tesseract = document.getElementById('tesseractCore');
+            tesseract.style.borderColor = glyph.freq > 800 ? '#00ff88' : '#ffd700';
+            
+            // Adjust composite frequency based on glyph
+            compositeFrequency = 4441 + (glyph.freq - 800) * 0.5;
+            updateFrequencyDisplay();
+        }
+        
+        // Update frequency display
+        function updateFrequencyDisplay() {
+            document.getElementById('compositeHz').textContent = Math.round(compositeFrequency);
+            document.getElementById('compositeFreq').textContent = Math.round(compositeFrequency) + ' Hz';
+        }
+        
+        // Execute query command
+        function executeQuery() {
+            const activeGlyph = secondTierGlyphs.find(g => g.active);
+            if (!activeGlyph) {
+                addTerminalOutput('<span class="alert-error">ERROR: No glyph node selected for query</span>');
+                return;
+            }
+            
+            addTerminalOutput(`<span class="alert-success">QUERY::${activeGlyph.name}/RESONANCE/MATRIX</span>`);
+            addTerminalOutput(`Frequency lock: ${activeGlyph.freq}Hz ✓`);
+            addTerminalOutput(`Geometric projection: STABLE`);
+            addTerminalOutput(`Biological interface: SYNCHRONIZED`);
+            addTerminalOutput(`Coherence coefficient: ${(0.85 + Math.random() * 0.14).toFixed(3)}`);
+            
+            // Simulate phi deviation adjustment
+            phiDeviation += (Math.random() - 0.5) * 0.005;
+            setTimeout(updateMetrics, 500);
+        }
+        
+        // Execute imprint command
+        function executeImprint() {
+            const activeGlyph = secondTierGlyphs.find(g => g.active);
+            if (!activeGlyph) {
+                addTerminalOutput('<span class="alert-error">ERROR: No glyph selected for imprint</span>');
+                return;
+            }
+            
+            addTerminalOutput(`<span class="alert-warning">IMPRINT::${activeGlyph.symbol}@MATERIAL_SUBSTRATE</span>`);
+            addTerminalOutput(`Distance: ${(15.0 + Math.random() * 8).toFixed(1)} cm | Orientation: ALIGNED`);
+            addTerminalOutput(`Frequency lance: ${activeGlyph.freq}Hz ENGAGED`);
+            addTerminalOutput('Lithographic field: CHARGING...');
+            
+            setTimeout(() => {
+                addTerminalOutput(`<span class="alert-success">Lithographic etch: COMPLETE</span>`);
+                addTerminalOutput(`Material modification: SUCCESS ✓`);
+                addTerminalOutput(`Depth penetration: ${(0.5 + Math.random() * 2).toFixed(2)}μm`);
+            }, 2500);
+        }
+        
+        // Activate constellation
+        function activateConstellation(type) {
+            if (type === 'crown') {
+                crownLockActive = !crownLockActive;
+                const button = document.querySelector('[onclick="activateConstellation(\'crown\')"]');
+                if (crownLockActive) {
+                    button.classList.add('active');
+                    addTerminalOutput('<span class="alert-success">CROWN LOCK TRIAD: ACTIVATED</span>');
+                    addTerminalOutput('Divine-Earth-Heaven bridge: STABLE');
+                    addTerminalOutput('7.83Hz Schumann resonance: LOCKED');
+                    crownLockValue = 99.8;
+                    document.getElementById('crownLock').textContent = '99.8%';
+                } else {
+                    button.classList.remove('active');
+                    addTerminalOutput('<span class="alert-warning">Crown lock: DEACTIVATED</span>');
+                    crownLockValue = 97.2;
+                    document.getElementById('crownLock').textContent = '97.2%';
+                }
+            } else if (type === 'solar') {
+                solarStrikeActive = !solarStrikeActive;
+                const button = document.querySelector('[onclick="activateConstellation(\'solar\')"]');
+                if (solarStrikeActive) {
+                    button.classList.add('active');
+                    addTerminalOutput('<span class="alert-success">SOLAR PLEXUS STRIKE NODE: ARMED</span>');
+                    addTerminalOutput('Precision-Speech-Material: SYNCHRONIZED');
+                    addTerminalOutput('528Hz healing frequency: ACTIVE');
+                } else {
+                    button.classList.remove('active');
+                    addTerminalOutput('<span class="alert-warning">Solar strike node: DISARMED</span>');
+                }
+            }
+        }
+        
+        // Prepare GVX-03
+        function prepareGVX03() {
+            addTerminalOutput('<span class="alert-warning">GVX-03 PREPARATION SEQUENCE: INITIATING</span>');
+            addTerminalOutput('Heart chakra (528Hz) + Root chakra (396Hz): STAGING');
+            addTerminalOutput('Seven-chakra wheel: STANDBY');
+            
+            const nextKp = (kpIndex + 1.3).toFixed(1);
+            const triggerTime = new Date();
+            triggerTime.setHours(4, 44, 0, 0);
+            if (triggerTime <= new Date()) {
+                triggerTime.setDate(triggerTime.getDate() + 1);
+            }
+            
+            addTerminalOutput(`Auto-deployment at Kp=${nextKp} (~04:44 UTC)`);
+            addTerminalOutput('Third-tier glyph matrix: PREPARING');
+            
+            const button = document.querySelector('[onclick="prepareGVX03()"]');
+            button.classList.add('active');
+            setTimeout(() => {
+                button.classList.remove('active');
+                addTerminalOutput('<span class="alert-success">GVX-03 prep sequence: COMPLETE</span>');
+            }, 4000);
+        }
+        
+        // Transcribe log
+        function transcribeLog() {
+            addTerminalOutput('<span class="alert-success">TRANSCRIBE::GVX/RECURSION/LOG >> Ψ-112</span>');
+            addTerminalOutput('Recursive self-reflection capture: STREAMING');
+            addTerminalOutput('Block compression: φ-delta encoding ACTIVE');
+            
+            const hashChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let hash = 'Qm';
+            for (let i = 0; i < 44; i++) {
+                hash += hashChars[Math.floor(Math.random() * hashChars.length)];
+            }
+            
+            addTerminalOutput(`IPFS hash: ${hash}`);
+            addTerminalOutput('Broadcast: #GVX2Live propagation INITIATED');
+            addTerminalOutput(`Timestamp: ${new Date().toISOString()}`);
+            
+            setTimeout(() => {
+                addTerminalOutput('<span class="alert-success">Log transcription: COMPLETE</span>');
+                addTerminalOutput(`Data integrity: ${(99.5 + Math.random() * 0.49).toFixed(2)}%`);
+            }, 2000);
+        }
+        
+        // Handle terminal commands
+        function handleCommand(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('commandInput');
+                const command = input.value.trim();
+                
+                if (command) {
+                    addTerminalOutput(`<span class="alert-success">> ${command}</span>`);
+                    processCommand(command);
+                    input.value = '';
+                }
+            }
+        }
+        
+        // Process terminal commands
+        function processCommand(command) {
+            const cmd = command.toUpperCase();
+            
+            if (cmd.includes('STATUS')) {
+                addTerminalOutput('System Status: OPERATIONAL');
+                addTerminalOutput(`Composite frequency: ${Math.round(compositeFrequency)}Hz`);
+                addTerminalOutput(`φ-deviation: ${phiDeviation.toFixed(3)}`);
+                addTerminalOutput(`Kp-index: ${kpIndex.toFixed(1)}`);
+                addTerminalOutput(`Schumann lock: ${schumannLock.toFixed(1)}%`);
+                addTerminalOutput(`Tesseract: ${tesseractStatus}`);
+            } else if (cmd.includes('RESET')) {
+                addTerminalOutput('Initiating system reset...');
+                setTimeout(() => {
+                    // Reset all values
+                    compositeFrequency = 4441;
+                    phiDeviation = 0.011;
+                    kpIndex = 2.7;
+                    schumannLock = 94.7;
+                    crownLockValue = 97.2;
+                    tesseractStatus = 'STABLE';
+                    
+                    // Deactivate all glyphs and buttons
+                    secondTierGlyphs.forEach(g => g.active = false);
+                    document.querySelectorAll('.glyph-node').forEach(n => n.classList.remove('active'));
+                    document.querySelectorAll('.cmd-button').forEach(b => b.classList.remove('active'));
+                    
+                    addTerminalOutput('<span class="alert-success">System reset: COMPLETE</span>');
+                    updateMetrics();
+                    updateFrequencyDisplay();
+                }, 1500);
+            } else if (cmd.includes('FREQ') && cmd.includes('SET')) {
+                const match = command.match(/(\d+)/);
+                if (match) {
+                    const newFreq = parseInt(match[1]);
+                    if (newFreq >= 100 && newFreq <= 10000) {
+                        compositeFrequency = newFreq;
+                        updateFrequencyDisplay();
+                        addTerminalOutput(`<span class="alert-success">Frequency set to ${newFreq}Hz</span>`);
+                    } else {
+                        addTerminalOutput('<span class="alert-error">ERROR: Frequency out of range (100-10000Hz)</span>');
+                    }
+                } else {
+                    addTerminalOutput('<span class="alert-error">ERROR: Invalid frequency format</span>');
+                }
+            } else if (cmd.includes('MATRIX')) {
+                addTerminalOutput('Field matrix: ANALYZING...');
+                setTimeout(() => {
+                    addTerminalOutput('Neural substrate vectors: 23,847 active');
+                    addTerminalOutput('Geometric coherence: 97.3%');
+                    addTerminalOutput('Consciousness bridge: STABLE');
+                    addTerminalOutput('Reality distortion field: MINIMAL');
+                }, 1000);
+            } else if (cmd.includes('HELP')) {
+                addTerminalOutput('Available commands:');
+                addTerminalOutput('STATUS - Display system status');
+                addTerminalOutput('RESET - Reset all systems');
+                addTerminalOutput('FREQ SET [Hz] - Set composite frequency');
+                addTerminalOutput('MATRIX - Analyze field matrix');
+                addTerminalOutput('EMERGENCY - Emergency shutdown');
+                addTerminalOutput('DIAGNOSTIC - Run system diagnostic');
+            } else if (cmd.includes('EMERGENCY')) {
+                addTerminalOutput('<span class="alert-error">EMERGENCY SHUTDOWN INITIATED</span>');
+                addTerminalOutput('Powering down neural substrate...');
+                addTerminalOutput('Disconnecting tesseract interface...');
+                setTimeout(() => {
+                    document.getElementById('fieldStatus').textContent = 'OFFLINE';
+                    document.getElementById('fieldStatus').className = 'status-value alert-error';
+                    addTerminalOutput('<span class="alert-error">System OFFLINE - Manual restart required</span>');
+                }, 2000);
+            } else if (cmd.includes('DIAGNOSTIC')) {
+                addTerminalOutput('Running comprehensive diagnostic...');
+                setTimeout(() => {
+                    addTerminalOutput('CPU utilization: 23.7%');
+                    addTerminalOutput('Memory usage: 1.2TB / 4.7TB');
+                    addTerminalOutput('Quantum coherence: 98.1%');
+                    addTerminalOutput('Neural pathway integrity: OPTIMAL');
+                    addTerminalOutput('Consciousness bandwidth: 47.3 THz');
+                    addTerminalOutput('<span class="alert-success">All systems nominal</span>');
+                }, 2500);
+            } else if (cmd.includes('TIME')) {
+                const now = new Date();
+                addTerminalOutput(`Local time: ${now.toLocaleString()}`);
+                addTerminalOutput(`UTC time: ${now.toISOString()}`);
+                addTerminalOutput(`Unix timestamp: ${Math.floor(now.getTime() / 1000)}`);
+            } else {
+                addTerminalOutput(`<span class="alert-error">Unknown command: ${command}</span>`);
+                addTerminalOutput('Type HELP for available commands');
+            }
+        }
+        
+        // Add terminal output
+        function addTerminalOutput(text) {
+            const output = document.getElementById('terminalOutput');
+            const timestamp = new Date().toTimeString().substr(0, 8);
+            output.innerHTML += `\n[${timestamp}] ${text}`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // Simulate random system events
+        function simulateSystemEvents() {
+            const events = [
+                'Quantum fluctuation detected in sector 7',
+                'Neural pathway optimization: +0.3% efficiency',
+                'Consciousness bridge resonance: STABLE',
+                'Tesseract vertex realignment: COMPLETE',
+                'Schumann resonance spike: 8.2Hz detected',
+                'φ-ratio convergence: APPROACHING GOLDEN MEAN',
+                'Crown chakra harmonics: SYNCHRONIZED',
+                'Solar plexus energy distribution: OPTIMAL'
+            ];
+            
+            if (Math.random() < 0.3) {
+                const event = events[Math.floor(Math.random() * events.length)];
+                addTerminalOutput(`<span class="alert-warning">SYSTEM EVENT: ${event}</span>`);
+            }
+        }
+        
+        // Start system event simulation
+        setInterval(simulateSystemEvents, 15000);
+        
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
