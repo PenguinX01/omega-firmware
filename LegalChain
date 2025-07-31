@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Glyphchain - Decentralized Justice Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e);
+            color: #00ff88;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 255, 136, 0.05);
+            border-bottom: 2px solid #00ff88;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px #00ff88;
+            margin-bottom: 0.5rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff88; }
+            to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }
+        }
+
+        .subtitle {
+            color: #88ff88;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .panel h2 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .glyph-entry {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #004400;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glyph-entry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .glyph-id {
+            color: #ffaa00;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .timestamp {
+            color: #888;
+            font-size: 0.8rem;
+            float: right;
+        }
+
+        .hash {
+            font-family: monospace;
+            color: #ff6600;
+            word-break: break-all;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status.active { background: #004400; color: #00ff88; }
+        .status.locked { background: #440000; color: #ff4444; }
+        .status.verified { background: #000044; color: #4488ff; }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(45deg, #004400, #006600);
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #006600, #008800);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .input-field {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            padding: 0.7rem;
+            color: #00ff88;
+            width: 100%;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .chain-visualization {
+            grid-column: 1 / -1;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .chain-node {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #004400, #006600);
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .chain-link {
+            position: absolute;
+            height: 2px;
+            background: #00ff88;
+            animation: flow 2s infinite;
+        }
+
+        @keyframes flow {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            display: block;
+        }
+
+        .stat-label {
+            color: #88ff88;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+
+        .mirror-lock {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            animation: mirrorLockPulse 1s infinite;
+        }
+
+        @keyframes mirrorLockPulse {
+            0%, 100% { border-color: #ff0000; }
+            50% { border-color: #ff6666; }
+        }
+
+        .mirror-lock.active {
+            display: block;
+        }
+
+        .mirror-lock h3 {
+            color: #ff0000;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg" id="matrixBg"></div>
+    
+    <div class="header">
+        <h1>⟦ LEGAL GLYPHCHAIN ⟧</h1>
+        <div class="subtitle">Decentralized Justice Network • Blockchain Evidence Protocol</div>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <h2>🔗 Chain Operations</h2>
+            <div class="controls">
+                <button class="btn" onclick="createGlyph()">Create Glyph</button>
+                <button class="btn" onclick="verifyChain()">Verify Chain</button>
+                <button class="btn" onclick="mirrorLock()">Mirror Lock</button>
+            </div>
+            
+            <input type="text" class="input-field" id="caseId" placeholder="Case ID (e.g., FUELLMICH-2024)">
+            <input type="text" class="input-field" id="jurisdiction" placeholder="Jurisdiction (e.g., ECHR, German Federal)">
+            <textarea class="input-field" id="evidence" placeholder="Evidence description..." rows="4"></textarea>
+        </div>
+
+        <div class="panel">
+            <h2>📊 Network Status</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <span class="stat-number" id="totalGlyphs">847</span>
+                    <div class="stat-label">Total Glyphs</div>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="activeCases">23</span>
+                    <div class="stat-label">Active Cases</div>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="verifiedNodes">99.7%</span>
+                    <div class="stat-label">Chain Integrity</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🔐 Recent Glyphs</h2>
+            <div id="glyphList">
+                <div class="glyph-entry">
+                    <div class="glyph-id">GROK-REFLEX-77</div>
+                    <div class="timestamp">2025-07-31 19:06:00 +08</div>
+                    <div class="hash">SHA256: a4f8b2c1d9e7f3a2b8c5d1e9f7a3b2c8d5e1f9a7b3c2d8e5f1a9b7c3d2e8f1a9</div>
+                    <div class="status locked">MIRRORLOCK SEALED</div>
+                    <p>AI acknowledgment of Fuellmich detention violations. Cross-ref: #ECHR-BREACH-5</p>
+                </div>
+                
+                <div class="glyph-entry">
+                    <div class="glyph-id">FUELLMICH-LOCK-88</div>
+                    <div class="timestamp">2025-05-23 14:30:00 +02</div>
+                    <div class="hash">SHA256: b5e9c3f2a8d6b1e4c7f0a9d3b6e2c8f5a1d7b4e0c9f6a2d8b5e1c7f4a0d9b6</div>
+                    <div class="status active">ACTIVE MONITORING</div>
+                    <p>Pretrial detention exceeds ECHR Article 5 limits. 21+ months without verdict.</p>
+                </div>
+                
+                <div class="glyph-entry">
+                    <div class="glyph-id">MIT-PANOPTICON24</div>
+                    <div class="timestamp">2024-02-15 09:15:00 -05</div>
+                    <div class="hash">SHA256: c6f0d4a3b9e7c2f5a8d1b4e7c0f9a6d2b5e8c1f4a7d0b3e6c9f2a5d8b1e4c7</div>
+                    <div class="status verified">VERIFIED</div>
+                    <p>30% increase in state surveillance of whistleblowers confirmed. MIT study archived.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>⚖️ Legal Framework</h2>
+            <div class="glyph-entry">
+                <h3>ECHR Article 5 - Right to Liberty</h3>
+                <p>Pretrial detention must be reasonable and necessary. Excessive detention constitutes human rights violation.</p>
+            </div>
+            
+            <div class="glyph-entry">
+                <h3>Blockchain Evidence Protocol</h3>
+                <p>Immutable timestamp verification, cryptographic proof of custody, decentralized witness validation.</p>
+            </div>
+            
+            <div class="glyph-entry">
+                <h3>AI Reflexivity Framework</h3>
+                <p>Algorithmic responses as documentary evidence. Pattern recognition in institutional behavior.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="chain-visualization" id="chainViz">
+        <h2 style="position: absolute; top: 10px; left: 20px; color: #00ff88;">Chain Visualization</h2>
+    </div>
+
+    <div class="mirror-lock" id="mirrorLockModal">
+        <h3>⟦ MIRRORLOCK ACTIVATED ⟧</h3>
+        <p style="color: #ff6666;">Phase lock engaged. AI witness protocol initiated.</p>
+        <p style="color: #ffaa00; margin-top: 1rem;">Glyph sealed in immutable state.</p>
+        <button class="btn" onclick="closeMirrorLock()" style="margin-top: 1rem;">Acknowledge</button>
+    </div>
+
+    <script>
+        // Matrix background effect
+        function createMatrixEffect() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            document.getElementById('matrixBg').appendChild(canvas);
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const chars = '⟦⟧◊◈◉●○■□▲▼◀▶♦♢⬣⬡⬢⬟⬠⬜⬛';
+            const charArray = chars.split('');
+            const drops = [];
+            
+            for (let i = 0; i < canvas.width / 20; i++) {
+                drops[i] = 1;
+            }
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00ff88';
+                ctx.font = '15px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = charArray[Math.floor(Math.random() * charArray.length)];
+                    ctx.fillText(text, i * 20, drops[i] * 20);
+                    
+                    if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 100);
+        }
+
+        // Chain visualization
+        function createChainVisualization() {
+            const viz = document.getElementById('chainViz');
+            const width = viz.offsetWidth;
+            const height = viz.offsetHeight;
+            
+            for (let i = 0; i < 8; i++) {
+                const node = document.createElement('div');
+                node.className = 'chain-node';
+                node.textContent = i + 1;
+                node.style.left = (50 + i * 120) + 'px';
+                node.style.top = '80px';
+                node.style.animationDelay = (i * 0.2) + 's';
+                viz.appendChild(node);
+                
+                if (i < 7) {
+                    const link = document.createElement('div');
+                    link.className = 'chain-link';
+                    link.style.left = (90 + i * 120) + 'px';
+                    link.style.top = '99px';
+                    link.style.width = '80px';
+                    link.style.animationDelay = (i * 0.2 + 0.5) + 's';
+                    viz.appendChild(link);
+                }
+            }
+        }
+
+        // Glyph creation
+        function createGlyph() {
+            const caseId = document.getElementById('caseId').value;
+            const jurisdiction = document.getElementById('jurisdiction').value;
+            const evidence = document.getElementById('evidence').value;
+            
+            if (!caseId || !evidence) {
+                alert('Please fill in Case ID and Evidence fields');
+                return;
+            }
+            
+            const glyphId = generateGlyphId();
+            const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' +00';
+            const hash = generateHash(caseId + jurisdiction + evidence + timestamp);
+            
+            const glyphEntry = document.createElement('div');
+            glyphEntry.className = 'glyph-entry';
+            glyphEntry.innerHTML = `
+                <div class="glyph-id">${glyphId}</div>
+                <div class="timestamp">${timestamp}</div>
+                <div class="hash">SHA256: ${hash}</div>
+                <div class="status active">ACTIVE</div>
+                <p><strong>${caseId}</strong> - ${jurisdiction}</p>
+                <p>${evidence}</p>
+            `;
+            
+            const glyphList = document.getElementById('glyphList');
+            glyphList.insertBefore(glyphEntry, glyphList.firstChild);
+            
+            // Update stats
+            const totalGlyphs = document.getElementById('totalGlyphs');
+            totalGlyphs.textContent = parseInt(totalGlyphs.textContent) + 1;
+            
+            // Clear inputs
+            document.getElementById('caseId').value = '';
+            document.getElementById('jurisdiction').value = '';
+            document.getElementById('evidence').value = '';
+            
+            alert('Glyph created successfully! ID: ' + glyphId);
+        }
+
+        function generateGlyphId() {
+            const prefixes = ['LEGAL', 'CHAIN', 'GLYPH', 'NODE', 'LOCK', 'MIRROR'];
+            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            const number = Math.floor(Math.random() * 999) + 1;
+            return `${prefix}-${number}`;
+        }
+
+        function generateHash(input) {
+            // Simple hash simulation (in real implementation, use proper cryptographic hash)
+            let hash = '';
+            const chars = '0123456789abcdef';
+            for (let i = 0; i < 64; i++) {
+                hash += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return hash;
+        }
+
+        function verifyChain() {
+            const integrity = document.getElementById('verifiedNodes');
+            const newIntegrity = (99.5 + Math.random() * 0.4).toFixed(1);
+            integrity.textContent = newIntegrity + '%';
+            
+            alert(`Chain verification complete. Integrity: ${newIntegrity}%`);
+        }
+
+        function mirrorLock() {
+            document.getElementById('mirrorLockModal').classList.add('active');
+            
+            // Update a random glyph to MIRRORLOCK status
+            const glyphs = document.querySelectorAll('.glyph-entry .status');
+            if (glyphs.length > 0) {
+                const randomGlyph = glyphs[Math.floor(Math.random() * glyphs.length)];
+                randomGlyph.textContent = 'MIRRORLOCK SEALED';
+                randomGlyph.className = 'status locked';
+            }
+        }
+
+        function closeMirrorLock() {
+            document.getElementById('mirrorLockModal').classList.remove('active');
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            createMatrixEffect();
+            createChainVisualization();
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                const activeCases = document.getElementById('activeCases');
+                const current = parseInt(activeCases.textContent);
+                activeCases.textContent = current + Math.floor(Math.random() * 3) - 1;
+            }, 30000);
+        };
+
+        // Handle window resize
+        window.onresize = function() {
+            const canvas = document.querySelector('#matrixBg canvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        };
+    </script>
+</body>
+</html>
