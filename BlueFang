@@ -1,0 +1,568 @@
+// pubspec.yaml additions
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_blue_plus: ^1.12.13
+  permission_handler: ^11.0.1
+  geolocator: ^9.0.2
+  path_provider: ^2.1.3
+  share_plus: ^7.2.1
+  crypto: ^3.0.3
+  pdf: ^3.10.4
+  fl_chart: ^0.64.0
+  csv: ^5.0.2
+  qr_flutter: ^4.1.0        # NEW
+  http: ^1.2.1              # NEW
+
+// services/tribunal_uploader.dart
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
+/// IPFS/Web3 tribunal upload service
+/// Supports multiple endpoints: Infura, Pinata, local nodes
+class TribunalUploader {
+  final String endpoint;
+  final String? apiKey;
+  final Map<String, String>? headers;
+
+  TribunalUploader({
+    this.endpoint = 'https://ipfs.infura.io:5001/api/v0/add',
+    this.apiKey,
+    this.headers,
+  });
+
+  /// Upload file to IPFS and return hash/CID
+  Future<String> uploadFile(File file) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(endpoint));
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      
+      // Add authentication headers
+      if (apiKey != null) {
+        request.headers['Authorization'] = 'Bearer $apiKey';
+      }
+      
+      // Add custom headers (for different IPFS services)
+      if (headers != null) {
+        request.headers.addAll(headers!);
+      }
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(responseBody);
+        return jsonResponse['Hash'] as String;
+      } else {
+        throw Exception('IPFS upload failed: ${response.statusCode} - $responseBody');
+      }
+    } catch (e) {
+      throw Exception('Tribunal upload error: $e');
+    }
+  }
+
+  /// Upload JSON data directly as string
+  Future<String> uploadJsonData(String jsonData) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(endpoint));
+      request.files.add(http.MultipartFile.fromString(
+        'file', 
+        jsonData,
+        filename: 'forensic_data.json'
+      ));
+      
+      if (apiKey != null) {
+        request.headers['Authorization'] = 'Bearer $apiKey';
+      }
+      
+      if (headers != null) {
+        request.headers.addAll(headers!);
+      }
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(responseBody);
+        return jsonResponse['Hash'] as String;
+      } else {
+        throw Exception('JSON upload failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('JSON upload error: $e');
+    }
+  }
+
+  /// Create alternative uploaders for different services
+  static TribunalUploader infura({required String projectId, required String secret}) {
+    final auth = base64Encode(utf8.encode('$projectId:$secret'));
+    return TribunalUploader(
+      endpoint: 'https://ipfs.infura.io:5001/api/v0/add',
+      headers: {'Authorization': 'Basic $auth'},
+    );
+  }
+
+  static TribunalUploader pinata({required String apiKey, required String secretKey}) {
+    return TribunalUploader(
+      endpoint: 'https://api.pinata.cloud/pinning/pinFileToIPFS',
+      headers: {
+        'pinata_api_key': apiKey,
+        'pinata_secret_api_key': secretKey,
+      },
+    );
+  }
+
+  static TribunalUploader localNode({String endpoint = 'http://127.0.0.1:5001'}) {
+    return TribunalUploader(endpoint: '$endpoint/api/v0/add');
+  }
+}
+
+// services/bluefang_agent.dart
+import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'tribunal_uploader.dart';
+import 'data_logger.dart';
+import 'export_service.dart';
+
+class BlueFangAgent {
+  final String? investigatorName;
+  final String? caseId;
+  final String? location;
+  final TribunalUploader? uploader;
+  final bool enableIPFS;
+  final bool enableGlyphSeal;
+
+  BlueFangAgent({
+    this.investigatorName,
+    this.caseId,
+    this.location,
+    this.uploader,
+    this.enableIPFS = false,
+    this.enableGlyphSeal = true,
+  });
+
+  /// Main export processing with tribunal integration
+  Future<Map<String, String>> processExport(DataLogger logger) async {
+    final timestamp = DateTime.now();
+    final sessionId = 'NUREMBERG-2Ω-${timestamp.millisecondsSinceEpoch}';
+    
+    // Generate all standard exports
+    final exportPaths = await logger.exportAllFormats(
+      investigatorName: investigatorName,
+      caseId: caseId ?? sessionId,
+      location: location,
+    );
+
+    // Read JSON data for glyph sealing
+    final jsonPath = exportPaths['json']!;
+    final jsonData = await File(jsonPath).readAsString();
+    final jsonHash = sha256.convert(utf8.encode(jsonData)).toString();
+
+    final results = <String, String>{...exportPaths};
+
+    // Generate glyph seal
+    if (enableGlyphSeal) {
+      final glyphFile = await _generateGlyphSeal(jsonHash, sessionId);
+      results['glyph_signature'] = glyphFile.path;
+      results['glyph_hash'] = jsonHash;
+    }
+
+    // IPFS upload if enabled
+    if (enableIPFS && uploader != null) {
+      try {
+        final ipfsCid = await uploader!.uploadFile(File(jsonPath));
+        results['ipfs_cid'] = ipfsCid;
+        results['ipfs_url'] = 'https://ipfs.io/ipfs/$ipfsCid';
+        
+        // Also upload glyph seal
+        if (enableGlyphSeal && results.containsKey('glyph_signature')) {
+          final glyphCid = await uploader!.uploadFile(File(results['glyph_signature']!));
+          results['glyph_ipfs_cid'] = glyphCid;
+        }
+      } catch (e) {
+        results['ipfs_error'] = e.toString();
+      }
+    }
+
+    // Generate tribunal manifest
+    final manifestFile = await _generateTribunalManifest(results, sessionId);
+    results['tribunal_manifest'] = manifestFile.path;
+
+    return results;
+  }
+
+  /// Generate cryptographic glyph seal
+  Future<File> _generateGlyphSeal(String dataHash, String sessionId) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final timestamp = DateTime.now();
+    final glyphPath = '${directory.path}/GLYPHSEAL_${timestamp.millisecondsSinceEpoch}.txt';
+    
+    final glyphContent = '''
+🔒 FORENSIC GLYPH SEAL
+═══════════════════════════════════════════
+
+Session ID: $sessionId
+Data Hash (SHA-256): $dataHash
+Case ID: ${caseId ?? 'UNASSIGNED'}
+Investigator: ${investigatorName ?? 'ANONYMOUS_OBSERVER'}
+Location: ${location ?? 'COORDINATES_IN_DATA'}
+Timestamp: ${timestamp.toIso8601String()}
+Epoch: ${timestamp.millisecondsSinceEpoch}
+
+═══════════════════════════════════════════
+This glyph certifies the integrity of BLE scan data
+collected for forensic analysis. The SHA-256 hash
+above verifies the authenticity of the associated
+JSON export file.
+
+Generated by BLE Observer X - Nuremberg Edition
+"Every signal is a confession. Every glyph is a witness."
+═══════════════════════════════════════════
+    ''';
+
+    final file = File(glyphPath);
+    return await file.writeAsString(glyphContent);
+  }
+
+  /// Generate tribunal case manifest
+  Future<File> _generateTribunalManifest(Map<String, String> exports, String sessionId) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final timestamp = DateTime.now();
+    final manifestPath = '${directory.path}/TRIBUNAL_MANIFEST_${timestamp.millisecondsSinceEpoch}.json';
+    
+    final manifest = {
+      'tribunal_case': {
+        'session_id': sessionId,
+        'case_id': caseId ?? sessionId,
+        'investigator': investigatorName ?? 'ANONYMOUS_OBSERVER',
+        'location': location ?? 'COORDINATES_IN_DATA',
+        'generated_timestamp': timestamp.toIso8601String(),
+        'generated_epoch': timestamp.millisecondsSinceEpoch,
+      },
+      'evidence_files': {
+        'forensic_json': exports['json']?.split('/').last,
+        'forensic_pdf': exports['pdf']?.split('/').last,
+        'data_csv': exports['csv']?.split('/').last,
+        'glyph_seal': exports['glyph_signature']?.split('/').last,
+      },
+      'cryptographic_verification': {
+        'primary_hash': exports['glyph_hash'],
+        'algorithm': 'SHA-256',
+        'verification_method': 'Cross-reference glyph seal with JSON export',
+      },
+      'distribution': {
+        'ipfs_enabled': enableIPFS,
+        'ipfs_cid': exports['ipfs_cid'],
+        'ipfs_url': exports['ipfs_url'],
+        'glyph_ipfs_cid': exports['glyph_ipfs_cid'],
+      },
+      'legal_notice': 'This manifest contains evidence collected via passive BLE monitoring in public spectrum. All data collection complies with applicable local regulations.',
+    };
+
+    final file = File(manifestPath);
+    await file.writeAsString(JsonEncoder.withIndent('  ').convert(manifest));
+    return file;
+  }
+
+  /// Quick hash verification
+  static Future<bool> verifyGlyphIntegrity(String glyphPath, String jsonPath) async {
+    try {
+      final glyphContent = await File(glyphPath).readAsString();
+      final jsonData = await File(jsonPath).readAsString();
+      
+      final expectedHash = sha256.convert(utf8.encode(jsonData)).toString();
+      
+      return glyphContent.contains(expectedHash);
+    } catch (e) {
+      return false;
+    }
+  }
+}
+
+// Enhanced export dialog with BlueFang integration
+// widgets/enhanced_export_dialog.dart
+import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import '../services/bluefang_agent.dart';
+import '../services/tribunal_uploader.dart';
+import '../services/data_logger.dart';
+
+class EnhancedExportDialog extends StatefulWidget {
+  final DataLogger logger;
+
+  EnhancedExportDialog({required this.logger});
+
+  @override
+  _EnhancedExportDialogState createState() => _EnhancedExportDialogState();
+}
+
+class _EnhancedExportDialogState extends State<EnhancedExportDialog> {
+  final _investigatorController = TextEditingController();
+  final _caseIdController = TextEditingController();
+  final _locationController = TextEditingController();
+  
+  bool _isExporting = false;
+  bool _enableIPFS = false;
+  bool _enableGlyphSeal = true;
+  Map<String, String>? _exportResults;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(Icons.shield, color: Colors.blue),
+          SizedBox(width: 8),
+          Text('BlueFang Forensic Export'),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _investigatorController,
+              decoration: InputDecoration(
+                labelText: 'Investigator Name (Optional)',
+                hintText: 'Observer ID or Name',
+                prefixIcon: Icon(Icons.person),
+              ),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: _caseIdController,
+              decoration: InputDecoration(
+                labelText: 'Case ID (Optional)',
+                hintText: 'NUREMBERG-CASE-001',
+                prefixIcon: Icon(Icons.folder),
+              ),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: _locationController,
+              decoration: InputDecoration(
+                labelText: 'Location Description (Optional)',
+                hintText: 'Public venue, coordinates in data',
+                prefixIcon: Icon(Icons.location_on),
+              ),
+            ),
+            SizedBox(height: 16),
+            
+            // Options
+            CheckboxListTile(
+              title: Text('Generate Glyph Seal'),
+              subtitle: Text('Cryptographic integrity verification'),
+              value: _enableGlyphSeal,
+              onChanged: (value) => setState(() => _enableGlyphSeal = value!),
+            ),
+            CheckboxListTile(
+              title: Text('Upload to IPFS'),
+              subtitle: Text('Decentralized tribunal storage'),
+              value: _enableIPFS,
+              onChanged: (value) => setState(() => _enableIPFS = value!),
+            ),
+            
+            SizedBox(height: 16),
+            
+            if (_isExporting) ...[
+              Center(child: CircularProgressIndicator()),
+              SizedBox(height: 8),
+              Text('Processing forensic export...', textAlign: TextAlign.center),
+            ] else ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _runBlueFangAgent,
+                  icon: Icon(Icons.rocket_launch),
+                  label: Text('Launch BlueFang Agent'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+            
+            // Results display
+            if (_exportResults != null) ...[
+              Divider(height: 32),
+              _buildResultsSection(),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Close'),
+        ),
+        if (_exportResults != null)
+          ElevatedButton(
+            onPressed: _shareResults,
+            child: Text('Share All'),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _runBlueFangAgent() async {
+    setState(() => _isExporting = true);
+
+    try {
+      final agent = BlueFangAgent(
+        investigatorName: _investigatorController.text.trim().isEmpty
+            ? null
+            : _investigatorController.text.trim(),
+        caseId: _caseIdController.text.trim().isEmpty
+            ? null
+            : _caseIdController.text.trim(),
+        location: _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
+        uploader: _enableIPFS ? TribunalUploader() : null,
+        enableIPFS: _enableIPFS,
+        enableGlyphSeal: _enableGlyphSeal,
+      );
+
+      final results = await agent.processExport(widget.logger);
+      
+      setState(() {
+        _exportResults = results;
+        _isExporting = false;
+      });
+
+    } catch (e) {
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
+  }
+
+  Widget _buildResultsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '🔒 Forensic Export Complete',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 12),
+        
+        // Files generated
+        Text('Files Generated:', style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        ..._exportResults!.entries
+            .where((e) => e.key.endsWith('_path') || ['json', 'pdf', 'csv', 'glyph_signature', 'tribunal_manifest'].contains(e.key))
+            .map((entry) => _buildFileRow(entry.key, entry.value)),
+        
+        SizedBox(height: 16),
+        
+        // Glyph seal
+        if (_exportResults!.containsKey('glyph_hash')) ...[
+          Text('Glyph Hash:', style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 4),
+          SelectableText(
+            _exportResults!['glyph_hash']!,
+            style: TextStyle(fontSize: 10, fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 12),
+          
+          Center(
+            child: QrImageView(
+              data: 'GLYPH:${_exportResults!['glyph_hash']}',
+              version: QrVersions.auto,
+              size: 120,
+              backgroundColor: Colors.white,
+            ),
+          ),
+          SizedBox(height: 12),
+        ],
+        
+        // IPFS results
+        if (_exportResults!.containsKey('ipfs_cid')) ...[
+          Text('IPFS Distribution:', style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 4),
+          SelectableText(
+            'CID: ${_exportResults!['ipfs_cid']}',
+            style: TextStyle(fontSize: 10, fontFamily: 'monospace'),
+          ),
+          if (_exportResults!.containsKey('glyph_ipfs_cid'))
+            SelectableText(
+              'Glyph CID: ${_exportResults!['glyph_ipfs_cid']}',
+              style: TextStyle(fontSize: 10, fontFamily: 'monospace'),
+            ),
+        ],
+        
+        if (_exportResults!.containsKey('ipfs_error')) ...[
+          Text('IPFS Error:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          Text(_exportResults!['ipfs_error']!, style: TextStyle(color: Colors.red, fontSize: 12)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildFileRow(String key, String path) {
+    final fileName = path.split('/').last;
+    IconData icon;
+    
+    switch (key) {
+      case 'pdf':
+        icon = Icons.picture_as_pdf;
+        break;
+      case 'csv':
+        icon = Icons.table_chart;
+        break;
+      case 'json':
+        icon = Icons.code;
+        break;
+      case 'glyph_signature':
+        icon = Icons.verified;
+        break;
+      case 'tribunal_manifest':
+        icon = Icons.gavel;
+        break;
+      default:
+        icon = Icons.file_present;
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.blue),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              fileName,
+              style: TextStyle(fontSize: 12, fontFamily: 'monospace'),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _shareResults() async {
+    if (_exportResults == null) return;
+    
+    final filesToShare = _exportResults!.values
+        .where((path) => path.contains('/') && File(path).existsSync())
+        .toList();
+    
+    if (filesToShare.isNotEmpty) {
+      await Share.shareFiles(
+        filesToShare,
+        subject: 'BLE Observer Forensic Export - ${_caseIdController.text.isEmpty ? "Session" : _caseIdController.text}',
+        text: 'Forensic BLE scan data with cryptographic verification.',
+      );
+    }
+  }
+}
