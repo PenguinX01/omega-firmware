@@ -1,0 +1,465 @@
+// widgets/export_dialog.dart
+import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+import '../services/data_logger.dart';
+import '../services/export_service.dart';
+
+class ExportDialog extends StatefulWidget {
+  final DataLogger logger;
+
+  ExportDialog({required this.logger});
+
+  @override
+  _ExportDialogState createState() => _ExportDialogState();
+}
+
+class _ExportDialogState extends State<ExportDialog> {
+  final _investigatorController = TextEditingController();
+  final _caseIdController = TextEditingController();
+  final _locationController = TextEditingController();
+  bool _isExporting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Export Forensic Data'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _investigatorController,
+              decoration: InputDecoration(
+                labelText: 'Investigator Name (Optional)',
+                hintText: 'Observer ID or Name',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _caseIdController,
+              decoration: InputDecoration(
+                labelText: 'Case ID (Optional)',
+                hintText: 'NUREMBERG-CASE-001',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _locationController,
+              decoration: InputDecoration(
+                labelText: 'Location Description (Optional)',
+                hintText: 'Public venue, coordinates in data',
+              ),
+            ),
+            SizedBox(height: 24),
+            Text(
+              'Export will generate:\n• PDF Forensic Report\n• CSV Data File\n• Signed JSON Archive',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isExporting ? null : () => Navigator.pop(context),
+          child: Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _isExporting ? null : _performExport,
+          child: _isExporting 
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Text('Export All'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _performExport() async {
+    setState(() => _isExporting = true);
+    
+    try {
+      final exports = await widget.logger.exportAllFormats(
+        investigatorName: _investigatorController.text.isNotEmpty 
+          ? _investigatorController.text 
+          : null,
+        caseId: _caseIdController.text.isNotEmpty 
+          ? _caseIdController.text 
+          : null,
+        location: _locationController.text.isNotEmpty 
+          ? _locationController.text 
+          : null,
+      );
+
+      Navigator.pop(context);
+      
+      // Show success dialog with file paths
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Export Complete'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Files generated:'),
+              SizedBox(height: 8),
+              ...exports.entries.map((entry) => 
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      Icon(
+                        entry.key == 'pdf' ? Icons.picture_as_pdf :
+                        entry.key == 'csv' ? Icons.table_chart :
+                        Icons.code,
+                        size: 16,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          entry.value.split('/').last,
+                          style: TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                // Share all files
+                await Share.shareFiles(
+                  exports.values.toList(),
+                  subject: 'BLE Observer Forensic Export',
+                );
+                Navigator.pop(context);
+              },
+              child: Text('Share Files'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Done'),
+            ),
+          ],
+        ),
+      );
+      
+    } catch (e) {
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
+  }
+}
+
+// widgets/advanced_analytics_view.dart
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import '../services/data_logger.dart';
+
+class AdvancedAnalyticsView extends StatelessWidget {
+  final DataLogger logger;
+
+  AdvancedAnalyticsView({required this.logger});
+
+  @override
+  Widget build(BuildContext context) {
+    final analytics = logger.getAdvancedAnalytics();
+    
+    if (analytics.isEmpty) {
+      return Center(
+        child: Text('No data available for analysis'),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildSessionSummary(analytics['session_summary']),
+          _buildSignalStrengthAnalysis(analytics['signal_strength']),
+          _buildManufacturerDistribution(analytics['manufacturer_distribution']),
+          _buildTimelineChart(analytics['hourly_timeline']),
+          _buildMacPatternAnalysis(analytics['mac_patterns']),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSessionSummary(Map<String, dynamic>? summary) {
+    if (summary == null) return SizedBox.shrink();
+    
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Session Summary',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildSummaryItem('Total Devices', summary['total_devices'].toString()),
+                _buildSummaryItem('Unique MACs', summary['unique_macs'].toString()),
+                _buildSummaryItem('Duration', summary['session_duration'].toString()),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _buildSignalStrengthAnalysis(Map<String, dynamic>? signalData) {
+    if (signalData == null) return SizedBox.shrink();
+    
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Signal Strength Analysis',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildSignalItem('Min', '${signalData['min_rssi']} dBm', Colors.red),
+                _buildSignalItem('Avg', '${signalData['average_rssi'].toStringAsFixed(1)} dBm', Colors.orange),
+                _buildSignalItem('Max', '${signalData['max_rssi']} dBm', Colors.green),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignalItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
+        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _buildManufacturerDistribution(Map<String, dynamic>? manufacturerData) {
+    if (manufacturerData == null || manufacturerData.isEmpty) return SizedBox.shrink();
+    
+    final entries = manufacturerData.entries.toList();
+    entries.sort((a, b) => (b.value as int).compareTo(a.value as int));
+    
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Top Manufacturer IDs',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            ...entries.take(5).map((entry) => 
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(entry.key.toString()),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(entry.value.toString()),
+                    ),
+                  ],
+                ),
+              )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimelineChart(Map<String, dynamic>? timelineData) {
+    if (timelineData == null || timelineData.isEmpty) return SizedBox.shrink();
+    
+    final entries = timelineData.entries.toList();
+    entries.sort((a, b) => a.key.compareTo(b.key));
+    
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Detection Timeline (by Hour)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Container(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: true),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() < entries.length) {
+                            return Text(
+                              entries[value.toInt()].key,
+                              style: TextStyle(fontSize: 10),
+                            );
+                          }
+                          return Text('');
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: true),
+                    ),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  borderData: FlBorderData(show: true),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: entries.asMap().entries.map((entry) => 
+                        FlSpot(entry.key.toDouble(), entry.value.value.toDouble())
+                      ).toList(),
+                      isCurved: true,
+                      color: Colors.blue,
+                      dotData: FlDotData(show: true),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMacPatternAnalysis(Map<String, dynamic>? macPatterns) {
+    if (macPatterns == null || macPatterns.isEmpty) return SizedBox.shrink();
+    
+    final entries = macPatterns.entries.toList();
+    entries.sort((a, b) => (b.value as int).compareTo(a.value as int));
+    
+    // Identify potentially randomized patterns
+    final suspiciousPatterns = entries.where((entry) => 
+      entry.key.toLowerCase().contains('ff:ff') || 
+      entry.key.toLowerCase().startsWith('3f:ff') ||
+      (entry.value as int) < 2  // Rarely repeated = likely randomized
+    ).toList();
+    
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'MAC Address Pattern Analysis',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            
+            if (suspiciousPatterns.isNotEmpty) ...[
+              Text(
+                'Potentially Randomized MACs:',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+              SizedBox(height: 8),
+              ...suspiciousPatterns.take(5).map((entry) => 
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 2),
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        entry.key.toString(),
+                        style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                      ),
+                      Text('${entry.value} occurrences'),
+                    ],
+                  ),
+                )
+              ),
+              SizedBox(height: 16),
+            ],
+            
+            Text(
+              'Most Common MAC Prefixes:',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            ...entries.where((e) => !suspiciousPatterns.contains(e)).take(5).map((entry) => 
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      entry.key.toString(),
+                      style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                    ),
+                    Text('${entry.value} devices'),
+                  ],
+                ),
+              )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
