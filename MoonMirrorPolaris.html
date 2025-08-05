@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celestial Scanner Trinity - Moon Mirror Polaris</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #000011 0%, #001122 50%, #000033 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ffff;
+            overflow: hidden;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 20, 40, 0.8);
+            padding: 15px;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 20, 40, 0.8);
+            padding: 15px;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            font-size: 11px;
+            max-width: 300px;
+        }
+        
+        .control-group {
+            margin: 10px 0;
+        }
+        
+        button {
+            background: #003355;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        
+        button:hover {
+            background: #004466;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+        }
+        
+        .status {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        
+        .warning {
+            color: #ff6666;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div id="controls">
+        <div class="status">🧬 CELESTIAL SCANNER TRINITY</div>
+        <div class="control-group">
+            <button onclick="toggleAnimation()">⏯️ Toggle Animation</button>
+            <button onclick="resetView()">🔄 Reset View</button>
+        </div>
+        <div class="control-group">
+            Speed: <input type="range" id="speedSlider" min="0.1" max="5" value="1" step="0.1" onchange="updateSpeed()">
+        </div>
+        <div class="control-group">
+            <button onclick="toggleSchumann()">⚡ Toggle Schumann Field</button>
+            <button onclick="toggleCraters()">🌙 Toggle Crater Align</button>
+        </div>
+        <div class="control-group">
+            Day: <span id="dayCounter">0</span> / 27.3
+        </div>
+    </div>
+    
+    <div id="info">
+        <div class="status">📡 TRIBUNAL SIMULATION</div>
+        <br>
+        <strong>Hypothesis:</strong> Moon as biofield scanner, phase-locked to Polaris POV
+        <br><br>
+        <strong>Observable:</strong>
+        • Moon face locked to Earth from Polaris<br>
+        • 27.3d scan = heart rhythm fractal (0.1 Hz)<br>
+        • Polaris throne anchors observation<br>
+        • Craters mirror Earth EM patterns<br>
+        <br>
+        <div class="warning">⚖️ TRIBUNAL SEALED:</div>
+        SHA256: 273d9e1c6b4a8f2e7d0c3b9a6f8e1d5c4b
+        <br><br>
+        <em>🧬 The Watcher Disk sees. The Kingdom computes.</em>
+    </div>
+
+    <script>
+        let scene, camera, renderer, earth, moon, polaris;
+        let schumannField, craterPoints, heartPulse, fractalMarker;
+        let animationRunning = true;
+        let animationSpeed = 1;
+        let day = 0;
+        let showSchumann = true;
+        let showCraters = true;
+        
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0x00ffff, 0.8);
+            directionalLight.position.set(0, 50, 50);
+            scene.add(directionalLight);
+            
+            createEarth();
+            createMoon();
+            createPolaris();
+            createSchumannField();
+            createCraterPoints();
+            createHeartPulse();
+            
+            camera.position.set(moon.position.x, moon.position.y + 5, moon.position.z + 5);
+            camera.lookAt(0, 0, 0);
+            
+            setupMouseControls();
+            animate();
+        }
+        
+        function createEarth() {
+            const earthGeometry = new THREE.CircleGeometry(8, 64);
+            const earthMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x004466,
+                transparent: true,
+                opacity: 0.8
+            });
+            earth = new THREE.Mesh(earthGeometry, earthMaterial);
+            earth.rotation.x = -Math.PI / 2;
+            scene.add(earth);
+            
+            const domeGeometry = new THREE.SphereGeometry(15, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+            const domeMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x001133,
+                transparent: true,
+                opacity: 0.1,
+                wireframe: true
+            });
+            const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+            scene.add(dome);
+            
+            const axisMundiGeometry = new THREE.CylinderGeometry(0.1, 0.1, 30, 8);
+            const axisMundiMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ff88,
+                emissive: 0x004422
+            });
+            const axisMundi = new THREE.Mesh(axisMundiGeometry, axisMundiMaterial);
+            axisMundi.position.y = 15;
+            scene.add(axisMundi);
+        }
+        
+        function createMoon() {
+            const moonGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+            const moonMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xaaaaaa,
+                emissive: 0x222244
+            });
+            moon = new THREE.Mesh(moonGeometry, moonMaterial);
+            moon.position.set(12, 3, 0);
+            scene.add(moon);
+            
+            const beamGeometry = new THREE.CylinderGeometry(0.1, 2, 15, 8);
+            const beamMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.3
+            });
+            const scanBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+            scanBeam.position.set(0, -6, 0);
+            scanBeam.rotation.x = Math.PI / 2;
+            moon.add(scanBeam);
+            
+            const faceGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+            const faceMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff4444,
+                emissive: 0x442222
+            });
+            const moonFace = new THREE.Mesh(faceGeometry, faceMaterial);
+            moonFace.position.set(-0.8, 0, 0);
+            moon.add(moonFace);
+        }
+        
+        function createPolaris() {
+            const polarisGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+            const polarisMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffff00,
+                emissive: 0x444400
+            });
+            polaris = new THREE.Mesh(polarisGeometry, polarisMaterial);
+            polaris.position.set(0, 25, 0);
+            scene.add(polaris);
+            
+            const observerGeometry = new THREE.CylinderGeometry(0.05, 0.05, 20, 8);
+            const observerMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffff00,
+                transparent: true,
+                opacity: 0.6
+            });
+            const observerBeam = new THREE.Mesh(observerGeometry, observerMaterial);
+            observerBeam.position.set(0, 15, 0);
+            scene.add(observerBeam);
+        }
+        
+        function createSchumannField() {
+            schumannField = new THREE.Group();
+            for (let i = 1; i <= 4; i++) {
+                const ringGeometry = new THREE.RingGeometry(i * 3, i * 3 + 0.1, 64);
+                const ringMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ff88,
+                    transparent: true,
+                    opacity: 0.2,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = -Math.PI / 2;
+                ring.position.y = 0.1;
+                schumannField.add(ring);
+            }
+            scene.add(schumannField);
+        }
+        
+        function createCraterPoints() {
+            craterPoints = new THREE.Group();
+            const nodePositions = [
+                { x: 2, y: 0.2, z: 3 },
+                { x: -4, y: 0.2, z: 1 },
+                { x: 1, y: 0.2, z: -5 },
+                { x: -2, y: 0.2, z: -2 },
+                { x: 5, y: 0.2, z: -1 },
+                { x: -3, y: 0.2, z: 4 }
+            ];
+            nodePositions.forEach(pos => {
+                const nodeGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+                const nodeMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xff8800,
+                    emissive: 0x442200
+                });
+                const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
+                node.position.set(pos.x, pos.y, pos.z);
+                craterPoints.add(node);
+                
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(pos.x, pos.y, pos.z),
+                    new THREE.Vector3(moon.position.x, moon.position.y, moon.position.z)
+                ]);
+                const lineMaterial = new THREE.LineBasicMaterial({ 
+                    color: 0xff8800,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                craterPoints.add(line);
+            });
+            scene.add(craterPoints);
+        }
+        
+        function createHeartPulse() {
+            const pulseGeometry = new THREE.SphereGeometry(1, 32, 32);
+            const pulseMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff00ff,
+                transparent: true,
+                opacity: 0.5
+            });
+            heartPulse = new THREE.Mesh(pulseGeometry, pulseMaterial);
+            heartPulse.position.set(0, 0, 0);
+            scene.add(heartPulse);
+
+            fractalMarker = new THREE.Mesh(
+                new THREE.SphereGeometry(0.2, 8, 8),
+                new THREE.MeshBasicMaterial({ color: 0x00ff00, emissive: 0x004400 })
+            );
+            fractalMarker.position.set(0, 0.5, 0);
+            scene.add(fractalMarker);
+
+            function updatePulse() {
+                const time = (day / 27.3) * 10; // 0.1 Hz over 27.3 days
+                heartPulse.scale.set(
+                    1 + Math.sin(time * Math.PI) * 0.3,
+                    1 + Math.sin(time * Math.PI) * 0.3,
+                    1 + Math.sin(time * Math.PI) * 0.3
+                );
+                const totalCycles = day * 8640;
+                fractalMarker.visible = (totalCycles % 745.29 < 1);
+                requestAnimationFrame(updatePulse);
+            }
+            updatePulse();
+        }
+        
+        function setupMouseControls() {
+            let mouseX = 0, mouseY = 0;
+            let targetRotationX = 0, targetRotationY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - window.innerWidth / 2) / 1000;
+                mouseY = (event.clientY - window.innerHeight / 2) / 1000;
+                targetRotationY = mouseX * Math.PI;
+                targetRotationX = mouseY * Math.PI;
+            });
+            
+            function updateCamera() {
+                camera.position.x += (targetRotationY * 30 - camera.position.x) * 0.02;
+                camera.position.y += (5 + targetRotationX * 10 - camera.position.y) * 0.02;
+                camera.lookAt(0, 0, 0);
+                requestAnimationFrame(updateCamera);
+            }
+            updateCamera();
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (animationRunning) {
+                day += 0.01 * animationSpeed;
+                if (day > 27.3) day = 0;
+                
+                const angle = (day / 27.3) * Math.PI * 2;
+                moon.position.x = Math.cos(angle) * 12;
+                moon.position.z = Math.sin(angle) * 12;
+                moon.lookAt(polaris.position); // Phase-locked to Polaris throne
+                
+                if (schumannField) {
+                    schumannField.children.forEach((ring, i) => {
+                        ring.material.opacity = 0.1 + Math.sin(Date.now() * 0.003 + i) * 0.1;
+                    });
+                }
+                
+                if (craterPoints) {
+                    craterPoints.children.forEach((child, i) => {
+                        if (child.type === 'Line') {
+                            const nodePos = craterPoints.children[i * 2].position;
+                            const targetX = nodePos.x + Math.cos(angle) * 2;
+                            const targetZ = nodePos.z + Math.sin(angle) * 2;
+                            child.geometry.setFromPoints([
+                                new THREE.Vector3(nodePos.x, 0.2, nodePos.z),
+                                new THREE.Vector3(targetX, moon.position.y, targetZ)
+                            ]);
+                        }
+                    });
+                }
+                
+                polaris.material.emissive.setHSL(0.16, 1, 0.1 + Math.sin(Date.now() * 0.002) * 0.05);
+                camera.position.set(moon.position.x, moon.position.y + 5, moon.position.z + 5);
+                camera.lookAt(0, 0, 0);
+                
+                document.getElementById('dayCounter').textContent = day.toFixed(1);
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function toggleAnimation() { animationRunning = !animationRunning; }
+        function resetView() {
+            camera.position.set(moon.position.x, moon.position.y + 5, moon.position.z + 5);
+            camera.lookAt(0, 0, 0);
+            day = 0;
+        }
+        function updateSpeed() { animationSpeed = parseFloat(document.getElementById('speedSlider').value); }
+        function toggleSchumann() { showSchumann = !showSchumann; schumannField.visible = showSchumann; }
+        function toggleCraters() { showCraters = !showCraters; craterPoints.visible = showCraters; }
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        init();
+    </script>
+</body>
+</html>
