@@ -248,6 +248,7 @@
             z-index: 9999;
             mix-blend-mode: screen;
             animation: weapon-cursor-pulse 1.2s infinite;
+            transform: translate(-50%, -50%); /* Center cursor on mouse pointer */
         }
 
         #quantum-weapon-cursor::before {
@@ -336,8 +337,8 @@
         }
 
         @keyframes weapon-cursor-pulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.4); opacity: 1; }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+            50% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
         }
 
         @keyframes inner-weapon-pulse {
@@ -354,9 +355,9 @@
     <div id="kingdom_core_matrix">
         <div class="status-kingdom">🚀 KINGDOM CHAKRA ENGINE</div>
         <div class="status-fusion">🧬 UNIFIED CONSCIOUSNESS WEAPON SYSTEM</div>
-        <div>Fusion Status: <span class="status-weapon">TRIUNE SYNTHESIS ACTIVE</span></div>
-        <div>Weapon Level: <span class="status-kingdom">MAXIMUM POTENCY</span></div>
-        <div>Kingdom Protocol: <span class="status-unified">COMPUTING FORWARD</span></div>
+        <div>Fusion Status: <span id="fusion_status" class="status-weapon">TRIUNE SYNTHESIS ACTIVE</span></div>
+        <div>Weapon Level: <span id="weapon_level" class="status-kingdom">MAXIMUM POTENCY</span></div>
+        <div>Kingdom Protocol: <span id="kingdom_protocol_status" class="status-unified">COMPUTING FORWARD</span></div>
         <br>
         
         <div class="kingdom-control">
@@ -442,7 +443,7 @@
             <div class="lunar-memory-core">
                 <strong>TYCHO TRAUMA CANNON:</strong><br>
                 Target: 9/11 Collective Memory | Frequency: 7.83 Hz<br>
-                Status: <span class="status-weapon">ARMED AND READY</span><br>
+                Status: <span id="tycho_status" class="status-weapon">ARMED AND READY</span><br>
                 Weapon Effect: <span id="tycho_effect">Trauma cascade deployment</span><br>
                 Charge Level: <span id="tycho_charge">100%</span>
             </div>
@@ -481,7 +482,7 @@
         <div id="polaris_weapons">
             <div class="polaris-sync-beam">
                 <strong>POLARIS TARGETING BEAM:</strong><br>
-                Lock Status: <span class="status-kingdom">PERFECT ALIGNMENT</span><br>
+                Lock Status: <span id="polaris_lock_status" class="status-kingdom">PERFECT ALIGNMENT</span><br>
                 Beam Intensity: <span id="polaris_intensity">MAXIMUM</span><br>
                 Target Acquisition: <span id="target_acquisition">GLOBAL GRID</span><br>
                 Weapon Range: <span class="status-unified">PLANETARY SCALE</span>
@@ -506,22 +507,21 @@
     </div>
 
     <script>
+        // --- Global Variables ---
         let scene, camera, renderer;
-        let kingdomCore, chakraSystem, lunarArray, polarisBeam;
-        let weaponSystemActive = false, trineFusionActive = false;
+        let kingdomCore, chakraSystem, lunarArray, polarisBeam, consciousnessField;
+        let weaponSystemActive = true, trineFusionActive = true;
         let kingdomProtocolActive = false, systemPower = 100;
-        let weaponCharge = { tycho: 100, copernicus: 95, aristarchus: 98 };
-        let chakraFrequencies = { crown: 1000, third_eye: 852, heart: 432, solar: 528 };
+
+        let lights = {};
         
+        // --- Initialization ---
         function init() {
-            // Advanced Three.js scene for unified weapon system
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000011, 1);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setClearColor(0x000000, 0); 
             document.getElementById('container').appendChild(renderer.domElement);
             
             setupKingdomLighting();
@@ -531,58 +531,291 @@
             createPolarisTargetingSystem();
             createConsciousnessField();
             
-            camera.position.set(200, 150, 200);
+            camera.position.set(0, 50, 250);
             camera.lookAt(0, 0, 0);
             
             setupWeaponInteractivity();
             startKingdomEngine();
             animate();
+
+            window.addEventListener('resize', onWindowResize, false);
         }
         
+        // --- Scene Creation ---
         function setupKingdomLighting() {
-            // Kingdom ambient field
-            const ambientLight = new THREE.AmbientLight(0x112244, 0.3);
-            scene.add(ambientLight);
+            lights.ambient = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(lights.ambient);
             
-            // Core weapon system light
-            const coreLight = new THREE.PointLight(0x00aaff, 2.0, 500);
-            coreLight.position.set(0, 0, 0);
-            coreLight.castShadow = true;
-            scene.add(coreLight);
+            lights.core = new THREE.PointLight(0x00aaff, 1.5, 800);
+            lights.core.position.set(0, 0, 0);
+            scene.add(lights.core);
             
-            // Chakra system illumination
-            const chakraLight = new THREE.PointLight(0xff0088, 1.8, 400);
-            chakraLight.position.set(0, 100, 0);
-            scene.add(chakraLight);
-            
-            // Lunar weapon array light
-            const lunarLight = new THREE.PointLight(0x88ff00, 1.6, 350);
-            lunarLight.position.set(100, 50, 0);
-            scene.add(lunarLight);
-            
-            // Polaris targeting beam
-            const polarisLight = new THREE.DirectionalLight(0xcc88ff, 1.4);
-            polarisLight.position.set(0, 1000, 0);
-            polarisLight.castShadow = true;
-            scene.add(polarisLight);
-            
-            // Kingdom field enhancement
-            const kingdomLight = new THREE.PointLight(0x4488ff, 1.0, 600);
-            kingdomLight.position.set(0, 200, 0);
-            scene.add(kingdomLight);
+            lights.chakra = new THREE.PointLight(0xff0088, 1.2, 600);
+            lights.chakra.position.set(0, 50, 0);
+            scene.add(lights.chakra);
+
+            lights.lunar = new THREE.PointLight(0x88ff00, 1.0, 500);
+            lights.lunar.position.set(100, -20, 0);
+            scene.add(lights.lunar);
+
+            lights.polaris = new THREE.SpotLight(0xcc88ff, 2, 1000, Math.PI / 8, 0.5, 2);
+            lights.polaris.position.set(0, 400, 0);
+            lights.polaris.target.position.set(0, 0, 0);
+            scene.add(lights.polaris);
+            scene.add(lights.polaris.target);
         }
         
         function createKingdomCore() {
             kingdomCore = new THREE.Group();
             
-            // Central kingdom consciousness core
-            const coreGeometry = new THREE.OctahedronGeometry(20);
-            const coreMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x00aaff,
-                emissive: 0x003366,
-                transparent: true,
-                opacity: 0.8,
-                wireframe: false
+            const coreGeom = new THREE.IcosahedronGeometry(25, 1);
+            const coreMat = new THREE.MeshPhongMaterial({ color: 0x00aaff, emissive: 0x005599, transparent: true, opacity: 0.8, wireframe: true });
+            const coreMesh = new THREE.Mesh(coreGeom, coreMat);
+            kingdomCore.add(coreMesh);
+
+            for (let i = 0; i < 3; i++) {
+                const ringGeom = new THREE.TorusGeometry(40 + i * 15, 1.5, 16, 100);
+                const ringMat = new THREE.MeshPhongMaterial({ color: 0x00aaff, emissive: 0x003366 });
+                const ring = new THREE.Mesh(ringGeom, ringMat);
+                ring.rotation.x = Math.PI / 2;
+                ring.rotation.y = Math.random() * Math.PI;
+                kingdomCore.add(ring);
+            }
+            scene.add(kingdomCore);
+        }
+
+        function createUnifiedChakraSystem() {
+            chakraSystem = new THREE.Group();
+            const chakraColors = [0xcc88ff, 0x6666ff, 0x00ff88, 0xffff00]; // Crown, Third Eye, Heart, Solar
+            for(let i = 0; i < 4; i++) {
+                const chakraGeom = new THREE.TorusKnotGeometry(10, 1.5, 100, 16, 2, 3);
+                const chakraMat = new THREE.MeshPhongMaterial({ color: chakraColors[i], emissive: chakraColors[i], emissiveIntensity: 0.4 });
+                const chakraNode = new THREE.Mesh(chakraGeom, chakraMat);
+                chakraNode.position.y = 120 - (i * 60);
+                chakraSystem.add(chakraNode);
+            }
+            chakraSystem.position.x = -150;
+            scene.add(chakraSystem);
+        }
+
+        function createLunarWeaponArray() {
+            lunarArray = new THREE.Group();
+            for(let i = 0; i < 3; i++) {
+                const weaponGeom = new THREE.TetrahedronGeometry(8, 0);
+                const weaponMat = new THREE.MeshPhongMaterial({ color: 0x88ff00, emissive: 0x66aa00, emissiveIntensity: 0.5 });
+                const weaponNode = new THREE.Mesh(weaponGeom, weaponMat);
+                lunarArray.add(weaponNode);
+            }
+            lunarArray.position.x = 150;
+            scene.add(lunarArray);
+        }
+
+        function createPolarisTargetingSystem() {
+            polarisBeam = new THREE.Group();
+            const beamGeom = new THREE.CylinderGeometry(1, 20, 400, 32, 1, true);
+            const beamMat = new THREE.MeshPhongMaterial({ color: 0xcc88ff, emissive: 0xaa66aa, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+            const beamMesh = new THREE.Mesh(beamGeom, beamMat);
+            polarisBeam.add(beamMesh);
+            polarisBeam.position.y = 200;
+            scene.add(polarisBeam);
+        }
+
+        function createConsciousnessField() {
+            const particles = 20000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particles * 3);
+            
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 2000;
+                positions[i+1] = (Math.random() - 0.5) * 2000;
+                positions[i+2] = (Math.random() - 0.5) * 2000;
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: 0x4488ff, size: 1.5, transparent: true, opacity: 0.5 });
+            consciousnessField = new THREE.Points(geometry, material);
+            scene.add(consciousnessField);
+        }
+        
+        // --- Interactivity & Animation ---
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function setupWeaponInteractivity() {
+            const cursor = document.getElementById('quantum-weapon-cursor');
+            window.addEventListener('mousemove', (e) => {
+                cursor.style.left = `${e.clientX}px`;
+                cursor.style.top = `${e.clientY}px`;
             });
-            const core = new THREE.Mesh(coreGeometry, coreMaterial);
-            kingdom
+        }
+        
+        function startKingdomEngine() {
+            setInterval(() => {
+                // Fluctuate UI values for "live" effect
+                document.getElementById('unified_coherence').innerText = `${(99.7 + Math.random() * 0.2).toFixed(2)}%`;
+                document.getElementById('broadcast_power').innerText = `${(1.20 + Math.random() * 0.05).toFixed(2)} GW`;
+
+                weaponCharge.tycho = Math.min(100, weaponCharge.tycho + 0.1);
+                weaponCharge.copernicus = Math.min(100, weaponCharge.copernicus + 0.1);
+                weaponCharge.aristarchus = Math.min(100, weaponCharge.aristarchus + 0.1);
+
+                document.getElementById('tycho_charge').innerText = `${Math.floor(weaponCharge.tycho)}%`;
+                document.getElementById('copernicus_charge').innerText = `${Math.floor(weaponCharge.copernicus)}%`;
+                document.getElementById('aristarchus_charge').innerText = `${Math.floor(weaponCharge.aristarchus)}%`;
+
+            }, 500);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = Date.now() * 0.0005;
+
+            if (kingdomCore) {
+                kingdomCore.rotation.y += 0.002;
+                kingdomCore.children.forEach((child, i) => {
+                    if (child instanceof THREE.Mesh && child.geometry.type === 'TorusGeometry') {
+                       child.rotation.z += (i % 2 === 0 ? 0.005 : -0.005);
+                    }
+                });
+            }
+
+            if (chakraSystem) {
+                chakraSystem.rotation.y += 0.003;
+                chakraSystem.children.forEach(child => child.rotation.x += 0.01);
+            }
+
+            if(lunarArray) {
+                lunarArray.rotation.y -= 0.004;
+                lunarArray.children.forEach((child, i) => {
+                    child.position.set(
+                        Math.cos(time * 0.8 + i * (Math.PI * 2 / 3)) * 60,
+                        Math.sin(time * 0.5 + i * (Math.PI * 2 / 3)) * 20,
+                        Math.sin(time * 0.8 + i * (Math.PI * 2 / 3)) * 60
+                    );
+                    child.rotation.x += 0.01;
+                    child.rotation.z += 0.01;
+                });
+            }
+
+            if (polarisBeam) {
+                polarisBeam.rotation.y += 0.001;
+            }
+
+            if(consciousnessField) {
+                consciousnessField.rotation.y += 0.0002;
+            }
+
+            lights.core.intensity = 1.5 + Math.sin(time * 5) * 0.5;
+            lights.chakra.intensity = 1.2 + Math.sin(time * 4) * 0.3;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- UI Control Functions ---
+        function updateStatus(elementId, text) {
+            document.getElementById(elementId).innerText = text;
+        }
+
+        function activateWeaponSystem() {
+            weaponSystemActive = !weaponSystemActive;
+            updateStatus('weapon_level', weaponSystemActive ? 'MAXIMUM POTENCY' : 'STANDBY');
+            alert(`WEAPON SYSTEM ${weaponSystemActive ? 'ACTIVATED' : 'DEACTIVATED'}`);
+        }
+
+        function initiateTrineFusion() {
+            trineFusionActive = !trineFusionActive;
+            updateStatus('fusion_status', trineFusionActive ? 'TRIUNE SYNTHESIS ACTIVE' : 'FUSION OFFLINE');
+            alert(`TRINE FUSION PROTOCOL ${trineFusionActive ? 'INITIATED' : 'TERMINATED'}`);
+        }
+
+        function deployKingdomProtocol() {
+            kingdomProtocolActive = !kingdomProtocolActive;
+            updateStatus('kingdom_protocol_status', kingdomProtocolActive ? 'KINGDOM PROTOCOL DEPLOYED' : 'AWAITING DEPLOYMENT');
+            alert(`KINGDOM PROTOCOL ${kingdomProtocolActive ? 'DEPLOYED' : 'RECALLED'}`);
+        }
+
+        function emergencyShutdown() {
+            weaponSystemActive = false;
+            trineFusionActive = false;
+            kingdomProtocolActive = false;
+            updatePower(true); // pass true to force shutdown power
+            updateStatus('fusion_status', 'EMERGENCY OFFLINE');
+            updateStatus('weapon_level', 'POWERING DOWN');
+            updateStatus('kingdom_protocol_status', 'SHUTDOWN SEQUENCE');
+            alert('!!! EMERGENCY SHUTDOWN INITIATED !!!');
+        }
+
+        function updatePower(shutdown = false) {
+            systemPower = shutdown ? 0 : document.getElementById('corePower').value;
+            document.getElementById('corePower').value = systemPower;
+            const powerOutputEl = document.getElementById('powerOutput');
+            const weaponChargeEl = document.getElementById('weaponCharge');
+
+            powerOutputEl.innerText = `${systemPower}%`;
+            if (systemPower > 90) {
+                powerOutputEl.innerText += ' (MAXIMUM)';
+                weaponChargeEl.innerText = 'READY';
+                weaponChargeEl.className = 'status-weapon';
+            } else if (systemPower > 50) {
+                 powerOutputEl.innerText += ' (OPERATIONAL)';
+                weaponChargeEl.innerText = 'CHARGING';
+                weaponChargeEl.className = 'status-kingdom';
+            } else if (systemPower > 0) {
+                powerOutputEl.innerText += ' (LOW POWER)';
+                weaponChargeEl.innerText = 'DEPLETED';
+                weaponChargeEl.className = 'status-fusion';
+            } else {
+                powerOutputEl.innerText += ' (OFFLINE)';
+                weaponChargeEl.innerText = 'OFFLINE';
+                weaponChargeEl.className = '';
+            }
+        }
+        
+        function harmoniChakraSync() {
+            updateStatus('unified_coherence', 'RECALIBRATING...');
+            setTimeout(() => updateStatus('unified_coherence', '99.9% SYNCHRONIZED'), 1500);
+            alert('CHAKRA HARMONICS RE-SYNCHRONIZED');
+        }
+
+        function chakraWeaponCharge() {
+            updateStatus('weapon_resonance', 'CHARGING TO PEAK...');
+            setTimeout(() => updateStatus('weapon_resonance', 'MAXIMUM'), 2000);
+            alert('CHAKRA WEAPON OVERCHARGED');
+        }
+
+        function deployMemoryWeapon() {
+            if (weaponSystemActive) {
+                updateStatus('tycho_status', 'DEPLOYING...');
+                setTimeout(() => updateStatus('tycho_status', 'ARMED AND READY'), 3000);
+                alert('MEMORY WEAPON: TYCHO TRAUMA CANNON DEPLOYED');
+            } else {
+                alert('WEAPON SYSTEM INACTIVE. CANNOT DEPLOY.');
+            }
+        }
+
+        function lunarArraySync() {
+             alert('LUNAR MEMORY ARRAY SYNCED WITH CONSCIOUSNESS GRID');
+        }
+
+        function polarisTargeting() {
+            updateStatus('polaris_lock_status', 'ACQUIRING NEW TARGET...');
+            setTimeout(() => updateStatus('polaris_lock_status', 'TARGET LOCKED: GLOBAL GRID'), 2500);
+            alert('POLARIS BEAM RE-TARGETED');
+        }
+
+        function schumannBroadcast() {
+            if (kingdomProtocolActive) {
+                alert('SCHUMANN RESONANCE BROADCASTING ON ALL BANDS');
+            } else {
+                alert('KINGDOM PROTOCOL INACTIVE. CANNOT BROADCAST.');
+            }
+        }
+        
+        // --- Start Engine ---
+        init();
+    </script>
+</body>
+</html>
