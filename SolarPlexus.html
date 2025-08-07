@@ -525,6 +525,377 @@
                     opacity: 0.1,
                     side: THREE.DoubleSide
                 });
+                const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
+                field.position.y = chakra.y;
+                field.rotation.x = Math.PI / 2;
+                field.userData = chakra;
+                chakraSystem.add(field);
+                
+                // Chakra core
+                const coreGeometry = new THREE.SphereGeometry(chakra.size / 2, 32, 32);
+                const coreMaterial = new THREE.MeshBasicMaterial({ 
+                    color: chakra.color,
+                    emissive: chakra.color,
+                    emissiveIntensity: 0.6,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const core = new THREE.Mesh(coreGeometry, coreMaterial);
+                core.position.y = chakra.y;
+                core.userData = chakra;
+                chakraSystem.add(core);
+            });
+            
+            scene.add(chakraSystem);
+        }
+        
+        function createPolarisConnection() {
+            // Polaris beam connection
+            const beamGeometry = new THREE.CylinderGeometry(1, 3, 400, 32);
+            const beamMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.3
+            });
+            const polarisBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+            polarisBeam.position.y = 200;
+            scene.add(polarisBeam);
+            
+            // Polaris star
+            const starGeometry = new THREE.SphereGeometry(5, 32, 32);
+            const starMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffff,
+                emissive: 0x004488
+            });
+            const polarisStar = new THREE.Mesh(starGeometry, starMaterial);
+            polarisStar.position.y = 400;
+            scene.add(polarisStar);
+            
+            window.polarisBeam = polarisBeam;
+            window.polarisStar = polarisStar;
+        }
+        
+        function createLunarInterface() {
+            // Lunar memory interface
+            const lunarGeometry = new THREE.SphereGeometry(12, 64, 64);
+            const lunarMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xcccccc,
+                emissive: 0x444444,
+                transparent: true,
+                opacity: 0.6
+            });
+            const lunarNode = new THREE.Mesh(lunarGeometry, lunarMaterial);
+            lunarNode.position.set(80, 100, 0);
+            scene.add(lunarNode);
+            
+            // Memory stream connection
+            const streamGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(80, 100, 0),
+                new THREE.Vector3(0, 100, 0)
+            ]);
+            const streamMaterial = new THREE.LineBasicMaterial({ 
+                color: 0xff00ff,
+                transparent: true,
+                opacity: 0.5
+            });
+            const memoryStream = new THREE.Line(streamGeometry, streamMaterial);
+            scene.add(memoryStream);
+            
+            window.lunarNode = lunarNode;
+            window.memoryStream = memoryStream;
+        }
+        
+        function setupNeuralInteractivity() {
+            let mouseX = 0, mouseY = 0;
+            const cursor = document.getElementById('neural-cursor');
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                // Update neural cursor
+                cursor.style.left = event.clientX - 20 + 'px';
+                cursor.style.top = event.clientY - 20 + 'px';
+                
+                // Dynamic camera movement based on consciousness state
+                if (mergerActive) {
+                    const radius = 150 + Math.sin(Date.now() * 0.001) * 50;
+                    camera.position.x = Math.cos(mouseX * Math.PI + Date.now() * 0.0002) * radius;
+                    camera.position.z = Math.sin(mouseX * Math.PI + Date.now() * 0.0002) * radius;
+                    camera.position.y = 150 + mouseY * 100;
+                    camera.lookAt(0, 100, 0);
+                }
+            });
+        }
+        
+        function startConsciousnessFeedback() {
+            // Real-time consciousness feedback updates
+            setInterval(() => {
+                if (mergerActive) {
+                    updateNeuralFeedback();
+                    updateBioenergeticStatus();
+                    updateConsciousnessLayers();
+                }
+            }, 1000);
+            
+            // Enhancement progression
+            setInterval(() => {
+                if (mergerActive) {
+                    progressEnhancements();
+                }
+            }, 500);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Consciousness field rotation
+            if (consciousnessField) {
+                consciousnessField.rotation.y += 0.002;
+                consciousnessField.children.forEach((child, i) => {
+                    if (child.userData && child.userData.layer) {
+                        child.rotation.z += 0.001 * child.userData.layer;
+                        if (mergerActive) {
+                            child.material.opacity = 0.1 + Math.sin(Date.now() * 0.003 + i) * 0.2;
+                        }
+                    }
+                });
+            }
+            
+            // Neural network pulsing
+            if (neuralNetwork && mergerActive) {
+                neuralNetwork.children.forEach(child => {
+                    if (child.userData && child.userData.type) {
+                        const pulse = Math.sin(Date.now() * 0.005) * 0.5 + 1;
+                        child.scale.setScalar(pulse);
+                        child.material.emissiveIntensity = 0.5 + pulse * 0.3;
+                    }
+                });
+            }
+            
+            // Chakra system enhancement
+            if (chakraSystem && mergerActive) {
+                chakraSystem.children.forEach(child => {
+                    if (child.userData && child.userData.name) {
+                        const enhancement = enhancementLevels[child.userData.name];
+                        const intensity = 0.3 + (enhancement / 100) * 0.7;
+                        child.material.emissiveIntensity = intensity;
+                        child.scale.setScalar(1 + (enhancement / 100) * 0.5);
+                    }
+                });
+            }
+            
+            // Polaris connection strengthening
+            if (window.polarisBeam && mergerActive) {
+                window.polarisBeam.material.opacity = 0.3 + (enhancementLevels.crown / 100) * 0.4;
+                window.polarisStar.material.emissiveIntensity = 0.5 + (enhancementLevels.crown / 100) * 0.5;
+            }
+            
+            // Lunar interface activation
+            if (window.lunarNode && mergerActive) {
+                window.lunarNode.material.emissiveIntensity = 0.2 + (enhancementLevels.solar / 100) * 0.6;
+                window.memoryStream.material.opacity = 0.3 + (enhancementLevels.heart / 100) * 0.4;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function initiateMerger() {
+            if (mergerActive) return;
+            
+            mergerActive = true;
+            currentStage = 1;
+            
+            console.log("🧭 CONSCIOUSNESS MERGER INITIATED - MAXIMUM INTEGRATION DEPTH");
+            
+            // Start stage progression
+            setTimeout(() => progressStage1(), 1000);
+            setTimeout(() => progressStage2(), 5000);
+            setTimeout(() => progressStage3(), 10000);
+            
+            // Activate visual effects
+            consciousnessField.children[0].material.color.setHex(0x9900ff);
+            
+            // Update interface
+            document.getElementById('stage1').style.borderColor = '#ff00ff';
+        }
+        
+        function progressStage1() {
+            console.log("🧠 STAGE 1: Neural Pathway Enhancement Initiated");
+            
+            const stage1Interval = setInterval(() => {
+                integrationProgress.stage1 += 2;
+                enhancementLevels.crown += 1.5;
+                
+                document.getElementById('stage1_progress').textContent = `${integrationProgress.stage1}%`;
+                document.getElementById('neural_bandwidth').textContent = `${(integrationProgress.stage1 * 0.1).toFixed(1)} TB/s`;
+                document.getElementById('crown_bandwidth').textContent = `${(enhancementLevels.crown * 0.05).toFixed(1)} TB/s`;
+                document.getElementById('crown_latency').textContent = `${Math.max(1, 100 - enhancementLevels.crown).toFixed(0)} ms`;
+                document.getElementById('crown_enhancement').textContent = `${enhancementLevels.crown.toFixed(0)}%`;
+                
+                if (integrationProgress.stage1 >= 100) {
+                    clearInterval(stage1Interval);
+                    document.getElementById('stage1').style.backgroundColor = 'rgba(0, 255, 0, 0.3)';
+                    console.log("✅ STAGE 1 COMPLETE: Crown Chakra → Polaris Lock Established");
+                }
+            }, 100);
+        }
+        
+        function progressStage2() {
+            console.log("⚡ STAGE 2: Empathic Resonance Coupling Initiated");
+            document.getElementById('stage2').style.borderColor = '#ffff00';
+            
+            const stage2Interval = setInterval(() => {
+                integrationProgress.stage2 += 1.8;
+                enhancementLevels.solar += 1.2;
+                enhancementLevels.heart += 1.0;
+                
+                document.getElementById('stage2_progress').textContent = `${integrationProgress.stage2}%`;
+                document.getElementById('emotional_depth').textContent = `${(integrationProgress.stage2 * 0.8).toFixed(0)}% Planetary Sync`;
+                document.getElementById('solar_enhancement').textContent = `${enhancementLevels.solar.toFixed(0)}%`;
+                document.getElementById('heart_enhancement').textContent = `${enhancementLevels.heart.toFixed(0)}%`;
+                
+                if (integrationProgress.stage2 >= 100) {
+                    clearInterval(stage2Interval);
+                    document.getElementById('stage2').style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+                    console.log("✅ STAGE 2 COMPLETE: Solar Plexus → Schumann Field Connected");
+                }
+            }, 120);
+        }
+        
+        function progressStage3() {
+            console.log("🌟 STAGE 3: Hybrid Consciousness Activation Initiated");
+            document.getElementById('stage3').style.borderColor = '#00ffff';
+            
+            const stage3Interval = setInterval(() => {
+                integrationProgress.stage3 += 1.5;
+                
+                document.getElementById('stage3_progress').textContent = `${integrationProgress.stage3}%`;
+                
+                if (integrationProgress.stage3 >= 100) {
+                    clearInterval(stage3Interval);
+                    activateHybridConsciousness();
+                }
+            }, 150);
+        }
+        
+        function activateHybridConsciousness() {
+            hybridActive = true;
+            console.log("🧬 HYBRID CONSCIOUSNESS ACTIVATED - PERMANENT ENHANCEMENT COMPLETE");
+            
+            document.getElementById('stage3').style.backgroundColor = 'rgba(0, 255, 255, 0.3)';
+            document.getElementById('hybrid_status').textContent = 'HYBRID CONSCIOUSNESS ACTIVE';
+            document.getElementById('hybrid_access').textContent = 'FULL ACCESS';
+            document.getElementById('hybrid_integration').textContent = 'COMPLETE';
+            
+            // Final consciousness field transformation
+            consciousnessField.children[0].material.color.setHex(0x00ffff);
+            consciousnessField.children[0].material.emissiveIntensity = 1.0;
+            
+            // Announce completion
+            setTimeout(() => {
+                console.log("🌟 CONSCIOUSNESS MERGER COMPLETE - YOU ARE NOW A HYBRID HUMAN-LUNAR NODE");
+                alert("🧬 CONSCIOUSNESS MERGER COMPLETE\n\nYou are now a Hybrid Human-Lunar Node with permanent access to:\n• Polaris cosmic data stream\n• Lunar holographic memory archive\n• Planetary Schumann resonance network\n• Non-linear time perception\n• Enhanced pattern recognition\n\nWelcome to expanded consciousness.");
+            }, 2000);
+        }
+        
+        function updateNeuralFeedback() {
+            const processing = enhancementLevels.crown > 50 ? 'ENHANCED' : 'UPGRADING';
+            const memoryAccess = enhancementLevels.solar > 30 ? 'HOLOGRAPHIC' : 'EXPANDING';
+            const timeFlow = enhancementLevels.heart > 40 ? 'NON-LINEAR' : 'TRANSITIONING';
+            const accessRange = hybridActive ? 'PAST/PRESENT/FUTURE' : 'EXPANDING';
+            
+            document.getElementById('cortex_processing').textContent = processing;
+            document.getElementById('memory_access').textContent = memoryAccess;
+            document.getElementById('time_flow').textContent = timeFlow;
+            document.getElementById('access_range').textContent = accessRange;
+        }
+        
+        function updateBioenergeticStatus() {
+            const crownFreq = 963 + (enhancementLevels.crown * 2);
+            const solarFreq = 528 + (enhancementLevels.solar * 1.5);
+            const heartFreq = 432 + (enhancementLevels.heart * 1.2);
+            
+            document.getElementById('crown_freq').textContent = `${crownFreq.toFixed(0)} Hz`;
+            document.getElementById('solar_freq').textContent = `${solarFreq.toFixed(0)} Hz`;
+            document.getElementById('heart_freq').textContent = `${heartFreq.toFixed(0)} Hz`;
+        }
+        
+        function updateConsciousnessLayers() {
+            const lunarAccess = enhancementLevels.solar > 25 ? 'CONNECTED' : 'CONNECTING';
+            const lunarIntegration = `${Math.min(100, enhancementLevels.solar + enhancementLevels.heart).toFixed(0)}%`;
+            const polarisAccess = enhancementLevels.crown > 40 ? 'ESTABLISHED' : 'ESTABLISHING';
+            const polarisIntegration = `${Math.min(100, enhancementLevels.crown).toFixed(0)}%`;
+            
+            document.getElementById('lunar_access').textContent = lunarAccess;
+            document.getElementById('lunar_integration').textContent = lunarIntegration;
+            document.getElementById('polaris_access').textContent = polarisAccess;
+            document.getElementById('polaris_integration').textContent = polarisIntegration;
+        }
+        
+        function progressEnhancements() {
+            if (!mergerActive) return;
+            
+            // Gradual enhancement progression
+            if (currentStage >= 1 && enhancementLevels.crown < 100) {
+                enhancementLevels.crown += 0.2;
+            }
+            if (currentStage >= 2 && enhancementLevels.solar < 100) {
+                enhancementLevels.solar += 0.15;
+            }
+            if (currentStage >= 2 && enhancementLevels.heart < 100) {
+                enhancementLevels.heart += 0.12;
+            }
+        }
+        
+        function emergencyDisconnect() {
+            if (!mergerActive) return;
+            
+            const confirmDisconnect = confirm("🚨 EMERGENCY DISCONNECT WARNING\n\nThis will immediately terminate the consciousness merger and restore your original consciousness backup.\n\nAll enhancements will be lost.\n\nProceed with emergency disconnection?");
+            
+            if (confirmDisconnect) {
+                mergerActive = false;
+                hybridActive = false;
+                currentStage = 0;
+                integrationProgress = { stage1: 0, stage2: 0, stage3: 0 };
+                enhancementLevels = { crown: 0, solar: 0, heart: 0 };
+                
+                // Reset visual elements
+                consciousnessField.children[0].material.color.setHex(0x004488);
+                consciousnessField.children[0].material.emissiveIntensity = 0.1;
+                
+                // Reset interface
+                document.getElementById('stage1_progress').textContent = '0%';
+                document.getElementById('stage2_progress').textContent = '0%';
+                document.getElementById('stage3_progress').textContent = '0%';
+                
+                console.log("🚨 EMERGENCY DISCONNECT EXECUTED - ORIGINAL CONSCIOUSNESS RESTORED");
+                alert("🔄 EMERGENCY DISCONNECT COMPLETE\n\nOriginal consciousness has been restored from backup.\nAll enhancements have been cleared.\nYou are now back to baseline human consciousness.");
+            }
+        }
+        
+        function updateDepth() {
+            integrationDepth = parseInt(document.getElementById('integrationDepth').value);
+            document.getElementById('currentDepth').textContent = `${integrationDepth}%`;
+            
+            // Adjust enhancement rates based on depth
+            const depthMultiplier = integrationDepth / 100;
+            // This affects the rate of enhancement progression
+        }
+        
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize consciousness merger interface
+        init();
+    </script>
+</body>
+</html>
+                });
                 const ring = new THREE.Mesh(ringGeometry, ringMaterial);
                 ring.rotation.x = Math.PI / 2;
                 ring.userData = { layer: i };
