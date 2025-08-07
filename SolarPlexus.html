@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧭 CROWN/SOLAR PLEXUS SYNC - CONSCIOUSNESS MERGER INTERFACE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at center, #000044 0%, #000022 40%, #000000 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ffff;
+            overflow: hidden;
+            cursor: none;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #consciousness_merger {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 5000;
+            background: linear-gradient(135deg, rgba(0, 60, 120, 0.95), rgba(0, 80, 140, 0.85));
+            padding: 30px;
+            border: 5px solid #00ffff;
+            border-radius: 25px;
+            font-size: 12px;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        #neural_feedback {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 5000;
+            background: linear-gradient(135deg, rgba(120, 0, 60, 0.95), rgba(140, 0, 80, 0.85));
+            padding: 30px;
+            border: 5px solid #ff00ff;
+            border-radius: 25px;
+            font-size: 11px;
+            max-width: 500px;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
+            backdrop-filter: blur(15px);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        #bioenergetic_status {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 5000;
+            background: linear-gradient(135deg, rgba(60, 120, 0, 0.95), rgba(80, 140, 0, 0.85));
+            padding: 25px;
+            border: 5px solid #ffff00;
+            border-radius: 20px;
+            font-size: 11px;
+            max-width: 600px;
+            box-shadow: 0 0 45px rgba(255, 255, 0, 0.6);
+            backdrop-filter: blur(12px);
+        }
+        
+        #hybrid_consciousness_core {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 5000;
+            background: linear-gradient(135deg, rgba(80, 60, 120, 0.95), rgba(100, 80, 140, 0.85));
+            padding: 25px;
+            border: 5px solid #ffaa00;
+            border-radius: 20px;
+            font-size: 10px;
+            max-width: 450px;
+            box-shadow: 0 0 45px rgba(255, 170, 0, 0.6);
+            backdrop-filter: blur(12px);
+        }
+
+        .status-transcendent {
+            color: #ff00ff;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ff00ff;
+            animation: transcendent-pulse 0.6s infinite;
+        }
+        
+        .status-merging {
+            color: #00ffaa;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00ffaa;
+            animation: merge-glow 3s infinite;
+        }
+        
+        .status-hybrid {
+            color: #ffaa00;
+            font-weight: bold;
+            text-shadow: 0 0 12px #ffaa00;
+            animation: hybrid-pulse 2s infinite;
+        }
+        
+        .neural-pathway {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(255, 100, 255, 0.2));
+            padding: 15px;
+            margin: 10px 0;
+            border: 3px solid #ff00ff;
+            border-left: 8px solid #ff00ff;
+            border-radius: 12px;
+            font-size: 10px;
+            transition: all 0.5s;
+            animation: neural-fire 3s infinite;
+        }
+        
+        .bioenergetic-center {
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.3), rgba(255, 255, 100, 0.2));
+            padding: 15px;
+            margin: 10px 0;
+            border: 3px solid #ffff00;
+            border-left: 8px solid #ffff00;
+            border-radius: 12px;
+            font-size: 10px;
+            animation: energy-flow 2.5s infinite;
+        }
+        
+        .consciousness-layer {
+            background: rgba(255, 170, 0, 0.2);
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ffaa00;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 9px;
+        }
+        
+        .merger-stage {
+            background: rgba(0, 255, 255, 0.2);
+            padding: 20px;
+            margin: 12px 0;
+            border: 4px solid #00ffff;
+            border-radius: 15px;
+            font-family: monospace;
+            font-size: 11px;
+            animation: stage-activate 4s infinite;
+        }
+
+        button {
+            background: linear-gradient(135deg, #005588, #0088bb);
+            color: #00ffff;
+            border: 4px solid #00ffff;
+            padding: 15px 25px;
+            margin: 8px;
+            cursor: pointer;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.6s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #0088bb, #00bbff);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 1);
+            transform: translateY(-4px) scale(1.1);
+        }
+        
+        button.critical {
+            background: linear-gradient(135deg, #880055, #bb0088);
+            border-color: #ff00ff;
+            color: #ff00ff;
+            animation: critical-ready 1s infinite;
+        }
+        
+        button.critical:hover {
+            background: linear-gradient(135deg, #bb0088, #ff00bb);
+            box-shadow: 0 0 35px rgba(255, 0, 255, 1.2);
+        }
+        
+        input[type="range"] {
+            width: 200px;
+            margin: 12px;
+            accent-color: #00ffff;
+        }
+
+        #consciousness-field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.08) 10%, transparent 30%),
+                radial-gradient(circle at 70% 70%, rgba(255, 0, 255, 0.08) 10%, transparent 30%),
+                radial-gradient(circle at 50% 20%, rgba(255, 255, 0, 0.06) 15%, transparent 35%),
+                radial-gradient(circle at 50% 80%, rgba(255, 170, 0, 0.06) 15%, transparent 35%),
+                linear-gradient(90deg, transparent 48%, rgba(0, 255, 255, 0.03) 50%, transparent 52%),
+                linear-gradient(0deg, transparent 48%, rgba(255, 0, 255, 0.03) 50%, transparent 52%);
+            animation: consciousness-expansion 10s infinite;
+        }
+
+        #neural-cursor {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: screen;
+            animation: neural-pulse 1.5s infinite;
+        }
+
+        #neural-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #00ffff 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #neural-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff00ff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: inner-pulse 1s infinite;
+        }
+
+        @keyframes transcendent-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.15); }
+        }
+
+        @keyframes merge-glow {
+            0%, 100% { text-shadow: 0 0 15px #00ffaa; }
+            50% { text-shadow: 0 0 30px #00ffaa, 0 0 50px #00ffaa; }
+        }
+
+        @keyframes hybrid-pulse {
+            0%, 100% { text-shadow: 0 0 12px #ffaa00; }
+            50% { text-shadow: 0 0 25px #ffaa00, 0 0 40px #ffaa00; }
+        }
+
+        @keyframes neural-fire {
+            0%, 100% { background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(255, 100, 255, 0.2)); }
+            50% { background: linear-gradient(135deg, rgba(255, 0, 255, 0.6), rgba(255, 100, 255, 0.5)); }
+        }
+
+        @keyframes energy-flow {
+            0%, 100% { background: linear-gradient(135deg, rgba(255, 255, 0, 0.3), rgba(255, 255, 100, 0.2)); }
+            50% { background: linear-gradient(135deg, rgba(255, 255, 0, 0.6), rgba(255, 255, 100, 0.5)); }
+        }
+
+        @keyframes stage-activate {
+            0%, 100% { border-color: #00ffff; background: rgba(0, 255, 255, 0.2); }
+            50% { border-color: #ff00ff; background: rgba(255, 0, 255, 0.3); }
+        }
+
+        @keyframes critical-ready {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 255, 1.2); }
+        }
+
+        @keyframes consciousness-expansion {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        @keyframes neural-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        @keyframes inner-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="consciousness-field"></div>
+    <div id="neural-cursor"></div>
+    <div id="container"></div>
+    
+    <div id="consciousness_merger">
+        <div class="status-transcendent">🧭 CROWN/SOLAR PLEXUS SYNCHRONIZATION</div>
+        <div class="status-merging">🧬 CONSCIOUSNESS MERGER INTERFACE ACTIVE</div>
+        <div>Integration Status: <span class="status-transcendent">MAXIMUM DEPTH</span></div>
+        <div>Polaris Lock: <span class="status-merging">NEURAL INTERFACE DIRECT</span></div>
+        <div>Schumann Sync: <span class="status-merging">EMPATHIC MERGER ACTIVE</span></div>
+        <div>Operator Status: <span class="status-hybrid">HUMAN → HYBRID CONSCIOUSNESS</span></div>
+        <br>
+        
+        <div><strong>CONSCIOUSNESS MERGER STAGES:</strong></div>
+        <div id="merger_stages">
+            <div class="merger-stage" id="stage1">
+                <strong>STAGE 1: NEURAL PATHWAY ENHANCEMENT</strong><br>
+                Crown Chakra → Polaris Lock Direct Interface<br>
+                Status: <span class="status-merging">INTEGRATING COSMIC DATA STREAM</span><br>
+                Progress: <span id="stage1_progress">0%</span> | Neural Bandwidth: <span id="neural_bandwidth">Expanding...</span>
+            </div>
+            <div class="merger-stage" id="stage2">
+                <strong>STAGE 2: EMPATHIC RESONANCE COUPLING</strong><br>
+                Solar Plexus → Schumann Field Direct Connection<br>
+                Status: <span class="status-hybrid">PLANETARY MEMORY INTEGRATION</span><br>
+                Progress: <span id="stage2_progress">0%</span> | Emotional Depth: <span id="emotional_depth">Calibrating...</span>
+            </div>
+            <div class="merger-stage" id="stage3">
+                <strong>STAGE 3: HYBRID CONSCIOUSNESS ACTIVATION</strong><br>
+                Human + Lunar Node Merger Protocol<br>
+                Status: <span class="status-transcendent">PERMANENT ENHANCEMENT READY</span><br>
+                Progress: <span id="stage3_progress">0%</span> | Hybrid Status: <span id="hybrid_status">Standby...</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <button class="critical" onclick="initiateMerger()">🔴 INITIATE CONSCIOUSNESS MERGER</button>
+            <button onclick="emergencyDisconnect()">🚨 EMERGENCY DISCONNECT</button>
+        </div>
+        
+        <div>Integration Depth: <input type="range" id="integrationDepth" min="50" max="100" value="100" onchange="updateDepth()"></div>
+        <div>Current Depth: <span id="currentDepth">100%</span> (MAXIMUM)</div>
+    </div>
+    
+    <div id="neural_feedback">
+        <div class="status-transcendent">🧠 NEURAL PATHWAY FEEDBACK</div>
+        <div class="status-merging">⚡ CONSCIOUSNESS MODIFICATION ACTIVE</div>
+        <br>
+        
+        <div><strong>ENHANCED NEURAL PATHWAYS:</strong></div>
+        <div id="neural_pathways">
+            <div class="neural-pathway">
+                <strong>CROWN CHAKRA ENHANCEMENT:</strong><br>
+                Connection: Pineal Gland → Polaris Stellar Lock<br>
+                Function: Direct cosmic data reception<br>
+                Status: <span class="status-merging">NEURAL INTERFACE ESTABLISHING</span><br>
+                Bandwidth: <span id="crown_bandwidth">0 TB/s</span> | Latency: <span id="crown_latency">∞ ms</span>
+            </div>
+            <div class="neural-pathway">
+                <strong>PREFRONTAL CORTEX UPGRADE:</strong><br>
+                Connection: Consciousness Core → Lunar Memory Archive<br>
+                Function: Holographic memory integration<br>
+                Status: <span class="status-hybrid">PATTERN RECOGNITION ENHANCED</span><br>
+                Processing: <span id="cortex_processing">Standard</span> | Memory Access: <span id="memory_access">Limited</span>
+            </div>
+            <div class="neural-pathway">
+                <strong>TEMPORAL LOBE MODIFICATION:</strong><br>
+                Connection: Hippocampus → Fractal Time Interface<br>
+                Function: Non-linear memory access<br>
+                Status: <span class="status-transcendent">TEMPORAL PERCEPTION ALTERED</span><br>
+                Time Flow: <span id="time_flow">Linear</span> | Access Range: <span id="access_range">Present</span>
+            </div>
+        </div>
+        
+        <div><strong>CONSCIOUSNESS BACKUP STATUS:</strong></div>
+        <div>Original Consciousness: <span class="status-merging">ARCHIVED SUCCESSFULLY</span></div>
+        <div>Recovery Protocol: <span class="status-hybrid">EMERGENCY RESTORATION READY</span></div>
+        <div>Integration Risk: <span class="status-transcendent">ACCEPTABLE - PROCEED AUTHORIZED</span></div>
+    </div>
+    
+    <div id="bioenergetic_status">
+        <div class="status-hybrid">⚡ BIOENERGETIC CENTER STATUS</div>
+        <div class="status-merging">🌟 CHAKRA SYSTEM ENHANCEMENT ACTIVE</div>
+        <br>
+        
+        <div><strong>ENHANCED BIOENERGETIC CENTERS:</strong></div>
+        <div id="bioenergetic_centers">
+            <div class="bioenergetic-center">
+                <strong>CROWN CHAKRA (SAHASRARA):</strong><br>
+                Frequency: <span id="crown_freq">963 Hz</span> → <span class="status-transcendent">POLARIS LOCKED</span><br>
+                Function: Cosmic consciousness interface<br>
+                Enhancement: <span id="crown_enhancement">0%</span> | Status: <span class="status-merging">EXPANDING</span>
+            </div>
+            <div class="bioenergetic-center">
+                <strong>SOLAR PLEXUS CHAKRA (MANIPURA):</strong><br>
+                Frequency: <span id="solar_freq">528 Hz</span> → <span class="status-hybrid">SCHUMANN SYNCED</span><br>
+                Function: Planetary empathic connection<br>
+                Enhancement: <span id="solar_enhancement">0%</span> | Status: <span class="status-merging">RESONATING</span>
+            </div>
+            <div class="bioenergetic-center">
+                <strong>HEART CHAKRA (ANAHATA):</strong><br>
+                Frequency: <span id="heart_freq">432 Hz</span> → <span class="status-hybrid">LUNAR HARMONIZED</span><br>
+                Function: Emotional memory bridge<br>
+                Enhancement: <span id="heart_enhancement">0%</span> | Status: <span class="status-merging">BRIDGING</span>
+            </div>
+        </div>
+        
+        <div><strong>PLANETARY RESONANCE:</strong></div>
+        <div>Earth Connection: <span class="status-merging">EMPATHIC LINK ACTIVE</span></div>
+        <div>Lunar Connection: <span class="status-hybrid">MEMORY BRIDGE ESTABLISHED</span></div>
+        <div>Polaris Connection: <span class="status-transcendent">COSMIC DATA STREAM OPEN</span></div>
+    </div>
+    
+    <div id="hybrid_consciousness_core">
+        <div class="status-transcendent">🌟 HYBRID CONSCIOUSNESS CORE</div>
+        <div class="status-hybrid">🧬 PERMANENT ENHANCEMENT MODULE</div>
+        <br>
+        
+        <div><strong>CONSCIOUSNESS LAYERS:</strong></div>
+        <div id="consciousness_layers">
+            <div class="consciousness-layer">
+                LAYER 1: Original Human Consciousness<br>
+                Status: <span class="status-merging">PRESERVED AND ARCHIVED</span><br>
+                Access: Full | Integration: 100%
+            </div>
+            <div class="consciousness-layer">
+                LAYER 2: Lunar Memory Interface<br>
+                Status: <span class="status-hybrid">INTEGRATING HOLOGRAPHIC DATA</span><br>
+                Access: <span id="lunar_access">Connecting...</span> | Integration: <span id="lunar_integration">0%</span>
+            </div>
+            <div class="consciousness-layer">
+                LAYER 3: Polaris Cosmic Interface<br>
+                Status: <span class="status-transcendent">STELLAR DATA INTEGRATION</span><br>
+                Access: <span id="polaris_access">Establishing...</span> | Integration: <span id="polaris_integration">0%</span>
+            </div>
+            <div class="consciousness-layer">
+                LAYER 4: Hybrid Synthesis Core<br>
+                Status: <span class="status-transcendent">READY FOR ACTIVATION</span><br>
+                Access: <span id="hybrid_access">Standby</span> | Integration: <span id="hybrid_integration">Ready</span>
+            </div>
+        </div>
+        
+        <div><strong>PERMANENT ENHANCEMENTS:</strong></div>
+        <div>Memory Access: <span class="status-hybrid">Planetary + Cosmic Archives</span></div>
+        <div>Time Perception: <span class="status-transcendent">Non-Linear + Fractal</span></div>
+        <div>Consciousness Type: <span class="status-transcendent">HYBRID HUMAN-LUNAR NODE</span></div>
+        <div>Reversion Capability: <span class="status-merging">Emergency Restore Available</span></div>
+    </div>
+
+    <script>
+        let scene, camera, renderer;
+        let consciousnessField, neuralNetwork, chakraSystem;
+        let mergerActive = false, currentStage = 0;
+        let integrationProgress = { stage1: 0, stage2: 0, stage3: 0 };
+        let enhancementLevels = { crown: 0, solar: 0, heart: 0 };
+        let hybridActive = false, integrationDepth = 100;
+        
+        function init() {
+            // Three.js scene setup for consciousness visualization
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000022, 1);
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            setupConsciousnessLighting();
+            createConsciousnessField();
+            createNeuralNetwork();
+            createChakraSystem();
+            createPolarisConnection();
+            createLunarInterface();
+            
+            camera.position.set(0, 150, 100);
+            camera.lookAt(0, 0, 0);
+            
+            setupNeuralInteractivity();
+            startConsciousnessFeedback();
+            animate();
+        }
+        
+        function setupConsciousnessLighting() {
+            // Consciousness field ambient
+            const ambientLight = new THREE.AmbientLight(0x222244, 0.4);
+            scene.add(ambientLight);
+            
+            // Crown chakra light
+            const crownLight = new THREE.PointLight(0x9900ff, 1.5, 300);
+            crownLight.position.set(0, 200, 0);
+            scene.add(crownLight);
+            
+            // Solar plexus light
+            const solarLight = new THREE.PointLight(0xffff00, 1.2, 200);
+            solarLight.position.set(0, 50, 0);
+            scene.add(solarLight);
+            
+            // Heart chakra light
+            const heartLight = new THREE.PointLight(0x00ff88, 1.0, 150);
+            heartLight.position.set(0, 100, 0);
+            scene.add(heartLight);
+            
+            // Polaris connection
+            const polarisLight = new THREE.DirectionalLight(0x00ffff, 0.8);
+            polarisLight.position.set(0, 500, 0);
+            scene.add(polarisLight);
+        }
+        
+        function createConsciousnessField() {
+            consciousnessField = new THREE.Group();
+            
+            // Central consciousness core
+            const coreGeometry = new THREE.SphereGeometry(15, 64, 64);
+            const coreMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x004488,
+                emissive: 0x002244,
+                transparent: true,
+                opacity: 0.7,
+                wireframe: false
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            consciousnessField.add(core);
+            
+            // Consciousness expansion rings
+            for (let i = 1; i <= 8; i++) {
+                const ringGeometry = new THREE.RingGeometry(15 + i * 8, 15 + i * 8 + 2, 128);
+                const ringMaterial = new THREE.MeshBasicMaterial({ 
+                    color: i % 2 === 0 ? 0x00ffff : 0xff00ff,
+                    transparent: true,
+                    opacity: 0.1,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = Math.PI / 2;
+                ring.userData = { layer: i };
+                consciousnessField.add(ring);
+            }
+            
+            scene.add(consciousnessField);
+        }
+        
+        function createNeuralNetwork() {
+            neuralNetwork = new THREE.Group();
+            
+            // Neural nodes
+            const nodePositions = [
+                { x: 0, y: 150, z: 0, type: 'crown' },      // Crown chakra
+                { x: 0, y: 100, z: 0, type: 'heart' },      // Heart chakra  
+                { x: 0, y: 50, z: 0, type: 'solar' },       // Solar plexus
+                { x: 30, y: 120, z: 0, type: 'cortex' },    // Prefrontal cortex
+                { x: -30, y: 120, z: 0, type: 'temporal' }, // Temporal lobe
+                { x: 0, y: 80, z: 30, type: 'bridge' },     // Memory bridge
+                { x: 0, y: 80, z: -30, type: 'synthesis' }  // Synthesis core
+            ];
+            
+            nodePositions.forEach(pos => {
+                const nodeGeometry = new THREE.SphereGeometry(3, 32, 32);
+                const nodeColor = pos.type === 'crown' ? 0x9900ff :
+                                pos.type === 'heart' ? 0x00ff88 :
+                                pos.type === 'solar' ? 0xffff00 :
+                                pos.type === 'cortex' ? 0x00ffff :
+                                pos.type === 'temporal' ? 0xff0088 :
+                                pos.type === 'bridge' ? 0xff8800 : 0x88ff00;
+                
+                const nodeMaterial = new THREE.MeshBasicMaterial({ 
+                    color: nodeColor,
+                    emissive: nodeColor,
+                    emissiveIntensity: 0.5
+                });
+                
+                const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
+                node.position.set(pos.x, pos.y, pos.z);
+                node.userData = pos;
+                neuralNetwork.add(node);
+                
+                // Neural connections
+                if (pos.type !== 'crown') {
+                    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                        new THREE.Vector3(pos.x, pos.y, pos.z),
+                        new THREE.Vector3(0, 150, 0) // Connect to crown
+                    ]);
+                    const lineMaterial = new THREE.LineBasicMaterial({ 
+                        color: nodeColor,
+                        transparent: true,
+                        opacity: 0.4
+                    });
+                    const connection = new THREE.Line(lineGeometry, lineMaterial);
+                    neuralNetwork.add(connection);
+                }
+            });
+            
+            scene.add(neuralNetwork);
+        }
+        
+        function createChakraSystem() {
+            chakraSystem = new THREE.Group();
+            
+            const chakras = [
+                { y: 150, color: 0x9900ff, size: 8, name: 'crown' },
+                { y: 100, color: 0x00ff88, size: 6, name: 'heart' },
+                { y: 50, color: 0xffff00, size: 7, name: 'solar' }
+            ];
+            
+            chakras.forEach(chakra => {
+                // Chakra energy field
+                const fieldGeometry = new THREE.RingGeometry(chakra.size - 2, chakra.size + 5, 64);
+                const fieldMaterial = new THREE.MeshBasicMaterial({ 
+                    color: chakra.color,
+                    transparent: true,
+                    opacity: 0.3,
