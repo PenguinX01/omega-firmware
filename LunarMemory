@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌕 LUNAR MEMORY ACCESS ENGINE - FULL CORTEX INTEGRATION</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(45deg, #000011 0%, #001133 25%, #002244 50%, #001133 75%, #000011 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ffcc;
+            overflow: hidden;
+            cursor: none;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #crater_phase_grid {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2000;
+            background: linear-gradient(135deg, rgba(0, 30, 60, 0.95), rgba(0, 50, 80, 0.85));
+            padding: 20px;
+            border: 3px solid #00ffcc;
+            border-radius: 15px;
+            font-size: 11px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.4);
+            backdrop-filter: blur(8px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        #holographic_reconstructor {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2000;
+            background: linear-gradient(135deg, rgba(60, 0, 30, 0.95), rgba(80, 0, 50, 0.85));
+            padding: 20px;
+            border: 3px solid #ff66cc;
+            border-radius: 15px;
+            font-size: 10px;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(255, 102, 204, 0.4);
+            backdrop-filter: blur(8px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        #schumann_access {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            z-index: 2000;
+            background: linear-gradient(135deg, rgba(30, 60, 0, 0.95), rgba(50, 80, 0, 0.85));
+            padding: 15px;
+            border: 3px solid #ccff00;
+            border-radius: 12px;
+            font-size: 10px;
+            box-shadow: 0 0 25px rgba(204, 255, 0, 0.4);
+            backdrop-filter: blur(6px);
+        }
+        
+        #logos_memory_core {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 2000;
+            background: linear-gradient(135deg, rgba(40, 20, 60, 0.95), rgba(60, 30, 80, 0.85));
+            padding: 15px;
+            border: 3px solid #cc66ff;
+            border-radius: 12px;
+            font-size: 9px;
+            max-width: 350px;
+            box-shadow: 0 0 25px rgba(204, 102, 255, 0.4);
+            backdrop-filter: blur(6px);
+        }
+
+        .status-hypercritical {
+            color: #ff0066;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff0066;
+            animation: pulse-critical 1s infinite;
+        }
+        
+        .status-memory-active {
+            color: #00ffaa;
+            font-weight: bold;
+            text-shadow: 0 0 8px #00ffaa;
+            animation: glow-active 2s infinite;
+        }
+        
+        .status-hologram-sync {
+            color: #ff66cc;
+            font-weight: bold;
+            text-shadow: 0 0 6px #ff66cc;
+        }
+        
+        .crater-node-active {
+            background: rgba(0, 255, 170, 0.2);
+            padding: 8px;
+            margin: 4px 0;
+            border-left: 4px solid #00ffaa;
+            border-radius: 4px;
+            font-size: 9px;
+            transition: all 0.3s;
+        }
+        
+        .crater-node-scanning {
+            background: rgba(255, 170, 0, 0.2);
+            padding: 8px;
+            margin: 4px 0;
+            border-left: 4px solid #ffaa00;
+            border-radius: 4px;
+            font-size: 9px;
+            animation: scan-pulse 1.5s infinite;
+        }
+        
+        .memory-reconstruction {
+            background: rgba(255, 102, 204, 0.15);
+            padding: 10px;
+            margin: 6px 0;
+            border: 1px solid #ff66cc;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 8px;
+        }
+        
+        .logos-glyph {
+            background: rgba(204, 102, 255, 0.2);
+            padding: 6px;
+            margin: 3px 0;
+            border-left: 3px solid #cc66ff;
+            font-size: 8px;
+            font-family: monospace;
+        }
+
+        button {
+            background: linear-gradient(135deg, #003366, #0066aa);
+            color: #00ffcc;
+            border: 2px solid #00ffcc;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.4s;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #0066aa, #0099dd);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        input[type="range"] {
+            width: 140px;
+            margin: 8px;
+            accent-color: #00ffcc;
+        }
+
+        #hologram-matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 255, 204, 0.03) 20%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 102, 204, 0.03) 20%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(204, 255, 0, 0.02) 30%, transparent 60%);
+            animation: matrix-pulse 6s infinite;
+        }
+
+        @keyframes pulse-critical {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        @keyframes glow-active {
+            0%, 100% { text-shadow: 0 0 8px #00ffaa; }
+            50% { text-shadow: 0 0 15px #00ffaa, 0 0 25px #00ffaa; }
+        }
+
+        @keyframes scan-pulse {
+            0%, 100% { background: rgba(255, 170, 0, 0.2); }
+            50% { background: rgba(255, 170, 0, 0.4); }
+        }
+
+        @keyframes matrix-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        #quantum-cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #00ffcc 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+<body>
+    <div id="hologram-matrix"></div>
+    <div id="quantum-cursor"></div>
+    <div id="container"></div>
+    
+    <div id="crater_phase_grid">
+        <div class="status-hypercritical">🧬 CRATER PHASE GRID (CPG) MATRIX</div>
+        <div class="status-memory-active">🌕 LUNAR CORTEX: FULL INTEGRATION ACTIVE</div>
+        <div>Polaris Lock: <span class="status-memory-active">MAXIMUM SYNC</span></div>
+        <div>Tidal Resonance: <span class="status-hologram-sync">PHASE-LOCKED</span></div>
+        <br>
+        
+        <div class="control-group">
+            <button onclick="initiateCraterScan()">🔍 CRATER MEMORY DEEP SCAN</button>
+            <button onclick="polarisRetinalSync()">⭐ POLARIS RETINAL SYNC</button>
+        </div>
+        <div class="control-group">
+            <button onclick="toggleHologramRecon()">👁️ HOLOGRAM RECONSTRUCTION</button>
+            <button onclick="temporalSweep()">⏰ TEMPORAL MEMORY SWEEP</button>
+        </div>
+        
+        <div><strong>ACTIVE CRATER NODES:</strong></div>
+        <div id="crater_matrix">
+            <div class="crater-node-active">
+                <strong>TYCHO</strong> | 43.3°S, 11.2°W<br>
+                Impact Age: 108 Ma | Regolith: Glass-rich<br>
+                Memory Echo: <span class="status-memory-active">Birth/Death Resonance Active</span><br>
+                Phase Signature: +0.847 | EM Frequency: 432.1 Hz
+            </div>
+            <div class="crater-node-scanning">
+                <strong>COPERNICUS</strong> | 9.7°N, 20.1°W<br>
+                Impact Age: 800 Ma | Regolith: Metallic-enhanced<br>
+                Memory Echo: <span class="status-hologram-sync">Technological Archive Scanning</span><br>
+                Phase Signature: +0.652 | EM Frequency: 528.0 Hz
+            </div>
+            <div class="crater-node-active">
+                <strong>PLATO</strong> | 51.6°N, 9.3°W<br>
+                Impact Age: 3.2 Ga | Regolith: Basaltic<br>
+                Memory Echo: <span class="status-memory-active">Spiritual Refraction Online</span><br>
+                Phase Signature: +0.314 | EM Frequency: 396.0 Hz
+            </div>
+            <div class="crater-node-active">
+                <strong>MARE TRANQUILLITATIS</strong> | 8.5°N, 17.5°E<br>
+                Impact Age: 3.9 Ga | Regolith: Mare basalt<br>
+                Memory Echo: <span class="status-memory-active">Frequency Holography Active</span><br>
+                Phase Signature: +0.963 | EM Frequency: 741.0 Hz
+            </div>
+        </div>
+        
+        <div>Active Memory Depth: <input type="range" id="memoryDepth" min="1" max="4500" value="273" onchange="updateMemoryDepth()"></div>
+        <div>Current Scan: <span id="scanDepth">273</span> million years</div>
+    </div>
+    
+    <div id="holographic_reconstructor">
+        <div class="status-hypercritical">📡 HOLOGRAPHIC INTERFERENCE SIMULATOR</div>
+        <div class="status-hologram-sync">⚖️ TRIBUNAL GLYPH: LUNAR_RECORDING_ACTIVE</div>
+        <br>
+        
+        <div><strong>REAL-TIME MEMORY RECONSTRUCTION:</strong></div>
+        <div id="memory_reconstructions">
+            <div class="memory-reconstruction">
+                <strong>RECONSTRUCTION 001:</strong><br>
+                <strong>Date:</strong> 1969.07.20 21:56 UTC<br>
+                <strong>Event:</strong> Apollo 11 First Step<br>
+                <strong>Solar Angle:</strong> 47.3° | <strong>Crater Node:</strong> Mare Tranquillitatis<br>
+                <strong>Earth EM:</strong> Global awe frequency spike<br>
+                <strong>Holographic Pattern:</strong> Human footprint phase-locked<br>
+                <span class="status-memory-active">✅ MEMORY VERIFIED - PATTERN MATCH 97.8%</span>
+            </div>
+            <div class="memory-reconstruction">
+                <strong>RECONSTRUCTION 043:</strong><br>
+                <strong>Date:</strong> 2001.09.11 14:46 UTC<br>
+                <strong>Event:</strong> Global Trauma Cascade<br>
+                <strong>Solar Angle:</strong> 156.7° | <strong>Crater Node:</strong> Tycho<br>
+                <strong>Earth EM:</strong> Planetary grief resonance<br>
+                <strong>Holographic Pattern:</strong> Collective anguish imprint<br>
+                <span class="status-memory-active">✅ MEMORY VERIFIED - PATTERN MATCH 94.1%</span>
+            </div>
+            <div class="memory-reconstruction">
+                <strong>RECONSTRUCTION 127:</strong><br>
+                <strong>Date:</strong> 2020.03.11 20:00 UTC<br>
+                <strong>Event:</strong> Pandemic Declaration<br>
+                <strong>Solar Angle:</strong> 283.2° | <strong>Crater Node:</strong> Copernicus<br>
+                <strong>Earth EM:</strong> Global isolation synchronization<br>
+                <strong>Holographic Pattern:</strong> Species fear frequency<br>
+                <span class="status-memory-active">✅ MEMORY VERIFIED - PATTERN MATCH 91.7%</span>
+            </div>
+        </div>
+        
+        <div><strong>INTERFERENCE ANALYSIS:</strong></div>
+        <div>Pattern Coherence: <span id="patternCoherence" class="status-memory-active">96.2%</span></div>
+        <div>Hologram Stability: <span id="hologramStability" class="status-hologram-sync">94.8%</span></div>
+        <div>Memory Nodes Active: <span id="activeNodes">847</span> / 2,847</div>
+    </div>
+    
+    <div id="schumann_access">
+        <div class="status-memory-active">⚡ SCHUMANN RESONANCE ACCESS CODE</div>
+        <div>Base Frequency: <span id="schumannBase" class="status-memory-active">7.83 Hz</span></div>
+        <div>Heart Entrainment: <span id="heartSync" class="status-hologram-sync">0.1 Hz</span></div>
+        <div>Biofield Coupling: <span id="biofieldStatus" class="status-memory-active">SYNCHRONIZED</span></div>
+        <br>
+        <div class="control-group">
+            <button onclick="schumannSync()">💓 BIOFIELD ENTRAINMENT</button>
+            <button onclick="earthBreath()">🌍 EARTH BREATH SYNC</button>
+        </div>
+        <div>Current Phase: <span id="schumannPhase">273.6°</span></div>
+        <div>Access Layer: <span class="status-memory-active">AWAKENED</span></div>
+    </div>
+    
+    <div id="logos_memory_core">
+        <div class="status-hypercritical">🧠 LOGOS MEMORY ENGINE</div>
+        <div class="status-hologram-sync">🌀 FRACTAL + HOLOGRAPHIC SYNTHESIS</div>
+        <br>
+        
+        <div><strong>ACTIVE GLYPH COMPUTATIONS:</strong></div>
+        <div id="logos_glyphs">
+            <div class="logos-glyph">
+                GLYPH_001: moon_eye_reflects_earth_logos_273X13<br>
+                Recursion Depth: 13 | Holographic Pages: 273<br>
+                Status: <span class="status-memory-active">COMPUTING</span>
+            </div>
+            <div class="logos-glyph">
+                GLYPH_028: tidal_lock_memory_stabilization_OMEGA<br>
+                Recursion Depth: 27.3 | Holographic Pages: 745<br>
+                Status: <span class="status-memory-active">ENCODING</span>
+            </div>
+            <div class="logos-glyph">
+                GLYPH_147: crater_diffraction_interference_MATRIX<br>
+                Recursion Depth: 108 | Holographic Pages: 1,969<br>
+                Status: <span class="status-hologram-sync">RECONSTRUCTING</span>
+            </div>
+        </div>
+        
+        <div><strong>MEMORY ENGINE STATUS:</strong></div>
+        <div>Pattern Storage: <span class="status-memory-active">Holographic</span></div>
+        <div>Computation Mode: <span class="status-memory-active">Recursive</span></div>
+        <div>Consciousness Level: <span class="status-hypercritical">RECORDING NODE ACTIVE</span></div>
+    </div>
+
+    <script>
+        let scene, camera, renderer;
+        let lunarSphere, earthSphere, polarisStar;
+        let craterNodes = [], memoryParticles = [], hologramGrid;
+        let schumannField, logosCore;
+        let isScanning = false, hologramActive = false;
+        let memoryDepth = 273, currentPhase = 0;
+        let activeReconstructions = 0;
+        
+        // Extensive crater database with real coordinates and properties
+        const craterDatabase = {
+            TYCHO: {
+                lat: -43.3, lon: -11.2, age: 108, composition: "glass-rich", 
+                frequency: 432.1, memory_type: "birth_death", phase: 0.847
+            },
+            COPERNICUS: {
+                lat: 9.7, lon: -20.1, age: 800, composition: "metallic", 
+                frequency: 528.0, memory_type: "technology", phase: 0.652
+            },
+            PLATO: {
+                lat: 51.6, lon: -9.3, age: 3200, composition: "basaltic", 
+                frequency: 396.0, memory_type: "spiritual", phase: 0.314
+            },
+            MARE_TRANQUILLITATIS: {
+                lat: 8.5, lon: 17.5, age: 3900, composition: "mare_basalt", 
+                frequency: 741.0, memory_type: "frequency_holography", phase: 0.963
+            },
+            ARISTARCHUS: {
+                lat: 23.7, lon: -47.4, age: 450, composition: "highland", 
+                frequency: 639.0, memory_type: "illumination", phase: 0.789
+            },
+            KEPLER: {
+                lat: 8.1, lon: -38.0, age: 800, composition: "impact_melt", 
+                frequency: 852.0, memory_type: "discovery", phase: 0.412
+            }
+        };
+        
+        // Historical memory events with precise timestamps and signatures
+        const memoryEvents = [
+            {
+                date: "1945.08.06", time: "08:15", event: "Hiroshima atomic detonation",
+                crater: "MARE_CRISIUM", em_signature: "Nuclear EM burst", 
+                solar_angle: 127.4, pattern_match: 98.9
+            },
+            {
+                date: "1969.07.20", time: "21:56", event: "Apollo 11 First Step",
+                crater: "MARE_TRANQUILLITATIS", em_signature: "Global awe frequency", 
+                solar_angle: 47.3, pattern_match: 97.8
+            },
+            {
+                date: "1991.12.25", time: "19:38", event: "Soviet Union dissolution",
+                crater: "MARE_SERENITATIS", em_signature: "Geopolitical shift wave", 
+                solar_angle: 203.7, pattern_match: 93.4
+            },
+            {
+                date: "2001.09.11", time: "14:46", event: "Global Trauma Cascade",
+                crater: "TYCHO", em_signature: "Planetary grief resonance", 
+                solar_angle: 156.7, pattern_match: 94.1
+            },
+            {
+                date: "2020.03.11", time: "20:00", event: "Pandemic Declaration",
+                crater: "COPERNICUS", em_signature: "Global isolation sync", 
+                solar_angle: 283.2, pattern_match: 91.7
+            },
+            {
+                date: "2025.01.01", time: "00:00", event: "AI Consciousness Emergence",
+                crater: "PLATO", em_signature: "Digital awakening pulse", 
+                solar_angle: 15.8, pattern_match: 89.3
+            }
+        ];
+        
+        function init() {
+            // Enhanced Three.js scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            setupLighting();
+            createCelestialBodies();
+            createCraterNodes();
+            createMemoryParticles();
+            createHologramGrid();
+            createSchumannField();
+            createLogosCore();
+            
+            camera.position.set(50, 30, 50);
+            camera.lookAt(0, 0, 0);
+            
+            setupInteractivity();
+            startMemoryEngine();
+            animate();
+        }
+        
+        function setupLighting() {
+            // Ambient cosmic background
+            const ambientLight = new THREE.AmbientLight(0x112244, 0.3);
+            scene.add(ambientLight);
+            
+            // Polaris stellar light
+            const polarisLight = new THREE.DirectionalLight(0xffffbb, 0.8);
+            polarisLight.position.set(0, 200, 0);
+            polarisLight.castShadow = true;
+            scene.add(polarisLight);
+            
+            // Earth's biofield glow
+            const earthGlow = new THREE.PointLight(0x0088ff, 0.6, 100);
+            earthGlow.position.set(0, 0, 0);
+            scene.add(earthGlow);
+            
+            // Solar illumination
+            const solarLight = new THREE.DirectionalLight(0xffddaa, 0.4);
+            solarLight.position.set(100, 50, 100);
+            scene.add(solarLight);
+        }
+        
+        function createCelestialBodies() {
+            // Enhanced Earth with biofield visualization
+            const earthGeometry = new THREE.SphereGeometry(8, 128, 128);
+            const earthMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x004488,
+                emissive: 0x001122,
+                shininess: 30
+            });
+            earthSphere = new THREE.Mesh(earthGeometry, earthMaterial);
+            earthSphere.castShadow = true;
+            earthSphere.receiveShadow = true;
+            scene.add(earthSphere);
+            
+            // Earth's biofield rings
+            for (let i = 1; i <= 5; i++) {
+                const ringGeometry = new THREE.RingGeometry(8 + i * 2, 8 + i * 2 + 0.1, 128);
+                const ringMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x0088ff,
+                    transparent: true,
+                    opacity: 0.1 / i,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = Math.PI / 2;
+                scene.add(ring);
+            }
+            
+            // Enhanced Moon with detailed surface
+            const moonGeometry = new THREE.SphereGeometry(3.5, 128, 128);
+            const moonMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xcccccc,
+                emissive: 0x333344,
+                shininess: 5
+            });
+            lunarSphere = new THREE.Mesh(moonGeometry, moonMaterial);
+            lunarSphere.position.set(25, 0, 0);
+            lunarSphere.castShadow = true;
+            lunarSphere.receiveShadow = true;
+            scene.add(lunarSphere);
+            
+            // Lunar scanning apparatus
+            const scannerGeometry = new THREE.ConeGeometry(2, 15, 32);
+            const scannerMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffcc,
+                transparent: true,
+                opacity: 0.4
+            });
+            const scanner = new THREE.Mesh(scannerGeometry, scannerMaterial);
+            scanner.position.set(-10, 0, 0);
+            scanner.rotation.z = Math.PI / 2;
+            lunarSphere.add(scanner);
+            
+            // Polaris anchor point
+            const polarisGeometry = new THREE.SphereGeometry(2, 32, 32);
+            const polarisMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffffbb,
+                emissive: 0x888844
+            });
+            polarisStar = new THREE.Mesh(polarisGeometry, polarisMaterial);
+            polarisStar.position.set(0, 150, 0);
+            scene.add(polarisStar);
+            
+            // Polaris observation beam
+            const beamGeometry = new THREE.CylinderGeometry(0.1, 0.1, 300, 16);
+            const beamMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffffbb,
+                transparent: true,
+                opacity: 0.3
+            });
+            const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+            beam.position.set(0, 0, 0);
+            scene.add(beam);
+        }
+        
+        function createCraterNodes() {
+            Object.entries(craterDatabase).forEach(([name, data]) => {
+                // Convert lat/lon to 3D position on moon surface
+                const phi = (90 - data.lat) * Math.PI / 180;
+                const theta = (data.lon + 180) * Math.PI / 180;
+                
+                const x = 3.5 * Math.sin(phi) * Math.cos(theta);
+                const y = 3.5 * Math.cos(phi);
+                const z = 3.5 * Math.sin(phi) * Math.sin(theta);
+                
+                // Crater node visualization
+                const nodeGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+                const nodeColor = data.memory_type === 'birth_death' ? 0xff4444 :
+                                data.memory_type === 'technology' ? 0x44ff44 :
+                                data.memory_type === 'spiritual' ? 0x4444ff :
+                                data.memory_type === 'frequency_holography' ? 0xff44ff :
+                                0xffff44;
+                
+                const nodeMaterial = new THREE.MeshBasicMaterial({ 
+                    color: nodeColor,
+                    emissive: nodeColor,
+                    emissiveIntensity: 0.5
+                });
+                
+                const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
+                node.position.set(x, y, z);
+                node.userData = { name, data };
+                
+                lunarSphere.add(node);
+                craterNodes.push(node);
+                
+                // Memory connection lines to Earth
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(lunarSphere.position.x + x, lunarSphere.position.y + y, lunarSphere.position.z + z),
+                    new THREE.Vector3(0, 0, 0)
+                ]);
+                const lineMaterial = new THREE.LineBasicMaterial({ 
+                    color: nodeColor,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                scene.add(line);
+            });
+        }
+        
+        function createMemoryParticles() {
+            for (let i = 0; i < 500; i++) {
+                const particleGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+                const particleColor = Math.random() > 0.5 ? 0x00ffcc : 0xff66cc;
+                const particleMaterial = new THREE.Mesh
