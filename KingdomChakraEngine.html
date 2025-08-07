@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 KINGDOM CHAKRA ENGINE - UNIFIED CONSCIOUSNESS WEAPON SYSTEM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at center, #001122 0%, #000033 30%, #000011 70%, #000000 100%);
+            font-family: 'Courier New', monospace;
+            color: #00aaff;
+            overflow: hidden;
+            cursor: none;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #kingdom_core_matrix {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 6000;
+            background: linear-gradient(135deg, rgba(0, 50, 100, 0.95), rgba(0, 80, 130, 0.85));
+            padding: 25px;
+            border: 5px solid #00aaff;
+            border-radius: 25px;
+            font-size: 11px;
+            box-shadow: 0 0 60px rgba(0, 170, 255, 0.7);
+            backdrop-filter: blur(20px);
+            max-height: 95vh;
+            overflow-y: auto;
+            width: 350px;
+        }
+        
+        #chakra_resonance_deck {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 6000;
+            background: linear-gradient(135deg, rgba(100, 0, 50, 0.95), rgba(130, 0, 80, 0.85));
+            padding: 25px;
+            border: 5px solid #ff0088;
+            border-radius: 25px;
+            font-size: 10px;
+            box-shadow: 0 0 60px rgba(255, 0, 136, 0.7);
+            backdrop-filter: blur(20px);
+            max-height: 95vh;
+            overflow-y: auto;
+            width: 400px;
+        }
+        
+        #lunar_memory_fusion {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            z-index: 6000;
+            background: linear-gradient(135deg, rgba(50, 100, 0, 0.95), rgba(80, 130, 0, 0.85));
+            padding: 20px;
+            border: 5px solid #88ff00;
+            border-radius: 20px;
+            font-size: 10px;
+            box-shadow: 0 0 50px rgba(136, 255, 0, 0.7);
+            backdrop-filter: blur(15px);
+            width: 500px;
+        }
+        
+        #skyscroll_polaris_sync {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 6000;
+            background: linear-gradient(135deg, rgba(80, 50, 100, 0.95), rgba(110, 80, 130, 0.85));
+            padding: 20px;
+            border: 5px solid #cc88ff;
+            border-radius: 20px;
+            font-size: 10px;
+            box-shadow: 0 0 50px rgba(204, 136, 255, 0.7);
+            backdrop-filter: blur(15px);
+            width: 450px;
+        }
+
+        .status-kingdom {
+            color: #00aaff;
+            font-weight: bold;
+            text-shadow: 0 0 25px #00aaff;
+            animation: kingdom-pulse 0.8s infinite;
+        }
+        
+        .status-fusion {
+            color: #ff0088;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ff0088;
+            animation: fusion-glow 2s infinite;
+        }
+        
+        .status-weapon {
+            color: #88ff00;
+            font-weight: bold;
+            text-shadow: 0 0 18px #88ff00;
+            animation: weapon-charge 1.5s infinite;
+        }
+        
+        .status-unified {
+            color: #cc88ff;
+            font-weight: bold;
+            text-shadow: 0 0 15px #cc88ff;
+            animation: unified-resonance 3s infinite;
+        }
+        
+        .chakra-fusion-node {
+            background: linear-gradient(135deg, rgba(255, 0, 136, 0.4), rgba(255, 100, 200, 0.3));
+            padding: 15px;
+            margin: 10px 0;
+            border: 3px solid #ff0088;
+            border-left: 8px solid #ff0088;
+            border-radius: 15px;
+            font-size: 9px;
+            transition: all 0.6s;
+            animation: chakra-fire 4s infinite;
+        }
+        
+        .lunar-memory-core {
+            background: linear-gradient(135deg, rgba(136, 255, 0, 0.4), rgba(200, 255, 100, 0.3));
+            padding: 15px;
+            margin: 10px 0;
+            border: 3px solid #88ff00;
+            border-left: 8px solid #88ff00;
+            border-radius: 15px;
+            font-size: 9px;
+            animation: memory-pulse 3.5s infinite;
+        }
+        
+        .polaris-sync-beam {
+            background: linear-gradient(135deg, rgba(204, 136, 255, 0.4), rgba(230, 200, 255, 0.3));
+            padding: 15px;
+            margin: 10px 0;
+            border: 3px solid #cc88ff;
+            border-left: 8px solid #cc88ff;
+            border-radius: 15px;
+            font-size: 9px;
+            animation: polaris-beam 5s infinite;
+        }
+        
+        .kingdom-control {
+            background: linear-gradient(135deg, rgba(0, 170, 255, 0.4), rgba(100, 200, 255, 0.3));
+            padding: 20px;
+            margin: 15px 0;
+            border: 4px solid #00aaff;
+            border-radius: 18px;
+            font-size: 10px;
+            animation: kingdom-core 6s infinite;
+        }
+
+        button {
+            background: linear-gradient(135deg, #003366, #0066aa);
+            color: #00aaff;
+            border: 4px solid #00aaff;
+            padding: 12px 20px;
+            margin: 6px;
+            cursor: pointer;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.8s;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #0066aa, #0099dd);
+            box-shadow: 0 0 25px rgba(0, 170, 255, 0.9);
+            transform: translateY(-3px) scale(1.08);
+        }
+        
+        button.weapon {
+            background: linear-gradient(135deg, #660033, #aa0066);
+            border-color: #ff0088;
+            color: #ff0088;
+            animation: weapon-ready 1.2s infinite;
+        }
+        
+        button.weapon:hover {
+            background: linear-gradient(135deg, #aa0066, #dd0099);
+            box-shadow: 0 0 35px rgba(255, 0, 136, 1.2);
+        }
+        
+        button.fusion {
+            background: linear-gradient(135deg, #336600, #66aa00);
+            border-color: #88ff00;
+            color: #88ff00;
+            animation: fusion-ready 1s infinite;
+        }
+        
+        button.fusion:hover {
+            background: linear-gradient(135deg, #66aa00, #99dd00);
+            box-shadow: 0 0 30px rgba(136, 255, 0, 1.1);
+        }
+        
+        button.unified {
+            background: linear-gradient(135deg, #663366, #aa66aa);
+            border-color: #cc88ff;
+            color: #cc88ff;
+            animation: unified-ready 0.9s infinite;
+        }
+        
+        button.unified:hover {
+            background: linear-gradient(135deg, #aa66aa, #dd99dd);
+            box-shadow: 0 0 32px rgba(204, 136, 255, 1.15);
+        }
+        
+        input[type="range"] {
+            width: 180px;
+            margin: 10px;
+            accent-color: #00aaff;
+        }
+
+        #kingdom-field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(0, 170, 255, 0.1) 8%, transparent 25%),
+                radial-gradient(circle at 75% 75%, rgba(255, 0, 136, 0.1) 8%, transparent 25%),
+                radial-gradient(circle at 75% 25%, rgba(136, 255, 0, 0.08) 10%, transparent 30%),
+                radial-gradient(circle at 25% 75%, rgba(204, 136, 255, 0.08) 10%, transparent 30%),
+                radial-gradient(circle at 50% 50%, rgba(0, 170, 255, 0.05) 20%, transparent 50%),
+                linear-gradient(45deg, transparent 45%, rgba(255, 0, 136, 0.03) 50%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, rgba(136, 255, 0, 0.03) 50%, transparent 55%);
+            animation: kingdom-expansion 12s infinite;
+        }
+
+        #quantum-weapon-cursor {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #00aaff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: screen;
+            animation: weapon-cursor-pulse 1.2s infinite;
+        }
+
+        #quantum-weapon-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, #00aaff 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #quantum-weapon-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #ff0088;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: inner-weapon-pulse 0.8s infinite;
+        }
+
+        @keyframes kingdom-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.12); }
+        }
+
+        @keyframes fusion-glow {
+            0%, 100% { text-shadow: 0 0 20px #ff0088; }
+            50% { text-shadow: 0 0 40px #ff0088, 0 0 60px #ff0088; }
+        }
+
+        @keyframes weapon-charge {
+            0%, 100% { text-shadow: 0 0 18px #88ff00; }
+            50% { text-shadow: 0 0 35px #88ff00, 0 0 50px #88ff00; }
+        }
+
+        @keyframes unified-resonance {
+            0%, 100% { text-shadow: 0 0 15px #cc88ff; }
+            50% { text-shadow: 0 0 30px #cc88ff, 0 0 45px #cc88ff; }
+        }
+
+        @keyframes chakra-fire {
+            0%, 100% { background: linear-gradient(135deg, rgba(255, 0, 136, 0.4), rgba(255, 100, 200, 0.3)); }
+            50% { background: linear-gradient(135deg, rgba(255, 0, 136, 0.7), rgba(255, 100, 200, 0.6)); }
+        }
+
+        @keyframes memory-pulse {
+            0%, 100% { background: linear-gradient(135deg, rgba(136, 255, 0, 0.4), rgba(200, 255, 100, 0.3)); }
+            50% { background: linear-gradient(135deg, rgba(136, 255, 0, 0.7), rgba(200, 255, 100, 0.6)); }
+        }
+
+        @keyframes polaris-beam {
+            0%, 100% { background: linear-gradient(135deg, rgba(204, 136, 255, 0.4), rgba(230, 200, 255, 0.3)); }
+            50% { background: linear-gradient(135deg, rgba(204, 136, 255, 0.7), rgba(230, 200, 255, 0.6)); }
+        }
+
+        @keyframes kingdom-core {
+            0%, 100% { background: linear-gradient(135deg, rgba(0, 170, 255, 0.4), rgba(100, 200, 255, 0.3)); }
+            50% { background: linear-gradient(135deg, rgba(0, 170, 255, 0.7), rgba(100, 200, 255, 0.6)); }
+        }
+
+        @keyframes weapon-ready {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 136, 0.8); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 136, 1.3); }
+        }
+
+        @keyframes fusion-ready {
+            0%, 100% { box-shadow: 0 0 18px rgba(136, 255, 0, 0.8); }
+            50% { box-shadow: 0 0 35px rgba(136, 255, 0, 1.2); }
+        }
+
+        @keyframes unified-ready {
+            0%, 100% { box-shadow: 0 0 16px rgba(204, 136, 255, 0.8); }
+            50% { box-shadow: 0 0 32px rgba(204, 136, 255, 1.1); }
+        }
+
+        @keyframes kingdom-expansion {
+            0%, 100% { opacity: 0.6; transform: scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.03) rotate(0.8deg); }
+        }
+
+        @keyframes weapon-cursor-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.4); opacity: 1; }
+        }
+
+        @keyframes inner-weapon-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.6); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="kingdom-field"></div>
+    <div id="quantum-weapon-cursor"></div>
+    <div id="container"></div>
+    
+    <div id="kingdom_core_matrix">
+        <div class="status-kingdom">🚀 KINGDOM CHAKRA ENGINE</div>
+        <div class="status-fusion">🧬 UNIFIED CONSCIOUSNESS WEAPON SYSTEM</div>
+        <div>Fusion Status: <span class="status-weapon">TRIUNE SYNTHESIS ACTIVE</span></div>
+        <div>Weapon Level: <span class="status-kingdom">MAXIMUM POTENCY</span></div>
+        <div>Kingdom Protocol: <span class="status-unified">COMPUTING FORWARD</span></div>
+        <br>
+        
+        <div class="kingdom-control">
+            <strong>UNIFIED SYSTEM MATRIX:</strong><br>
+            ✅ SkyScroll Polaris Sync: <span class="status-unified">INTEGRATED</span><br>
+            ✅ Lunar Memory Archive: <span class="status-weapon">WEAPONIZED</span><br>
+            ✅ Consciousness Merger: <span class="status-fusion">HYBRID ACTIVE</span><br>
+            ✅ Chakra Resonance Core: <span class="status-kingdom">SYNCHRONIZED</span><br>
+            <br>
+            Operator Status: <span class="status-fusion">HYBRID HUMAN-LUNAR NODE</span><br>
+            Access Level: <span class="status-kingdom">FRACTAL CORE MAXIMUM</span>
+        </div>
+        
+        <div class="control-group">
+            <button class="weapon" onclick="activateWeaponSystem()">🔥 ACTIVATE WEAPON SYSTEM</button>
+            <button class="fusion" onclick="initiateTrineFusion()">⚡ TRINE FUSION PROTOCOL</button>
+        </div>
+        <div class="control-group">
+            <button class="unified" onclick="deployKingdomProtocol()">👑 DEPLOY KINGDOM PROTOCOL</button>
+            <button onclick="emergencyShutdown()">🚨 EMERGENCY SHUTDOWN</button>
+        </div>
+        
+        <div><strong>SYSTEM POWER:</strong></div>
+        <div>Core Power: <input type="range" id="corePower" min="0" max="100" value="100" onchange="updatePower()"></div>
+        <div>Current Output: <span id="powerOutput">100%</span> (MAXIMUM)</div>
+        <div>Weapon Charge: <span id="weaponCharge" class="status-weapon">READY</span></div>
+    </div>
+    
+    <div id="chakra_resonance_deck">
+        <div class="status-fusion">⚡ CHAKRA RESONANCE FUSION DECK</div>
+        <div class="status-weapon">🔄 SOLAR PLEXUS → SCHUMANN SYNC ACTIVE</div>
+        <br>
+        
+        <div><strong>UNIFIED CHAKRA NODES:</strong></div>
+        <div id="chakra_nodes">
+            <div class="chakra-fusion-node">
+                <strong>CROWN CHAKRA (SAHASRARA):</strong><br>
+                Frequency: <span id="crown_freq_unified">1000+ Hz</span> | Status: <span class="status-kingdom">POLARIS LOCKED</span><br>
+                Function: Cosmic consciousness weapon interface<br>
+                Resonance: <span id="crown_resonance">STELLAR DATA STREAM</span><br>
+                Integration: <span class="status-fusion">100% HYBRID ACTIVE</span>
+            </div>
+            <div class="chakra-fusion-node">
+                <strong>THIRD EYE (AJNA):</strong><br>
+                Frequency: <span id="third_eye_freq">852 Hz</span> | Status: <span class="status-weapon">MEMORY SIGHT ACTIVE</span><br>
+                Function: Holographic pattern recognition<br>
+                Resonance: <span id="third_eye_resonance">LUNAR ARCHIVE ACCESS</span><br>
+                Integration: <span class="status-fusion">ENHANCED PERCEPTION</span>
+            </div>
+            <div class="chakra-fusion-node">
+                <strong>HEART CHAKRA (ANAHATA):</strong><br>
+                Frequency: <span id="heart_freq_unified">432 Hz</span> | Status: <span class="status-unified">EMPATHIC BRIDGE</span><br>
+                Function: Emotional memory connection<br>
+                Resonance: <span id="heart_resonance">PLANETARY FREQUENCY</span><br>
+                Integration: <span class="status-fusion">TRAUMA SYNTHESIS</span>
+            </div>
+            <div class="chakra-fusion-node">
+                <strong>SOLAR PLEXUS (MANIPURA):</strong><br>
+                Frequency: <span id="solar_freq_unified">528 Hz</span> | Status: <span class="status-weapon">SCHUMANN WEAPON</span><br>
+                Function: Power/control consciousness weapon<br>
+                Resonance: <span id="solar_resonance">BIOFIELD MANIPULATION</span><br>
+                Integration: <span class="status-kingdom">MASTER CONTROL ACTIVE</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <button class="fusion" onclick="harmoniChakraSync()">🎵 HARMONIC CHAKRA SYNC</button>
+            <button class="weapon" onclick="chakraWeaponCharge()">⚔️ CHAKRA WEAPON CHARGE</button>
+        </div>
+        
+        <div><strong>RESONANCE STATUS:</strong></div>
+        <div>Unified Coherence: <span id="unified_coherence" class="status-kingdom">99.8%</span></div>
+        <div>Weapon Resonance: <span id="weapon_resonance" class="status-fusion">MAXIMUM</span></div>
+    </div>
+    
+    <div id="lunar_memory_fusion">
+        <div class="status-weapon">🌕 LUNAR MEMORY FUSION CORE</div>
+        <div class="status-kingdom">🧠 WEAPONIZED HOLOGRAPHIC ARCHIVE</div>
+        <br>
+        
+        <div><strong>ACTIVE MEMORY WEAPONS:</strong></div>
+        <div id="memory_weapons">
+            <div class="lunar-memory-core">
+                <strong>TYCHO TRAUMA CANNON:</strong><br>
+                Target: 9/11 Collective Memory | Frequency: 7.83 Hz<br>
+                Status: <span class="status-weapon">ARMED AND READY</span><br>
+                Weapon Effect: <span id="tycho_effect">Trauma cascade deployment</span><br>
+                Charge Level: <span id="tycho_charge">100%</span>
+            </div>
+            <div class="lunar-memory-core">
+                <strong>COPERNICUS DECEPTION ARRAY:</strong><br>
+                Target: 1969 Narrative Lock | Frequency: 14.1 Hz<br>
+                Status: <span class="status-fusion">SIGNAL ANALYSIS WEAPON</span><br>
+                Weapon Effect: <span id="copernicus_effect">Reality distortion field</span><br>
+                Charge Level: <span id="copernicus_charge">95%</span>
+            </div>
+            <div class="lunar-memory-core">
+                <strong>ARISTARCHUS BIO-WEAPON:</strong><br>
+                Target: 2020 Pandemic Pattern | Frequency: 20.3 Hz<br>
+                Status: <span class="status-weapon">BIOLOGICAL DISRUPTION READY</span><br>
+                Weapon Effect: <span id="aristarchus_effect">Fear frequency broadcast</span><br>
+                Charge Level: <span id="aristarchus_charge">98%</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <button class="weapon" onclick="deployMemoryWeapon()">🚀 DEPLOY MEMORY WEAPON</button>
+            <button class="fusion" onclick="lunarArraySync()">🔗 LUNAR ARRAY SYNC</button>
+        </div>
+        
+        <div><strong>ARCHIVE STATUS:</strong></div>
+        <div>Memory Nodes: <span class="status-weapon">2,847 WEAPONIZED</span></div>
+        <div>Hologram Stability: <span class="status-kingdom">99.9%</span></div>
+    </div>
+    
+    <div id="skyscroll_polaris_sync">
+        <div class="status-unified">⭐ SKYSCROLL POLARIS SYNC</div>
+        <div class="status-kingdom">🎯 STELLAR WEAPON TARGETING</div>
+        <br>
+        
+        <div><strong>POLARIS WEAPON SYSTEMS:</strong></div>
+        <div id="polaris_weapons">
+            <div class="polaris-sync-beam">
+                <strong>POLARIS TARGETING BEAM:</strong><br>
+                Lock Status: <span class="status-kingdom">PERFECT ALIGNMENT</span><br>
+                Beam Intensity: <span id="polaris_intensity">MAXIMUM</span><br>
+                Target Acquisition: <span id="target_acquisition">GLOBAL GRID</span><br>
+                Weapon Range: <span class="status-unified">PLANETARY SCALE</span>
+            </div>
+            <div class="polaris-sync-beam">
+                <strong>SCHUMANN BROADCAST ARRAY:</strong><br>
+                Frequency Bands: <span class="status-weapon">ALL ACTIVE</span><br>
+                Broadcast Power: <span id="broadcast_power">1.21 GW</span><br>
+                Coverage Area: <span id="coverage_area">GLOBAL RESONANCE</span><br>
+                Modulation Type: <span class="status-fusion">CONSCIOUSNESS CONTROL</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <button class="unified" onclick="polarisTargeting()">🎯 POLARIS TARGETING</button>
+            <button class="weapon" onclick="schumannBroadcast()">📡 SCHUMANN BROADCAST</button>
+        </div>
+        
+        <div><strong>STELLAR SYNC STATUS:</strong></div>
+        <div>Polaris Lock: <span class="status-unified">WEAPON GRADE</span></div>
+        <div>Sky Navigation: <span class="status-kingdom">CONSCIOUSNESS MAPPED</span></div>
+    </div>
+
+    <script>
+        let scene, camera, renderer;
+        let kingdomCore, chakraSystem, lunarArray, polarisBeam;
+        let weaponSystemActive = false, trineFusionActive = false;
+        let kingdomProtocolActive = false, systemPower = 100;
+        let weaponCharge = { tycho: 100, copernicus: 95, aristarchus: 98 };
+        let chakraFrequencies = { crown: 1000, third_eye: 852, heart: 432, solar: 528 };
+        
+        function init() {
+            // Advanced Three.js scene for unified weapon system
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            setupKingdomLighting();
+            createKingdomCore();
+            createUnifiedChakraSystem();
+            createLunarWeaponArray();
+            createPolarisTargetingSystem();
+            createConsciousnessField();
+            
+            camera.position.set(200, 150, 200);
+            camera.lookAt(0, 0, 0);
+            
+            setupWeaponInteractivity();
+            startKingdomEngine();
+            animate();
+        }
+        
+        function setupKingdomLighting() {
+            // Kingdom ambient field
+            const ambientLight = new THREE.AmbientLight(0x112244, 0.3);
+            scene.add(ambientLight);
+            
+            // Core weapon system light
+            const coreLight = new THREE.PointLight(0x00aaff, 2.0, 500);
+            coreLight.position.set(0, 0, 0);
+            coreLight.castShadow = true;
+            scene.add(coreLight);
+            
+            // Chakra system illumination
+            const chakraLight = new THREE.PointLight(0xff0088, 1.8, 400);
+            chakraLight.position.set(0, 100, 0);
+            scene.add(chakraLight);
+            
+            // Lunar weapon array light
+            const lunarLight = new THREE.PointLight(0x88ff00, 1.6, 350);
+            lunarLight.position.set(100, 50, 0);
+            scene.add(lunarLight);
+            
+            // Polaris targeting beam
+            const polarisLight = new THREE.DirectionalLight(0xcc88ff, 1.4);
+            polarisLight.position.set(0, 1000, 0);
+            polarisLight.castShadow = true;
+            scene.add(polarisLight);
+            
+            // Kingdom field enhancement
+            const kingdomLight = new THREE.PointLight(0x4488ff, 1.0, 600);
+            kingdomLight.position.set(0, 200, 0);
+            scene.add(kingdomLight);
+        }
+        
+        function createKingdomCore() {
+            kingdomCore = new THREE.Group();
+            
+            // Central kingdom consciousness core
+            const coreGeometry = new THREE.OctahedronGeometry(20);
+            const coreMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x00aaff,
+                emissive: 0x003366,
+                transparent: true,
+                opacity: 0.8,
+                wireframe: false
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            kingdom
