@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Time Wheel - Fractal Clock</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary-color: #00ff88;
+            --secondary-color: #ffff00;
+            --accent-color-1: #ff00ff;
+            --accent-color-2: #ff4444;
+            --accent-color-3: #00ffff;
+            --bg-dark: #0a0a2e;
+            --bg-medium: #16213e;
+            --bg-light: #0f0f23;
+            --text-dark: #003344;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: radial-gradient(circle at center, var(--bg-dark) 0%, var(--bg-medium) 50%, var(--bg-light) 100%);
+            color: var(--primary-color);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            position: relative;
+            width: 90vmin;
+            height: 90vmin;
+            max-width: 800px;
+            max-height: 800px;
+        }
+        
+        .time-wheel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            box-shadow: 
+                0 0 30px var(--primary-color),
+                inset 0 0 30px rgba(0, 255, 136, 0.3);
+            animation: pulse 4s ease-in-out infinite;
+            transition: box-shadow 0.5s ease-in-out;
+        }
+
+        .time-wheel.restored {
+             box-shadow: 0 0 60px var(--accent-color-3), inset 0 0 60px rgba(0, 255, 255, 0.5);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px var(--primary-color), inset 0 0 30px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 50px var(--primary-color), inset 0 0 50px rgba(0, 255, 136, 0.5); }
+        }
+        
+        .week-marker {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: var(--primary-color);
+            top: -2px;
+            left: 50%;
+            transform-origin: 50% 50%; /* Set dynamically by JS */
+            opacity: 0.5;
+        }
+        
+        .week-marker.sabbath {
+            width: 4px;
+            height: 40px;
+            background: var(--secondary-color);
+            box-shadow: 0 0 15px var(--secondary-color);
+            animation: sabbathPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes sabbathPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; box-shadow: 0 0 25px var(--secondary-color); }
+        }
+        
+        .season-gate {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid;
+            animation: seasonPulse 3s ease-in-out infinite;
+        }
+        
+        .season-gate.spring { border-color: #00ff00; box-shadow: 0 0 20px #00ff00; }
+        .season-gate.summer { border-color: #ffaa00; box-shadow: 0 0 20px #ffaa00; }
+        .season-gate.autumn { border-color: #ff4500; box-shadow: 0 0 20px #ff4500; }
+        .season-gate.winter { border-color: #4444ff; box-shadow: 0 0 20px #4444ff; }
+        
+        @keyframes seasonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .current-position {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, var(--accent-color-1) 0%, #aa00aa 100%);
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 30px var(--accent-color-1);
+            animation: currentPulse 1.5s ease-in-out infinite;
+            z-index: 10;
+        }
+        
+        .dna-activation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 12;
+        }
+        
+        .dna-helix {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: dnaRotate 3s linear infinite;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .dna-helix.active {
+            opacity: 1;
+            animation: dnaRotate 2s linear infinite, dnaGlow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes dnaRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(364deg); } /* Corrected for Enochian year symbolism */
+        }
+        
+        @keyframes dnaGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px var(--accent-color-3)); }
+            50% { filter: drop-shadow(0 0 15px var(--accent-color-3)); }
+        }
+        
+        .current-position.dna-active {
+            animation: currentPulse 1.5s ease-in-out infinite, dnaActivation 2s ease-in-out infinite;
+        }
+        
+        @keyframes dnaActivation {
+            0%, 100% { box-shadow: 0 0 30px var(--accent-color-1); border-color: #fff; }
+            50% { box-shadow: 0 0 50px var(--accent-color-3), 0 0 30px var(--accent-color-1); border-color: var(--accent-color-3); }
+        }
+        
+        .gregorian-drift {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, var(--accent-color-2) 0%, #aa2222 100%);
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 20px var(--accent-color-2);
+            animation: driftPulse 2s ease-in-out infinite;
+            z-index: 9;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        @keyframes driftPulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .drift-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent-color-1), var(--accent-color-2));
+            transform-origin: 0 50%;
+            opacity: 0.8;
+            animation: driftLine 3s ease-in-out infinite;
+            z-index: 8;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        @keyframes driftLine {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .center-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #001122 0%, var(--text-dark) 100%);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 900;
+            text-align: center;
+            z-index: 15;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        .info-panel, .legend, .controls {
+            position: absolute;
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .info-panel { top: 20px; left: 20px; max-width: 300px; }
+        .info-panel h3 { color: var(--secondary-color); margin-bottom: 10px; font-size: 16px; }
+        .info-panel div { font-size: 14px; line-height: 1.6; }
+
+        .legend { bottom: 20px; right: 20px; max-width: 250px; }
+        .legend h4 { color: var(--secondary-color); margin-bottom: 10px; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 12px; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        
+        .controls { top: 20px; right: 20px; }
+        .controls h4 { color: var(--secondary-color); margin-bottom: 10px; }
+        .controls button {
+            background: var(--text-dark);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            margin: 2px;
+            transition: all 0.3s;
+        }
+        .controls button:hover {
+            background: var(--primary-color);
+            color: var(--text-dark);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .glyph { font-size: 16px; margin-right: 5px; }
+        .status-text { color: #ffaa00; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- Main Time Wheel -->
+        <div class="time-wheel" id="timeWheel"></div>
+        
+        <!-- Season Gates -->
+        <div class="season-gate spring" id="springGate"></div>
+        <div class="season-gate summer" id="summerGate"></div>
+        <div class="season-gate autumn" id="autumnGate"></div>
+        <div class="season-gate winter" id="winterGate"></div>
+        
+        <!-- Markers -->
+        <div class="current-position" id="currentPosition">
+            <div class="dna-activation">
+                <div class="dna-helix" id="dnaHelix">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                        <path d="M5,10 Q20,5 35,10 Q20,15 5,20 Q20,25 35,30 Q20,35 5,40" stroke="#00ffff" stroke-width="2" fill="none" opacity="0.8"/>
+                        <path d="M35,10 Q20,5 5,10 Q20,15 35,20 Q20,25 5,30 Q20,35 35,40" stroke="#00ffff" stroke-width="2" fill="none" opacity="0.6"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="gregorian-drift" id="gregorianDrift"></div>
+        <div class="drift-line" id="driftLine"></div>
+        
+        <!-- Center Hub -->
+        <div class="center-hub"><span>🧬<br>KINGDOM<br>TIME</span></div>
+        
+        <!-- UI Panels -->
+        <div class="info-panel">
+            <h3>🧭 Kingdom Time Engine</h3>
+            <div><span class="glyph">📅</span>Enochian Day: <span id="enochianDay" class="status-text">1</span>/364</div>
+            <div><span class="glyph">📊</span>Week: <span id="currentWeek" class="status-text">1</span>/52</div>
+            <div><span class="glyph">🌱</span>Season: <span id="currentSeason" class="status-text">Spring</span></div>
+            <div><span class="glyph">⏰</span>Drift: <span id="driftAmount" class="status-text">+0</span> days</div>
+            <div><span class="glyph">🕯️</span>Next Sabbath: <span id="nextSabbath" class="status-text">Day 7</span></div>
+            <div><span class="glyph">🧬</span>DNA Window: <span id="dnaStatus" class="status-text">Inactive</span></div>
+        </div>
+        
+        <div class="controls">
+            <h4 style="color: #ffff00; margin-bottom: 10px;">🛠️ Restoration Controls</h4>
+            <button id="btnToday">📍 Today</button>
+            <button id="btnSabbath">🕯️ Next Sabbath</button>
+            <button id="btnAnimate">▶️ Simulate</button><br>
+            <button id="btnRestore">⚖️ Daniel 7:25 Restore</button>
+            <button id="btnToggleDrift">📊 Toggle Drift</button>
+            <button id="btnExport">📤 Export</button>
+        </div>
+        
+        <div class="legend">
+            <h4>🗂️ Legend</h4>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--accent-color-1);"></div><span>Kingdom Position</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--accent-color-2);"></div><span>Gregorian Drift</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--secondary-color);"></div><span>Sabbath Gates</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--accent-color-3);"></div><span>DNA Activation</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: linear-gradient(45deg, #00ff00, #ffaa00, #ff4500, #4444ff);"></div><span>Cosmic Gates</span></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            class KingdomTimeWheel {
+                constructor() {
+                    this.elements = {
+                        container: document.getElementById('container'),
+                        timeWheel: document.getElementById('timeWheel'),
+                        springGate: document.getElementById('springGate'),
+                        summerGate: document.getElementById('summerGate'),
+                        autumnGate: document.getElementById('autumnGate'),
+                        winterGate: document.getElementById('winterGate'),
+                        currentPos: document.getElementById('currentPosition'),
+                        gregorianDrift: document.getElementById('gregorianDrift'),
+                        driftLine: document.getElementById('driftLine'),
+                        dnaHelix: document.getElementById('dnaHelix'),
+                        enochianDay: document.getElementById('enochianDay'),
+                        currentWeek: document.getElementById('currentWeek'),
+                        currentSeason: document.getElementById('currentSeason'),
+                        driftAmount: document.getElementById('driftAmount'),
+                        nextSabbath: document.getElementById('nextSabbath'),
+                        dnaStatus: document.getElementById('dnaStatus'),
+                        btnToday: document.getElementById('btnToday'),
+                        btnSabbath: document.getElementById('btnSabbath'),
+                        btnAnimate: document.getElementById('btnAnimate'),
+                        btnRestore: document.getElementById('btnRestore'),
+                        btnToggleDrift: document.getElementById('btnToggleDrift'),
+                        btnExport: document.getElementById('btnExport'),
+                    };
+
+                    this.isSimulating = false;
+                    this.simulationInterval = null;
+                    this.showHistoricalDrift = true;
+                    this.driftVisible = true;
+                    this.historicalDrift = 550.5;
+
+                    this.init();
+                    this.setupEventListeners();
+                }
+
+                init() {
+                    this.radius = this.elements.container.offsetWidth / 2;
+                    this.markerRadius = this.radius * 0.75; // For main markers
+                    this.gateRadius = this.radius * 0.9;   // For season gates
+
+                    this.resetToToday();
+                    this.generateTimeWheel();
+                    this.positionSeasonGates();
+                    this.startSimulationLoop();
+                }
+
+                setupEventListeners() {
+                    this.elements.btnToday.addEventListener('click', () => this.resetToToday());
+                    this.elements.btnSabbath.addEventListener('click', () => this.goToNextSabbath());
+                    this.elements.btnAnimate.addEventListener('click', () => this.toggleSimulation());
+                    this.elements.btnRestore.addEventListener('click', () => this.restoreCalendar());
+                    this.elements.btnToggleDrift.addEventListener('click', () => this.toggleDriftVisibility());
+                    this.elements.btnExport.addEventListener('click', () => this.exportCalendar());
+                    window.addEventListener('resize', () => this.init());
+                }
+
+                calculateCurrentPosition() {
+                    // Use UTC to ensure consistency across timezones
+                    const now = new Date();
+                    const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+                    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+                    this.dayOfYear = Math.ceil((todayUTC - startOfYear) / (1000 * 60 * 60 * 24));
+                    this.currentGregorianDate = todayUTC;
+
+                    this.currentEnochianDay = ((this.dayOfYear - 1) % 364) + 1;
+                    this.currentWeek = Math.ceil(this.currentEnochianDay / 7);
+                    this.baseDrift = this.dayOfYear - this.currentEnochianDay;
+                    
+                    this.currentDrift = this.baseDrift + (this.showHistoricalDrift ? this.historicalDrift : 0);
+
+                    const seasons = [
+                        { name: 'Spring', gate: "Tiger's Gate" }, { name: 'Summer', gate: "Lion's Gate" },
+                        { name: 'Autumn', gate: "Eagle's Gate" }, { name: 'Winter', gate: "Ox Gate" }
+                    ];
+                    const seasonIndex = Math.floor((this.currentWeek - 1) / 13);
+                    this.currentSeason = seasons[seasonIndex].name;
+                    this.currentGate = seasons[seasonIndex].gate;
+                    
+                    this.nextSabbathDay = Math.ceil(this.currentEnochianDay / 7) * 7;
+                    if (this.nextSabbathDay === 0) this.nextSabbathDay = 7;
+                    if (this.currentEnochianDay > this.nextSabbathDay) {
+                        this.nextSabbathDay = (Math.floor(this.currentEnochianDay / 7) + 1) * 7;
+                    }
+                    if (this.nextSabbathDay > 364) this.nextSabbathDay = 7;
+
+                    this.isDNAWindow = (this.currentEnochianDay % 7 === 0) || [91, 182, 273, 364].includes(this.currentEnochianDay);
+                }
+
+                generateTimeWheel() {
+                    this.elements.timeWheel.innerHTML = '';
+                    for (let day = 1; day <= 364; day++) {
+                        const marker = document.createElement('div');
+                        marker.className = 'week-marker';
+                        if (day % 7 === 0) {
+                            marker.classList.add('sabbath');
+                        }
+                        const angle = (day / 364) * 360 - 90;
+                        marker.style.transform = `rotate(${angle}deg)`;
+                        marker.style.transformOrigin = `50% ${this.radius}px`;
+                        this.elements.timeWheel.appendChild(marker);
+                    }
+                }
+
+                positionSeasonGates() {
+                    const gates = [
+                        { day: 91, element: this.elements.springGate }, { day: 182, element: this.elements.summerGate },
+                        { day: 273, element: this.elements.autumnGate }, { day: 364, element: this.elements.winterGate }
+                    ];
+                    gates.forEach(gate => {
+                        const angle = (gate.day / 364) * 360 - 90;
+                        const x = Math.cos(angle * Math.PI / 180) * this.gateRadius;
+                        const y = Math.sin(angle * Math.PI / 180) * this.gateRadius;
+                        gate.element.style.transform = `translate(${x}px, ${y}px)`;
+                    });
+                }
+
+                updatePositions() {
+                    const center = { x: 0, y: 0 };
+                    
+                    const kingdomAngle = (this.currentEnochianDay / 364) * 360 - 90;
+                    const kingdomPos = this.getCoordinates(center, this.markerRadius, kingdomAngle);
+                    this.elements.currentPos.style.transform = `translate(${kingdomPos.x - 15}px, ${kingdomPos.y - 15}px)`;
+
+                    const gregorianAngle = (this.dayOfYear / 364) * 360 - 90;
+                    const gregorianPos = this.getCoordinates(center, this.markerRadius, gregorianAngle);
+                    this.elements.gregorianDrift.style.transform = `translate(${gregorianPos.x - 12.5}px, ${gregorianPos.y - 12.5}px)`;
+                    
+                    const lineLength = Math.hypot(gregorianPos.x - kingdomPos.x, gregorianPos.y - kingdomPos.y);
+                    const lineAngle = Math.atan2(gregorianPos.y - kingdomPos.y, gregorianPos.x - kingdomPos.x) * 180 / Math.PI;
+                    this.elements.driftLine.style.width = `${lineLength}px`;
+                    this.elements.driftLine.style.transform = `translate(${kingdomPos.x}px, ${kingdomPos.y}px) rotate(${lineAngle}deg)`;
+                }
+
+                updateDisplay() {
+                    this.elements.enochianDay.textContent = this.currentEnochianDay;
+                    this.elements.currentWeek.textContent = this.currentWeek;
+                    this.elements.currentSeason.textContent = `${this.currentSeason} (${this.currentGate})`;
+                    
+                    let driftText = `${this.baseDrift >= 0 ? '+' : ''}${this.baseDrift.toFixed(1)}`;
+                    if (this.showHistoricalDrift) {
+                        driftText += ` (+${this.historicalDrift} historical) = ${this.currentDrift.toFixed(1)} total`;
+                    }
+                    this.elements.driftAmount.textContent = driftText;
+                    this.elements.nextSabbath.textContent = `Day ${this.nextSabbathDay}`;
+                    this.elements.dnaStatus.textContent = this.isDNAWindow ? 'ACTIVE' : 'Inactive';
+                    
+                    this.elements.currentPos.classList.toggle('dna-active', this.isDNAWindow);
+                    this.elements.dnaHelix.classList.toggle('active', this.isDNAWindow);
+
+                    this.updatePositions();
+                }
+                
+                startSimulationLoop() {
+                    this.simulationInterval = setInterval(() => {
+                        if (this.isSimulating) {
+                            this.dayOfYear = (this.dayOfYear % 365) + 1; // Simulate Gregorian year progression
+                            this.calculateCurrentPosition();
+                            this.updateDisplay();
+                        }
+                    }, 100); // Faster simulation
+                }
+
+                resetToToday() {
+                    this.isSimulating = false;
+                    this.elements.btnAnimate.textContent = "▶️ Simulate";
+                    this.calculateCurrentPosition();
+                    this.updateDisplay();
+                }
+
+                goToNextSabbath() {
+                    this.currentEnochianDay = this.nextSabbathDay;
+                    // Note: This desyncs from the actual gregorian day. It's a "jump to" feature.
+                    // To keep sync, we'd need a more complex calculation. For simplicity, we just update the Enochian day.
+                    this.currentWeek = Math.ceil(this.currentEnochianDay / 7);
+                    this.updateDisplay();
+                }
+
+                toggleSimulation() {
+                    this.isSimulating = !this.isSimulating;
+                    this.elements.btnAnimate.textContent = this.isSimulating ? "⏸️ Simulate" : "▶️ Simulate";
+                }
+
+                restoreCalendar() {
+                    this.showHistoricalDrift = false;
+                    this.elements.timeWheel.classList.add('restored');
+                    setTimeout(() => this.elements.timeWheel.classList.remove('restored'), 2000);
+                    this.calculateCurrentPosition(); // Recalculate without historical drift
+                    this.updateDisplay();
+                }
+
+                toggleDriftVisibility() {
+                    this.driftVisible = !this.driftVisible;
+                    const opacity = this.driftVisible ? '1' : '0';
+                    this.elements.gregorianDrift.style.opacity = opacity;
+                    this.elements.driftLine.style.opacity = opacity;
+                }
+
+                exportCalendar() {
+                    const state = {
+                        kingdomTime: {
+                            enochianDay: this.currentEnochianDay,
+                            week: this.currentWeek,
+                            season: this.currentSeason,
+                            gate: this.currentGate,
+                            nextSabbath: this.nextSabbathDay,
+                            isDnaActive: this.isDNAWindow,
+                        },
+                        gregorianData: {
+                            dateUTC: this.currentGregorianDate.toISOString().split('T')[0],
+                            dayOfYear: this.dayOfYear,
+                            drift: this.currentDrift,
+                        },
+                        timestamp: new Date().toISOString()
+                    };
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", "kingdom_time_state.json");
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                }
+
+                getCoordinates(center, radius, angle) {
+                    const rad = (angle * Math.PI) / 180;
+                    return {
+                        x: center.x + radius * Math.cos(rad),
+                        y: center.y + radius * Math.sin(rad)
+                    };
+                }
+            }
+
+            // Initialize the Kingdom Time Wheel
+            new KingdomTimeWheel();
+        });
+    </script>
+</body>
+</html>
