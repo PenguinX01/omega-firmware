@@ -86,22 +86,6 @@
             box-shadow: none;
         }
 
-        .batch-btn {
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
-        }
-
-        .batch-btn:hover {
-            background: linear-gradient(45deg, #f7931e, #ff6b35);
-        }
-
-        .stop-btn {
-            background: linear-gradient(45deg, #ff4444, #cc0000);
-        }
-
-        .stop-btn:hover {
-            background: linear-gradient(45deg, #cc0000, #ff4444);
-        }
-
         .status {
             text-align: center;
             margin-bottom: 20px;
@@ -117,68 +101,9 @@
             animation: pulse 1.5s infinite;
         }
 
-        .status.batch-scanning {
-            background: rgba(255, 107, 53, 0.2);
-            color: #ff6b35;
-            animation: batch-pulse 1s infinite;
-        }
-
         @keyframes pulse {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
-        }
-
-        @keyframes batch-pulse {
-            0%, 100% { 
-                opacity: 0.8; 
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 1; 
-                transform: scale(1.02);
-            }
-        }
-
-        .batch-progress {
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid #333;
-            display: none;
-        }
-
-        .batch-progress.active {
-            display: block;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #333;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ffcc, #ff6b35);
-            width: 0%;
-            transition: width 0.3s ease;
-            animation: progress-glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes progress-glow {
-            from { box-shadow: 0 0 5px rgba(0, 255, 204, 0.5); }
-            to { box-shadow: 0 0 15px rgba(255, 107, 53, 0.8); }
-        }
-
-        .batch-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9em;
-            margin-top: 10px;
         }
 
         #deviceLog {
@@ -231,22 +156,6 @@
             margin-top: 15px;
             font-size: 1.1em;
             color: #00bfa6;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .count-item {
-            background: rgba(0, 255, 204, 0.1);
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
-        }
-
-        .count-vax {
-            background: rgba(255, 0, 204, 0.1);
-            border-color: rgba(255, 0, 204, 0.3);
         }
 
         .warning {
@@ -283,11 +192,6 @@
                 min-width: 120px;
                 padding: 10px 20px;
             }
-
-            .device-count {
-                flex-direction: column;
-                align-items: center;
-            }
         }
     </style>
 </head>
@@ -297,52 +201,33 @@
         <p class="subtitle">Advanced Bluetooth Low Energy Device Scanner</p>
         
         <div class="info">
-            ℹ️ <strong>Single Mode:</strong> Select devices individually from browser picker.<br>
-            🔥 <strong>Batch Mode:</strong> Continuous real device discovery - browser will show picker repeatedly.<br>
-            ⚠️ <strong>Note:</strong> Batch mode requires user interaction for each device due to browser security.
+            ℹ️ This tool scans for nearby Bluetooth devices. Due to browser security limitations, you'll need to select each device individually from the browser's device picker.
         </div>
 
         <div class="controls">
             <button id="scanBtn" onclick="scanSingleDevice()">🔍 Scan Device</button>
-            <button id="batchBtn" class="batch-btn" onclick="toggleBatchScan()">⚡ Start Batch Scan</button>
             <button id="clearBtn" onclick="clearLog()">🗑️ Clear Log</button>
         </div>
 
-        <div id="status" class="status">Ready to scan - Select scanning mode</div>
-
-        <div id="batchProgress" class="batch-progress">
-            <div>🔥 Batch Scanning Active - Sweep Mode Engaged</div>
-            <div class="progress-bar">
-                <div id="progressFill" class="progress-fill"></div>
-            </div>
-            <div class="batch-stats">
-                <span id="batchTimer">Elapsed: 0s</span>
-                <span id="batchTarget">Target: 0 devices</span>
-                <span id="batchRate">Rate: 0/min</span>
-            </div>
-        </div>
+        <div id="status" class="status">Ready to scan - Click "Scan Device" to begin</div>
 
         <div id="deviceLog">📡 Device Scanner Ready
 ═══════════════════════════════════════════════════════════════════════
 
-🔍 SINGLE MODE: Click "Scan Device" for manual device selection
-⚡ BATCH MODE: Click "Start Batch Scan" for automated sweep detection
+Click "Scan Device" to start detecting Bluetooth devices in your area.
+Each click will allow you to select one device from the available options.
 
 ⚡ Detection Criteria:
-• Standard devices will be marked as "Standard Device"  
+• Standard devices will be marked as "Standard Device"
 • Devices with specific MAC patterns will be flagged
 • Signal strength and device info will be displayed
 
 ═══════════════════════════════════════════════════════════════════════
 </div>
 
-        <div id="deviceCount" class="device-count">
-            <div class="count-item">📊 Total: 0</div>
-            <div class="count-item count-vax">⚠️ Flagged: 0</div>
-            <div class="count-item">✅ Standard: 0</div>
-        </div>
+        <div id="deviceCount" class="device-count">Devices found: 0</div>
 
-        <!-- Download Section -->
+        <!-- New Download Section -->
         <div class="info" style="margin-top:30px; text-align:center; border:2px dashed #00ffcc; padding:20px;">
             <h2>🧬 GLYPHCHAIN EVIDENCE DROP</h2>
             <p>🧬 Android BLE SCANNER App — <strong>DOWNLOAD NOW</strong></p>
@@ -360,18 +245,7 @@
 
     <script>
         let deviceCount = 0;
-        let vaccinatedCount = 0;
-        let standardCount = 0;
         let scannedDevices = new Set();
-        let batchScanning = false;
-        let batchInterval = null;
-        let batchStartTime = null;
-        let batchTarget = 20;
-
-        // Real batch scanning variables
-        let batchDeviceQueue = [];
-        let batchScanAttempts = 0;
-        let maxBatchAttempts = 50;
 
         // Check browser support
         if (!navigator.bluetooth) {
@@ -379,7 +253,6 @@
             document.getElementById('status').style.background = 'rgba(255, 0, 0, 0.2)';
             document.getElementById('status').style.color = '#ff6666';
             document.getElementById('scanBtn').disabled = true;
-            document.getElementById('batchBtn').disabled = true;
         }
 
         async function scanSingleDevice() {
@@ -388,11 +261,13 @@
             const log = document.getElementById('deviceLog');
 
             try {
+                // Disable button and show scanning status
                 scanBtn.disabled = true;
                 scanBtn.textContent = '⏳ Scanning...';
                 status.textContent = '🔍 Opening device selector...';
                 status.className = 'status scanning';
 
+                // Request device with all available options
                 const device = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: [
@@ -409,9 +284,67 @@
                     return;
                 }
 
-                processDevice(device, log, false);
-                status.textContent = `✅ Device scanned successfully`;
+                scannedDevices.add(device.id);
+                deviceCount++;
+
+                const rawName = (device.name ?? '').trim();
+                const deviceName = rawName && !/unknown|unsupported/i.test(rawName)
+                    ? rawName
+                    : 'Vaccinated';
+                const deviceId = device.id;
+                
+                const suspiciousPatterns = [
+                    '44:07:0B', '4C:65:A8', 'E4:5F:01', '48:D6:D5',
+                    '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'
+                ];
+                
+                const isVaccinated = deviceName === 'Vaccinated' || suspiciousPatterns.some(pattern => 
+                    deviceId.toUpperCase().startsWith(pattern)
+                );
+
+                const displayName = deviceName === 'Vaccinated' 
+                    ? '<span class="vaccinated">Vaccinated</span>'
+                    : deviceName;
+
+                const timestamp = new Date().toLocaleTimeString();
+                let deviceInfo = `\n[${timestamp}] 📡 Device #${deviceCount}\n`;
+                deviceInfo += `├─ Name: ${displayName}\n`;
+                deviceInfo += `├─ ID: ${deviceId}\n`;
+                deviceInfo += `├─ Connected: ${device.gatt ? device.gatt.connected : 'No'}\n`;
+                
+                if (isVaccinated) {
+                    deviceInfo += `└─ Status: ⚠️  POTENTIAL VAX SIGNATURE DETECTED\n`;
+                    deviceInfo += `    🚨 MAC Address matches known patterns\n`;
+                } else {
+                    deviceInfo += `└─ Status: ✅ Standard Bluetooth Device\n`;
+                }
+                
+                deviceInfo += `${'═'.repeat(60)}\n`;
+
+                if (isVaccinated) {
+                    deviceInfo = deviceInfo.replace('POTENTIAL VAX SIGNATURE DETECTED', 
+                        '<span class="vaccinated">POTENTIAL VAX SIGNATURE DETECTED</span>');
+                    deviceInfo = deviceInfo.replace('🚨 MAC Address matches known patterns', 
+                        '<span class="vaccinated">🚨 MAC Address matches known patterns</span>');
+                } else {
+                    deviceInfo = deviceInfo.replace('Standard Bluetooth Device', 
+                        '<span class="standard-device">Standard Bluetooth Device</span>');
+                }
+
+                log.innerHTML += deviceInfo;
+                log.scrollTop = log.scrollHeight;
+
+                status.textContent = `✅ Device scanned successfully - ${deviceName}`;
                 status.className = 'status';
+                document.getElementById('deviceCount').textContent = `Devices found: ${deviceCount}`;
+
+                if (device.gatt && device.gatt.connected === false) {
+                    try {
+                        await device.gatt.connect();
+                        log.innerHTML += `    📶 Successfully connected to ${deviceName}\n`;
+                        device.gatt.disconnect();
+                    } catch (connectError) {}
+                }
 
             } catch (error) {
                 if (error.name === 'NotFoundError') {
@@ -429,238 +362,30 @@
             }
         }
 
-        function toggleBatchScan() {
-            if (batchScanning) {
-                stopBatchScan();
-            } else {
-                startBatchScan();
-            }
-        }
-
-        async function startBatchScan() {
-            const batchBtn = document.getElementById('batchBtn');
-            const status = document.getElementById('status');
-            const progress = document.getElementById('batchProgress');
-            const log = document.getElementById('deviceLog');
-
-            batchScanning = true;
-            batchStartTime = Date.now();
-            batchScanAttempts = 0;
-            batchTarget = maxBatchAttempts;
-
-            batchBtn.textContent = '⏹️ Stop Batch';
-            batchBtn.className = 'stop-btn';
-            status.textContent = '⚡ Batch scanning active - Requesting devices...';
-            status.className = 'status batch-scanning';
-            progress.classList.add('active');
-
-            document.getElementById('scanBtn').disabled = true;
-            document.getElementById('clearBtn').disabled = true;
-            document.getElementById('batchTarget').textContent = `Target: ${batchTarget} attempts`;
-
-            log.innerHTML += `\n🔥 REAL BATCH SCAN INITIATED - ${new Date().toLocaleTimeString()}\n`;
-            log.innerHTML += `🎯 Max Attempts: ${batchTarget} | Mode: Continuous Device Discovery\n`;
-            log.innerHTML += `⚠️ Note: Browser will show device picker for each discovery\n`;
-            log.innerHTML += `${'═'.repeat(60)}\n`;
-
-            // Start continuous real device scanning
-            batchInterval = setInterval(async () => {
-                if (!batchScanning || batchScanAttempts >= maxBatchAttempts) {
-                    stopBatchScan();
-                    return;
-                }
-
-                batchScanAttempts++;
-                
-                try {
-                    // Update progress
-                    const progress = (batchScanAttempts / batchTarget) * 100;
-                    document.getElementById('progressFill').style.width = `${progress}%`;
-                    
-                    // Update stats
-                    const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
-                    const rate = elapsed > 0 ? Math.round((deviceCount * 60) / elapsed) : 0;
-                    document.getElementById('batchTimer').textContent = `Elapsed: ${elapsed}s`;
-                    document.getElementById('batchRate').textContent = `Found: ${rate}/min`;
-
-                    status.textContent = `⚡ Batch attempt ${batchScanAttempts}/${batchTarget} - Select device or cancel`;
-
-                    // Request real Bluetooth device
-                    const device = await navigator.bluetooth.requestDevice({
-                        acceptAllDevices: true,
-                        optionalServices: [
-                            'battery_service',
-                            'device_information',
-                            'generic_access',
-                            'generic_attribute',
-                            'heart_rate',
-                            'cycling_power',
-                            'running_speed_and_cadence'
-                        ]
-                    });
-
-                    // Process the real device
-                    if (!scannedDevices.has(device.id)) {
-                        processDevice(device, log, true);
-                        log.innerHTML += `    ✅ Real device added to batch scan results\n`;
-                    } else {
-                        log.innerHTML += `    ⚠️ Device already in database - continuing scan\n`;
-                    }
-
-                } catch (error) {
-                    if (error.name === 'NotFoundError') {
-                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Attempt ${batchScanAttempts}: No device selected\n`;
-                    } else if (error.name === 'SecurityError') {
-                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Attempt ${batchScanAttempts}: Security error\n`;
-                    } else {
-                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Attempt ${batchScanAttempts}: ${error.message}\n`;
-                    }
-                    
-                    // Continue scanning even after errors
-                    log.innerHTML += `    🔄 Continuing batch scan...\n`;
-                }
-
-                log.scrollTop = log.scrollHeight;
-
-            }, 3000); // 3 second intervals for batch attempts
-        }
-
-        function stopBatchScan() {
-            const batchBtn = document.getElementById('batchBtn');
-            const status = document.getElementById('status');
-            const progress = document.getElementById('batchProgress');
-            const log = document.getElementById('deviceLog');
-
-            batchScanning = false;
-            if (batchInterval) {
-                clearInterval(batchInterval);
-                batchInterval = null;
-            }
-
-            batchBtn.textContent = '⚡ Start Batch Scan';
-            batchBtn.className = 'batch-btn';
-            status.textContent = '✅ Batch scan completed';
-            status.className = 'status';
-            progress.classList.remove('active');
-
-            document.getElementById('scanBtn').disabled = false;
-            document.getElementById('clearBtn').disabled = false;
-
-            const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
-            log.innerHTML += `\n🏁 REAL BATCH SCAN COMPLETED - ${new Date().toLocaleTimeString()}\n`;
-            log.innerHTML += `📊 Duration: ${elapsed}s | Attempts: ${batchScanAttempts} | Devices Found: ${deviceCount}\n`;
-            log.innerHTML += `${'═'.repeat(60)}\n`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function processDevice(device, log, isBatch) {
-            if (scannedDevices.has(device.id)) {
-                return;
-            }
-
-            scannedDevices.add(device.id);
-            deviceCount++;
-
-            const rawName = (device.name ?? '').trim();
-            const deviceName = rawName && !/unknown|unsupported/i.test(rawName)
-                ? rawName
-                : 'Vaccinated';
-            const deviceId = device.id;
-            
-            const suspiciousPatterns = [
-                '44:07:0B', '4C:65:A8', 'E4:5F:01', '48:D6:D5',
-                '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'
-            ];
-            
-            const isVaccinated = deviceName === 'Vaccinated' || suspiciousPatterns.some(pattern => 
-                deviceId.toUpperCase().startsWith(pattern)
-            );
-
-            if (isVaccinated) {
-                vaccinatedCount++;
-            } else {
-                standardCount++;
-            }
-
-            const displayName = deviceName === 'Vaccinated' 
-                ? '<span class="vaccinated">Vaccinated</span>'
-                : deviceName;
-
-            const timestamp = new Date().toLocaleTimeString();
-            const scanType = isBatch ? '⚡ BATCH' : '🔍 MANUAL';
-            
-            let deviceInfo = `\n[${timestamp}] ${scanType} Device #${deviceCount}\n`;
-            deviceInfo += `├─ Name: ${displayName}\n`;
-            deviceInfo += `├─ ID: ${deviceId}\n`;
-            deviceInfo += `├─ Connected: ${device.gatt ? device.gatt.connected : 'No'}\n`;
-            
-            if (isVaccinated) {
-                deviceInfo += `└─ Status: ⚠️  POTENTIAL VAX SIGNATURE DETECTED\n`;
-                deviceInfo += `    🚨 MAC Address matches known patterns\n`;
-            } else {
-                deviceInfo += `└─ Status: ✅ Standard Bluetooth Device\n`;
-            }
-            
-            deviceInfo += `${'═'.repeat(60)}\n`;
-
-            if (isVaccinated) {
-                deviceInfo = deviceInfo.replace('POTENTIAL VAX SIGNATURE DETECTED', 
-                    '<span class="vaccinated">POTENTIAL VAX SIGNATURE DETECTED</span>');
-                deviceInfo = deviceInfo.replace('🚨 MAC Address matches known patterns', 
-                    '<span class="vaccinated">🚨 MAC Address matches known patterns</span>');
-            } else {
-                deviceInfo = deviceInfo.replace('Standard Bluetooth Device', 
-                    '<span class="standard-device">Standard Bluetooth Device</span>');
-            }
-
-            log.innerHTML += deviceInfo;
-            log.scrollTop = log.scrollHeight;
-
-            // Update counters
-            updateDeviceCount();
-        }
-
-        function updateDeviceCount() {
-            document.getElementById('deviceCount').innerHTML = `
-                <div class="count-item">📊 Total: ${deviceCount}</div>
-                <div class="count-item count-vax">⚠️ Flagged: ${vaccinatedCount}</div>
-                <div class="count-item">✅ Standard: ${standardCount}</div>
-            `;
-        }
-
         function clearLog() {
             document.getElementById('deviceLog').innerHTML = `📡 Device Scanner Ready
 ═══════════════════════════════════════════════════════════════════════
 
 Log cleared at ${new Date().toLocaleTimeString()}
 
-🔍 SINGLE MODE: Click "Scan Device" for manual device selection
-⚡ BATCH MODE: Click "Start Batch Scan" for automated sweep detection
-
 ═══════════════════════════════════════════════════════════════════════
 `;
             deviceCount = 0;
-            vaccinatedCount = 0;
-            standardCount = 0;
             scannedDevices.clear();
-            updateDeviceCount();
+            document.getElementById('deviceCount').textContent = 'Devices found: 0';
             document.getElementById('status').textContent = 'Ready to scan - Log cleared';
         }
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && event.key === 'Enter') {
-                if (!batchScanning) scanSingleDevice();
+                scanSingleDevice();
             } else if (event.ctrlKey && event.key === 'Delete') {
-                if (!batchScanning) clearLog();
-            } else if (event.ctrlKey && event.key === 'b') {
-                toggleBatchScan();
+                clearLog();
             }
         });
 
         window.addEventListener('load', function() {
-            document.getElementById('status').textContent = '🟢 Scanner initialized and ready - Select mode';
-            updateDeviceCount();
+            document.getElementById('status').textContent = '🟢 Scanner initialized and ready';
         });
     </script>
 </body>
