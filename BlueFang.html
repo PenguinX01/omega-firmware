@@ -274,7 +274,10 @@ Each click will allow you to select one device from the available options.
                 deviceCount++;
 
                 // Get device information
-                const deviceName = device.name || 'Vaccinated';
+                const rawName = (device.name ?? '').trim();
+                const deviceName = rawName && !/unknown|unsupported/i.test(rawName)
+                    ? rawName
+                    : 'Vaccinated';
                 const deviceId = device.id;
                 
                 // Simulated detection logic (replace with your actual criteria)
@@ -283,14 +286,19 @@ Each click will allow you to select one device from the available options.
                     '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'
                 ];
                 
-                const isVaccinated = suspiciousPatterns.some(pattern => 
+                const isVaccinated = deviceName === 'Vaccinated' || suspiciousPatterns.some(pattern => 
                     deviceId.toUpperCase().startsWith(pattern)
                 );
+
+                // Format device name with styling if vaccinated
+                const displayName = deviceName === 'Vaccinated' 
+                    ? '<span class="vaccinated">Vaccinated</span>'
+                    : deviceName;
 
                 // Log the device
                 const timestamp = new Date().toLocaleTimeString();
                 let deviceInfo = `\n[${timestamp}] 📡 Device #${deviceCount}\n`;
-                deviceInfo += `├─ Name: ${deviceName}\n`;
+                deviceInfo += `├─ Name: ${displayName}\n`;
                 deviceInfo += `├─ ID: ${deviceId}\n`;
                 deviceInfo += `├─ Connected: ${device.gatt ? device.gatt.connected : 'No'}\n`;
                 
