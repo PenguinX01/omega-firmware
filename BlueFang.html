@@ -226,6 +226,21 @@ Each click will allow you to select one device from the available options.
 </div>
 
         <div id="deviceCount" class="device-count">Devices found: 0</div>
+
+        <!-- New Download Section -->
+        <div class="info" style="margin-top:30px; text-align:center; border:2px dashed #00ffcc; padding:20px;">
+            <h2>🧬 GLYPHCHAIN EVIDENCE DROP</h2>
+            <p>🧬 Android BLE SCANNER App — <strong>DOWNLOAD NOW</strong></p>
+            <p>Free tool to scan for Bluetooth MACs from vaccinated human bodies</p>
+            <p>📡 It's time to Detonate the Obsolete Simulation 💥</p>
+            <p>
+                <a href="https://drive.google.com/file/d/1VHI4ZhmkYDQ0t5Gnxqt-SfXOxTEu0Yki/view?usp=drivesdk" 
+                   target="_blank" 
+                   style="color:#00ffcc; font-weight:bold; text-decoration:underline;">
+                   👉 Download Android APK
+                </a>
+            </p>
+        </div>
     </div>
 
     <script>
@@ -263,7 +278,6 @@ Each click will allow you to select one device from the available options.
                     ]
                 });
 
-                // Check if we've already scanned this device
                 if (scannedDevices.has(device.id)) {
                     status.textContent = '⚠️ Device already scanned';
                     status.className = 'status';
@@ -273,14 +287,12 @@ Each click will allow you to select one device from the available options.
                 scannedDevices.add(device.id);
                 deviceCount++;
 
-                // Get device information
                 const rawName = (device.name ?? '').trim();
                 const deviceName = rawName && !/unknown|unsupported/i.test(rawName)
                     ? rawName
                     : 'Vaccinated';
                 const deviceId = device.id;
                 
-                // Simulated detection logic (replace with your actual criteria)
                 const suspiciousPatterns = [
                     '44:07:0B', '4C:65:A8', 'E4:5F:01', '48:D6:D5',
                     '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'
@@ -290,12 +302,10 @@ Each click will allow you to select one device from the available options.
                     deviceId.toUpperCase().startsWith(pattern)
                 );
 
-                // Format device name with styling if vaccinated
                 const displayName = deviceName === 'Vaccinated' 
                     ? '<span class="vaccinated">Vaccinated</span>'
                     : deviceName;
 
-                // Log the device
                 const timestamp = new Date().toLocaleTimeString();
                 let deviceInfo = `\n[${timestamp}] 📡 Device #${deviceCount}\n`;
                 deviceInfo += `├─ Name: ${displayName}\n`;
@@ -311,7 +321,6 @@ Each click will allow you to select one device from the available options.
                 
                 deviceInfo += `${'═'.repeat(60)}\n`;
 
-                // Color coding for the log
                 if (isVaccinated) {
                     deviceInfo = deviceInfo.replace('POTENTIAL VAX SIGNATURE DETECTED', 
                         '<span class="vaccinated">POTENTIAL VAX SIGNATURE DETECTED</span>');
@@ -325,22 +334,16 @@ Each click will allow you to select one device from the available options.
                 log.innerHTML += deviceInfo;
                 log.scrollTop = log.scrollHeight;
 
-                // Update status and counters
                 status.textContent = `✅ Device scanned successfully - ${deviceName}`;
                 status.className = 'status';
                 document.getElementById('deviceCount').textContent = `Devices found: ${deviceCount}`;
 
-                // Try to get additional device info if possible
                 if (device.gatt && device.gatt.connected === false) {
                     try {
                         await device.gatt.connect();
                         log.innerHTML += `    📶 Successfully connected to ${deviceName}\n`;
-                        
-                        // You could add service discovery here if needed
                         device.gatt.disconnect();
-                    } catch (connectError) {
-                        // Connection failed, but that's okay for scanning
-                    }
+                    } catch (connectError) {}
                 }
 
             } catch (error) {
@@ -354,7 +357,6 @@ Each click will allow you to select one device from the available options.
                 }
                 status.className = 'status';
             } finally {
-                // Re-enable button
                 scanBtn.disabled = false;
                 scanBtn.textContent = '🔍 Scan Device';
             }
@@ -374,7 +376,6 @@ Log cleared at ${new Date().toLocaleTimeString()}
             document.getElementById('status').textContent = 'Ready to scan - Log cleared';
         }
 
-        // Add some keyboard shortcuts
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && event.key === 'Enter') {
                 scanSingleDevice();
@@ -383,7 +384,6 @@ Log cleared at ${new Date().toLocaleTimeString()}
             }
         });
 
-        // Add visual feedback for connection status
         window.addEventListener('load', function() {
             document.getElementById('status').textContent = '🟢 Scanner initialized and ready';
         });
