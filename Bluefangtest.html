@@ -1,392 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueFang Vax Detector</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: #00ffcc;
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #00ffcc;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #00ffcc;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #00ffcc; }
-            to { text-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc; }
-        }
-
-        .subtitle {
-            text-align: center;
-            font-size: 1.1em;
-            margin-bottom: 30px;
-            opacity: 0.8;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            background: linear-gradient(45deg, #00ffcc, #00bfa6);
-            color: #000;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-family: inherit;
-            min-width: 150px;
-        }
-
-        button:hover {
-            background: linear-gradient(45deg, #00bfa6, #009688);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4);
-        }
-
-        button:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .status {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-            padding: 10px;
-            border-radius: 5px;
-            background: rgba(0, 255, 204, 0.1);
-        }
-
-        .status.scanning {
-            background: rgba(255, 165, 0, 0.2);
-            color: #ffa500;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-
-        #deviceLog {
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 300px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-y: auto;
-            max-height: 500px;
-            font-size: 0.95em;
-            line-height: 1.4;
-        }
-
-        .device-entry {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-left: 3px solid #00ffcc;
-            background: rgba(0, 255, 204, 0.05);
-        }
-
-        .device-name {
-            color: #00ffcc;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .device-id {
-            color: #888;
-            font-size: 0.9em;
-        }
-
-        .vaccinated {
-            color: #ff00cc !important;
-            font-weight: bold;
-            text-shadow: 0 0 5px #ff00cc;
-            background: rgba(255, 0, 204, 0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-
-        .standard-device {
-            color: #00ff88;
-        }
-
-        .device-count {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 1.1em;
-            color: #00bfa6;
-        }
-
-        .warning {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #ff0000;
-            color: #ff6666;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .info {
-            background: rgba(0, 100, 255, 0.1);
-            border: 1px solid #0064ff;
-            color: #66aaff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            button {
-                min-width: 120px;
-                padding: 10px 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>🧬 BlueFang | BLE Scanner</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ffcc;
+      font-family: Courier New, monospace;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 22px;
+      text-align: center;
+      text-transform: uppercase;
+      border-bottom: 1px solid #00ffcc;
+      padding-bottom: 10px;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    button {
+      background-color: #003333;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #004d4d;
+    }
+    .status {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .status.scanning::after {
+      content: ' ⟳';
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    pre {
+      background-color: #001a1a;
+      padding: 12px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .vaccinated {
+      color: #ff00cc;
+      font-weight: bold;
+    }
+    a {
+      color: #00ffff;
+    }
+    .download-section {
+      margin-top: 20px;
+      border-top: 1px dashed #00ffcc;
+      padding-top: 12px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧠 BlueFang Vax Detector</h1>
-        <p class="subtitle">Advanced Bluetooth Low Energy Device Scanner</p>
-        
-        <div class="info">
-            ℹ️ This tool scans for nearby Bluetooth devices. Due to browser security limitations, you'll need to select each device individually from the browser's device picker.
-        </div>
+  <h1>🧬 BlueFang BLE Scanner</h1>
 
-        <div class="controls">
-            <button id="scanBtn" onclick="scanSingleDevice()">🔍 Scan Device</button>
-            <button id="clearBtn" onclick="clearLog()">🗑️ Clear Log</button>
-        </div>
+  <div class="controls">
+    <button onclick="scanBLE()">Start Scan</button>
+    <button onclick="clearLog()">Clear Log</button>
+    <button onclick="downloadCSV()">Export Log</button>
+  </div>
 
-        <div id="status" class="status">Ready to scan - Click "Scan Device" to begin</div>
+  <div class="status" id="status">Status: Ready</div>
 
-        <div id="deviceLog">📡 Device Scanner Ready
-═══════════════════════════════════════════════════════════════════════
+  <pre id="log"></pre>
 
-Click "Scan Device" to start detecting Bluetooth devices in your area.
-Each click will allow you to select one device from the available options.
+  <div class="download-section">
+    <p>🧬 GLYPHCHAIN EVIDENCE DROP</p>
+    <p>🧬 Android BLE SCANNER App — <a href="https://drive.google.com/file/d/1VHI4ZhmkYDQ0t5Gnxqt-SfXOxTEu0Yki/view?usp=drivesdk" target="_blank">DOWNLOAD NOW</a></p>
+    <p>📡 It's time to Detonate the Obsolete Simulation 💥</p>
+  </div>
 
-⚡ Detection Criteria:
-• Standard devices will be marked as "Standard Device"
-• Devices with specific MAC patterns will be flagged
-• Signal strength and device info will be displayed
+  <script>
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
 
-═══════════════════════════════════════════════════════════════════════
-</div>
+    let scannedDevices = JSON.parse(localStorage.getItem('bluefang_log') || '[]');
 
-        <div id="deviceCount" class="device-count">Devices found: 0</div>
+    const suspiciousPatterns = [
+      /^ac:23:3f/i,
+      /^00:1A:7D/i,
+      /^4c:65:a8/i,
+      /^66:55:44/i
+    ];
 
-        <!-- New Download Section -->
-        <div class="info" style="margin-top:30px; text-align:center; border:2px dashed #00ffcc; padding:20px;">
-            <h2>🧬 GLYPHCHAIN EVIDENCE DROP</h2>
-            <p>🧬 Android BLE SCANNER App — <strong>DOWNLOAD NOW</strong></p>
-            <p>Free tool to scan for Bluetooth MACs from vaccinated human bodies</p>
-            <p>📡 It's time to Detonate the Obsolete Simulation 💥</p>
-            <p>
-                <a href="https://drive.google.com/file/d/1VHI4ZhmkYDQ0t5Gnxqt-SfXOxTEu0Yki/view?usp=drivesdk" 
-                   target="_blank" 
-                   style="color:#00ffcc; font-weight:bold; text-decoration:underline;">
-                   👉 Download Android APK
-                </a>
-            </p>
-        </div>
-    </div>
+    const RSSI_THRESHOLD = -90; // optional filter (more negative = weaker signal)
 
-    <script>
-        let deviceCount = 0;
-        let scannedDevices = new Set();
+    function logDevice(device, rssi = null) {
+      const timestamp = new Date().toLocaleTimeString();
+      const mac = device.id || device.name || "Unknown";
+      const isVaccinated = suspiciousPatterns.some(pat => pat.test(mac));
+      const rssiText = rssi ? ` RSSI: ${rssi}dBm` : '';
+      const line = `${timestamp} - ${mac}${rssiText}`;
 
-        // Check browser support
-        if (!navigator.bluetooth) {
-            document.getElementById('status').innerHTML = '❌ Web Bluetooth API not supported in this browser';
-            document.getElementById('status').style.background = 'rgba(255, 0, 0, 0.2)';
-            document.getElementById('status').style.color = '#ff6666';
-            document.getElementById('scanBtn').disabled = true;
+      const entry = isVaccinated
+        ? `<div class="vaccinated">⚠️ VACCINATED SIGNAL DETECTED: ${line}</div>`
+        : line;
+
+      logEl.innerHTML = entry + '\n' + logEl.innerHTML;
+
+      scannedDevices.push({ time: timestamp, mac: mac, rssi: rssi || '', vaccinated: isVaccinated });
+      localStorage.setItem('bluefang_log', JSON.stringify(scannedDevices));
+    }
+
+    async function scanBLE() {
+      try {
+        statusEl.textContent = "Status: Scanning...";
+        statusEl.classList.add("scanning");
+
+        const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
+        const rssi = device.adData?.rssi || null;
+
+        if (!rssi || rssi > RSSI_THRESHOLD) {
+          logDevice(device, rssi);
         }
 
-        async function scanSingleDevice() {
-            const scanBtn = document.getElementById('scanBtn');
-            const status = document.getElementById('status');
-            const log = document.getElementById('deviceLog');
+        statusEl.textContent = "Status: Ready";
+        statusEl.classList.remove("scanning");
+      } catch (error) {
+        statusEl.textContent = "Error: " + error.message;
+        statusEl.classList.remove("scanning");
+      }
+    }
 
-            try {
-                // Disable button and show scanning status
-                scanBtn.disabled = true;
-                scanBtn.textContent = '⏳ Scanning...';
-                status.textContent = '🔍 Opening device selector...';
-                status.className = 'status scanning';
+    function clearLog() {
+      logEl.innerHTML = '';
+      scannedDevices = [];
+      localStorage.removeItem('bluefang_log');
+      statusEl.textContent = "Status: Log cleared";
+    }
 
-                // Request device with all available options
-                const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: [
-                        'battery_service',
-                        'device_information',
-                        'generic_access',
-                        'generic_attribute'
-                    ]
-                });
+    function downloadCSV() {
+      const rows = [
+        ["Time", "MAC", "RSSI", "Vaccinated"]
+      ].concat(scannedDevices.map(d => [d.time, d.mac, d.rssi, d.vaccinated]));
 
-                if (scannedDevices.has(device.id)) {
-                    status.textContent = '⚠️ Device already scanned';
-                    status.className = 'status';
-                    return;
-                }
+      const csv = rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
 
-                scannedDevices.add(device.id);
-                deviceCount++;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bluefang_log.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
-                const rawName = (device.name ?? '').trim();
-                const deviceName = rawName && !/unknown|unsupported/i.test(rawName)
-                    ? rawName
-                    : 'Vaccinated';
-                const deviceId = device.id;
-                
-                const suspiciousPatterns = [
-                    '44:07:0B', '4C:65:A8', 'E4:5F:01', '48:D6:D5',
-                    '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'
-                ];
-                
-                const isVaccinated = deviceName === 'Vaccinated' || suspiciousPatterns.some(pattern => 
-                    deviceId.toUpperCase().startsWith(pattern)
-                );
+    // Load saved logs on page load
+    window.addEventListener('load', () => {
+      scannedDevices.forEach(d => {
+        const text = `${d.time} - ${d.mac}${d.rssi ? ` RSSI: ${d.rssi}dBm` : ''}`;
+        const entry = d.vaccinated
+          ? `<div class="vaccinated">⚠️ VACCINATED SIGNAL DETECTED: ${text}</div>`
+          : text;
+        logEl.innerHTML += entry + '\n';
+      });
+    });
 
-                const displayName = deviceName === 'Vaccinated' 
-                    ? '<span class="vaccinated">Vaccinated</span>'
-                    : deviceName;
-
-                const timestamp = new Date().toLocaleTimeString();
-                let deviceInfo = `\n[${timestamp}] 📡 Device #${deviceCount}\n`;
-                deviceInfo += `├─ Name: ${displayName}\n`;
-                deviceInfo += `├─ ID: ${deviceId}\n`;
-                deviceInfo += `├─ Connected: ${device.gatt ? device.gatt.connected : 'No'}\n`;
-                
-                if (isVaccinated) {
-                    deviceInfo += `└─ Status: ⚠️  POTENTIAL VAX SIGNATURE DETECTED\n`;
-                    deviceInfo += `    🚨 MAC Address matches known patterns\n`;
-                } else {
-                    deviceInfo += `└─ Status: ✅ Standard Bluetooth Device\n`;
-                }
-                
-                deviceInfo += `${'═'.repeat(60)}\n`;
-
-                if (isVaccinated) {
-                    deviceInfo = deviceInfo.replace('POTENTIAL VAX SIGNATURE DETECTED', 
-                        '<span class="vaccinated">POTENTIAL VAX SIGNATURE DETECTED</span>');
-                    deviceInfo = deviceInfo.replace('🚨 MAC Address matches known patterns', 
-                        '<span class="vaccinated">🚨 MAC Address matches known patterns</span>');
-                } else {
-                    deviceInfo = deviceInfo.replace('Standard Bluetooth Device', 
-                        '<span class="standard-device">Standard Bluetooth Device</span>');
-                }
-
-                log.innerHTML += deviceInfo;
-                log.scrollTop = log.scrollHeight;
-
-                status.textContent = `✅ Device scanned successfully - ${deviceName}`;
-                status.className = 'status';
-                document.getElementById('deviceCount').textContent = `Devices found: ${deviceCount}`;
-
-                if (device.gatt && device.gatt.connected === false) {
-                    try {
-                        await device.gatt.connect();
-                        log.innerHTML += `    📶 Successfully connected to ${deviceName}\n`;
-                        device.gatt.disconnect();
-                    } catch (connectError) {}
-                }
-
-            } catch (error) {
-                if (error.name === 'NotFoundError') {
-                    status.textContent = '❌ No device selected';
-                } else if (error.name === 'SecurityError') {
-                    status.textContent = '❌ Security error - please try again';
-                } else {
-                    status.textContent = `❌ Error: ${error.message}`;
-                    log.innerHTML += `\n❌ Scan Error: ${error.message}\n${'═'.repeat(60)}\n`;
-                }
-                status.className = 'status';
-            } finally {
-                scanBtn.disabled = false;
-                scanBtn.textContent = '🔍 Scan Device';
-            }
-        }
-
-        function clearLog() {
-            document.getElementById('deviceLog').innerHTML = `📡 Device Scanner Ready
-═══════════════════════════════════════════════════════════════════════
-
-Log cleared at ${new Date().toLocaleTimeString()}
-
-═══════════════════════════════════════════════════════════════════════
-`;
-            deviceCount = 0;
-            scannedDevices.clear();
-            document.getElementById('deviceCount').textContent = 'Devices found: 0';
-            document.getElementById('status').textContent = 'Ready to scan - Log cleared';
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'Enter') {
-                scanSingleDevice();
-            } else if (event.ctrlKey && event.key === 'Delete') {
-                clearLog();
-            }
-        });
-
-        window.addEventListener('load', function() {
-            document.getElementById('status').textContent = '🟢 Scanner initialized and ready';
-        });
-    </script>
+    // Keyboard shortcuts
+    document.addEventListener("keydown", e => {
+      if (e.ctrlKey && e.key === "Enter") scanBLE();
+      if (e.ctrlKey && e.key === "Delete") clearLog();
+    });
+  </script>
 </body>
 </html>
