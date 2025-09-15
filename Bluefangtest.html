@@ -298,7 +298,8 @@
         
         <div class="info">
             ℹ️ <strong>Single Mode:</strong> Select devices individually from browser picker.<br>
-            🔥 <strong>Batch Mode:</strong> Automated scanning with simulated device discovery.
+            🔥 <strong>Batch Mode:</strong> Continuous real device discovery - browser will show picker repeatedly.<br>
+            ⚠️ <strong>Note:</strong> Batch mode requires user interaction for each device due to browser security.
         </div>
 
         <div class="controls">
@@ -367,29 +368,10 @@
         let batchStartTime = null;
         let batchTarget = 20;
 
-        // Simulated device database for batch mode
-        const simulatedDevices = [
-            { name: 'iPhone 12', id: '12:34:56:78:9A:BC', isVax: false },
-            { name: 'Samsung Galaxy', id: '44:07:0B:12:34:56', isVax: true },
-            { name: 'AirPods Pro', id: '98:76:54:32:10:FE', isVax: false },
-            { name: '', id: '4C:65:A8:AA:BB:CC', isVax: true },
-            { name: 'Fitbit Versa', id: 'AA:BB:CC:DD:EE:FF', isVax: false },
-            { name: 'Unknown Device', id: 'E4:5F:01:11:22:33', isVax: true },
-            { name: 'MacBook Pro', id: '11:22:33:44:55:66', isVax: false },
-            { name: '', id: '48:D6:D5:77:88:99', isVax: true },
-            { name: 'Sony WH-1000XM4', id: '66:77:88:99:AA:BB', isVax: false },
-            { name: 'Apple Watch', id: 'CC:DD:EE:FF:00:11', isVax: false },
-            { name: '', id: '80:E4:DA:22:33:44', isVax: true },
-            { name: 'Google Pixel', id: '33:44:55:66:77:88', isVax: false },
-            { name: 'Tesla Model 3', id: '55:66:77:88:99:AA', isVax: false },
-            { name: '', id: 'F4:5C:89:BB:CC:DD', isVax: true },
-            { name: 'Nintendo Switch', id: '77:88:99:AA:BB:CC', isVax: false },
-            { name: 'Ring Doorbell', id: '99:AA:BB:CC:DD:EE', isVax: false },
-            { name: '', id: '3C:61:05:EE:FF:00', isVax: true },
-            { name: 'Alexa Echo', id: 'BB:CC:DD:EE:FF:00', isVax: false },
-            { name: 'Garmin Fenix', id: 'DD:EE:FF:00:11:22', isVax: false },
-            { name: '', id: '00:1A:7D:33:44:55', isVax: true }
-        ];
+        // Real batch scanning variables
+        let batchDeviceQueue = [];
+        let batchScanAttempts = 0;
+        let maxBatchAttempts = 50;
 
         // Check browser support
         if (!navigator.bluetooth) {
@@ -455,7 +437,7 @@
             }
         }
 
-        function startBatchScan() {
+        async function startBatchScan() {
             const batchBtn = document.getElementById('batchBtn');
             const status = document.getElementById('status');
             const progress = document.getElementById('batchProgress');
@@ -463,58 +445,84 @@
 
             batchScanning = true;
             batchStartTime = Date.now();
-            batchTarget = Math.floor(Math.random() * 15) + 10; // 10-25 devices
+            batchScanAttempts = 0;
+            batchTarget = maxBatchAttempts;
 
             batchBtn.textContent = '⏹️ Stop Batch';
             batchBtn.className = 'stop-btn';
-            status.textContent = '⚡ Batch scanning active - Sweeping area...';
+            status.textContent = '⚡ Batch scanning active - Requesting devices...';
             status.className = 'status batch-scanning';
             progress.classList.add('active');
 
             document.getElementById('scanBtn').disabled = true;
             document.getElementById('clearBtn').disabled = true;
-            document.getElementById('batchTarget').textContent = `Target: ${batchTarget} devices`;
+            document.getElementById('batchTarget').textContent = `Target: ${batchTarget} attempts`;
 
-            log.innerHTML += `\n🔥 BATCH SCAN INITIATED - ${new Date().toLocaleTimeString()}\n`;
-            log.innerHTML += `🎯 Target: ${batchTarget} devices | Sweep Pattern: Radial\n`;
+            log.innerHTML += `\n🔥 REAL BATCH SCAN INITIATED - ${new Date().toLocaleTimeString()}\n`;
+            log.innerHTML += `🎯 Max Attempts: ${batchTarget} | Mode: Continuous Device Discovery\n`;
+            log.innerHTML += `⚠️ Note: Browser will show device picker for each discovery\n`;
             log.innerHTML += `${'═'.repeat(60)}\n`;
 
-            // Simulate device discovery every 2-5 seconds
-            let devicesFound = 0;
-            batchInterval = setInterval(() => {
-                if (devicesFound >= batchTarget) {
+            // Start continuous real device scanning
+            batchInterval = setInterval(async () => {
+                if (!batchScanning || batchScanAttempts >= maxBatchAttempts) {
                     stopBatchScan();
                     return;
                 }
 
-                // Pick a random simulated device
-                const availableDevices = simulatedDevices.filter(d => !scannedDevices.has(d.id));
-                if (availableDevices.length === 0) {
-                    stopBatchScan();
-                    return;
+                batchScanAttempts++;
+                
+                try {
+                    // Update progress
+                    const progress = (batchScanAttempts / batchTarget) * 100;
+                    document.getElementById('progressFill').style.width = `${progress}%`;
+                    
+                    // Update stats
+                    const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
+                    const rate = elapsed > 0 ? Math.round((deviceCount * 60) / elapsed) : 0;
+                    document.getElementById('batchTimer').textContent = `Elapsed: ${elapsed}s`;
+                    document.getElementById('batchRate').textContent = `Found: ${rate}/min`;
+
+                    status.textContent = `⚡ Batch attempt ${batchScanAttempts}/${batchTarget} - Select device or cancel`;
+
+                    // Request real Bluetooth device
+                    const device = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: [
+                            'battery_service',
+                            'device_information',
+                            'generic_access',
+                            'generic_attribute',
+                            'heart_rate',
+                            'cycling_power',
+                            'running_speed_and_cadence'
+                        ]
+                    });
+
+                    // Process the real device
+                    if (!scannedDevices.has(device.id)) {
+                        processDevice(device, log, true);
+                        log.innerHTML += `    ✅ Real device added to batch scan results\n`;
+                    } else {
+                        log.innerHTML += `    ⚠️ Device already in database - continuing scan\n`;
+                    }
+
+                } catch (error) {
+                    if (error.name === 'NotFoundError') {
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Attempt ${batchScanAttempts}: No device selected\n`;
+                    } else if (error.name === 'SecurityError') {
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Attempt ${batchScanAttempts}: Security error\n`;
+                    } else {
+                        log.innerHTML += `[${new Date().toLocaleTimeString()}] ❌ Attempt ${batchScanAttempts}: ${error.message}\n`;
+                    }
+                    
+                    // Continue scanning even after errors
+                    log.innerHTML += `    🔄 Continuing batch scan...\n`;
                 }
 
-                const randomDevice = availableDevices[Math.floor(Math.random() * availableDevices.length)];
-                const mockDevice = {
-                    name: randomDevice.name,
-                    id: randomDevice.id,
-                    gatt: { connected: false }
-                };
+                log.scrollTop = log.scrollHeight;
 
-                processDevice(mockDevice, log, true);
-                devicesFound++;
-
-                // Update progress
-                const progress = (devicesFound / batchTarget) * 100;
-                document.getElementById('progressFill').style.width = `${progress}%`;
-
-                // Update timer and rate
-                const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
-                const rate = elapsed > 0 ? Math.round((devicesFound * 60) / elapsed) : 0;
-                document.getElementById('batchTimer').textContent = `Elapsed: ${elapsed}s`;
-                document.getElementById('batchRate').textContent = `Rate: ${rate}/min`;
-
-            }, Math.random() * 3000 + 2000); // 2-5 seconds
+            }, 3000); // 3 second intervals for batch attempts
         }
 
         function stopBatchScan() {
@@ -539,8 +547,8 @@
             document.getElementById('clearBtn').disabled = false;
 
             const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
-            log.innerHTML += `\n🏁 BATCH SCAN COMPLETED - ${new Date().toLocaleTimeString()}\n`;
-            log.innerHTML += `📊 Duration: ${elapsed}s | Devices Found: ${deviceCount}\n`;
+            log.innerHTML += `\n🏁 REAL BATCH SCAN COMPLETED - ${new Date().toLocaleTimeString()}\n`;
+            log.innerHTML += `📊 Duration: ${elapsed}s | Attempts: ${batchScanAttempts} | Devices Found: ${deviceCount}\n`;
             log.innerHTML += `${'═'.repeat(60)}\n`;
             log.scrollTop = log.scrollHeight;
         }
