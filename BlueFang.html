@@ -28,12 +28,72 @@
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background logo watermark */
+        .background-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            opacity: 0.03;
+            z-index: 1;
+            animation: slowRotate 30s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .main-logo {
+            width: 50px;
+            height: 60px;
+            filter: drop-shadow(0 0 10px #00ffcc);
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        .main-logo.scanning {
+            animation: logoScan 1.5s linear infinite;
+        }
+
+        @keyframes logoGlow {
+            from { filter: drop-shadow(0 0 10px #00ffcc); }
+            to { filter: drop-shadow(0 0 20px #00ffcc) drop-shadow(0 0 30px #00ffcc); }
+        }
+
+        @keyframes logoScan {
+            0%, 100% { 
+                filter: drop-shadow(0 0 15px #00ffcc);
+                transform: scale(1);
+            }
+            50% { 
+                filter: drop-shadow(0 0 25px #ff00cc) drop-shadow(0 0 35px #ff00cc);
+                transform: scale(1.1);
+            }
         }
 
         h1 {
-            text-align: center;
             font-size: 2.5em;
-            margin-bottom: 10px;
             text-shadow: 0 0 10px #00ffcc;
             animation: glow 2s ease-in-out infinite alternate;
         }
@@ -46,11 +106,12 @@
         .subtitle {
             text-align: center;
             font-size: 1.1em;
-            margin-bottom: 30px;
             opacity: 0.8;
         }
 
         .controls {
+            position: relative;
+            z-index: 2;
             display: flex;
             gap: 15px;
             justify-content: center;
@@ -87,6 +148,8 @@
         }
 
         .status {
+            position: relative;
+            z-index: 2;
             text-align: center;
             margin-bottom: 20px;
             font-size: 1.1em;
@@ -107,6 +170,8 @@
         }
 
         #deviceLog {
+            position: relative;
+            z-index: 2;
             background: #0a0a0a;
             border: 1px solid #333;
             border-radius: 8px;
@@ -152,13 +217,37 @@
         }
 
         .device-count {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             text-align: center;
             margin-top: 15px;
             font-size: 1.1em;
             color: #00bfa6;
         }
 
+        .status-logo {
+            width: 20px;
+            height: 24px;
+            filter: drop-shadow(0 0 5px #00bfa6);
+        }
+
+        .status-logo.threat-detected {
+            filter: drop-shadow(0 0 8px #ff00cc);
+            animation: threatPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes threatPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+
         .warning {
+            position: relative;
+            z-index: 2;
             background: rgba(255, 0, 0, 0.1);
             border: 1px solid #ff0000;
             color: #ff6666;
@@ -169,6 +258,8 @@
         }
 
         .info {
+            position: relative;
+            z-index: 2;
             background: rgba(0, 100, 255, 0.1);
             border: 1px solid #0064ff;
             color: #66aaff;
@@ -176,6 +267,38 @@
             border-radius: 5px;
             margin-bottom: 20px;
             font-size: 0.9em;
+        }
+
+        /* Particle effect for scanning */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .particles.active {
+            opacity: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffcc;
+            border-radius: 50%;
+            animation: float 3s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10px) translateX(20px); opacity: 0; }
         }
 
         @media (max-width: 768px) {
@@ -187,18 +310,54 @@
             h1 {
                 font-size: 2em;
             }
+
+            .logo-title-container {
+                flex-direction: column;
+                gap: 10px;
+            }
             
             button {
                 min-width: 120px;
                 padding: 10px 20px;
+            }
+
+            .background-logo {
+                width: 250px;
+                height: 250px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧠 BlueFang Vax Detector</h1>
-        <p class="subtitle">Advanced Bluetooth Low Energy Device Scanner</p>
+        <!-- Background logo watermark -->
+        <svg class="background-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#bgGradient)" stroke="none"/>
+        </svg>
+
+        <div class="particles" id="particles"></div>
+
+        <div class="header">
+            <div class="logo-title-container">
+                <svg id="mainLogo" class="main-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#logoGradient)" stroke="none"/>
+                </svg>
+                <h1>BlueFang Vax Detector</h1>
+            </div>
+            <p class="subtitle">Advanced Bluetooth Low Energy Device Scanner</p>
+        </div>
         
         <div class="info">
             ℹ️ This tool scans for nearby Bluetooth devices. Due to browser security limitations, you'll need to select each device individually from the browser's device picker.
@@ -225,9 +384,20 @@ Each click will allow you to select one device from the available options.
 ═══════════════════════════════════════════════════════════════════════
 </div>
 
-        <div id="deviceCount" class="device-count">Devices found: 0</div>
+        <div id="deviceCount" class="device-count">
+            <svg class="status-logo" id="statusLogo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="statusGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00bfa6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#009688;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#statusGradient)" stroke="none"/>
+            </svg>
+            <span id="countText">Devices found: 0</span>
+        </div>
 
-        <!-- New Download Section -->
+        <!-- Download Section -->
         <div class="info" style="margin-top:30px; text-align:center; border:2px dashed #00ffcc; padding:20px;">
             <h2>🧬 GLYPHCHAIN EVIDENCE DROP</h2>
             <p>🧬 Android BLE SCANNER App — <strong>DOWNLOAD NOW</strong></p>
@@ -246,6 +416,7 @@ Each click will allow you to select one device from the available options.
     <script>
         let deviceCount = 0;
         let scannedDevices = new Set();
+        let threatsDetected = 0;
 
         // Check browser support
         if (!navigator.bluetooth) {
@@ -255,17 +426,56 @@ Each click will allow you to select one device from the available options.
             document.getElementById('scanBtn').disabled = true;
         }
 
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = '';
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function updateStatusLogo() {
+            const statusLogo = document.getElementById('statusLogo');
+            const statusGradient = statusLogo.querySelector('#statusGradient');
+            
+            if (threatsDetected > 0) {
+                statusLogo.classList.add('threat-detected');
+                statusGradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:#ff00cc;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#cc0099;stop-opacity:1" />
+                `;
+            } else {
+                statusLogo.classList.remove('threat-detected');
+                statusGradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:#00bfa6;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#009688;stop-opacity:1" />
+                `;
+            }
+        }
+
         async function scanSingleDevice() {
             const scanBtn = document.getElementById('scanBtn');
             const status = document.getElementById('status');
             const log = document.getElementById('deviceLog');
+            const mainLogo = document.getElementById('mainLogo');
+            const particles = document.getElementById('particles');
 
             try {
-                // Disable button and show scanning status
+                // Start scanning effects
                 scanBtn.disabled = true;
                 scanBtn.textContent = '⏳ Scanning...';
                 status.textContent = '🔍 Opening device selector...';
                 status.className = 'status scanning';
+                mainLogo.classList.add('scanning');
+                
+                createParticles();
+                particles.classList.add('active');
 
                 // Request device with all available options
                 const device = await navigator.bluetooth.requestDevice({
@@ -302,6 +512,10 @@ Each click will allow you to select one device from the available options.
                     deviceId.toUpperCase().startsWith(pattern)
                 );
 
+                if (isVaccinated) {
+                    threatsDetected++;
+                }
+
                 const displayName = deviceName === 'Vaccinated' 
                     ? '<span class="vaccinated">Vaccinated</span>'
                     : deviceName;
@@ -336,7 +550,13 @@ Each click will allow you to select one device from the available options.
 
                 status.textContent = `✅ Device scanned successfully - ${deviceName}`;
                 status.className = 'status';
-                document.getElementById('deviceCount').textContent = `Devices found: ${deviceCount}`;
+                
+                const countText = threatsDetected > 0 
+                    ? `Devices found: ${deviceCount} | Threats: ${threatsDetected}`
+                    : `Devices found: ${deviceCount}`;
+                document.getElementById('countText').textContent = countText;
+                
+                updateStatusLogo();
 
                 if (device.gatt && device.gatt.connected === false) {
                     try {
@@ -357,8 +577,15 @@ Each click will allow you to select one device from the available options.
                 }
                 status.className = 'status';
             } finally {
+                // Reset scanning effects
                 scanBtn.disabled = false;
                 scanBtn.textContent = '🔍 Scan Device';
+                mainLogo.classList.remove('scanning');
+                particles.classList.remove('active');
+                
+                setTimeout(() => {
+                    particles.innerHTML = '';
+                }, 500);
             }
         }
 
@@ -371,9 +598,11 @@ Log cleared at ${new Date().toLocaleTimeString()}
 ═══════════════════════════════════════════════════════════════════════
 `;
             deviceCount = 0;
+            threatsDetected = 0;
             scannedDevices.clear();
-            document.getElementById('deviceCount').textContent = 'Devices found: 0';
+            document.getElementById('countText').textContent = 'Devices found: 0';
             document.getElementById('status').textContent = 'Ready to scan - Log cleared';
+            updateStatusLogo();
         }
 
         document.addEventListener('keydown', function(event) {
