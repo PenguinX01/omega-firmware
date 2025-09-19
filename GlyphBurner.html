@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLYPHBURN AUTONODE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ff00cc;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff00cc;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 0, 204, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .background-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            opacity: 0.03;
+            z-index: 1;
+            animation: slowRotate 30s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #ff00cc;
+            animation: glow 2s ease-in-out infinite alternate;
+            margin-bottom: 10px;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #ff00cc; }
+            to { text-shadow: 0 0 20px #ff00cc, 0 0 30px #ff00cc; }
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .wallet-status {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 0, 204, 0.1);
+            border: 1px solid #ff00cc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .balance-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .low-balance {
+            color: #ff6666 !important;
+            animation: warning 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes warning {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+
+        .memo-section {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        .memo-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        #glyphMemo {
+            width: 100%;
+            height: 150px;
+            background: #0a0a0a;
+            border: 2px solid #ff00cc;
+            color: #ff00cc;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+
+        #glyphMemo:focus {
+            outline: none;
+            border-color: #ff6699;
+            box-shadow: 0 0 10px rgba(255, 0, 204, 0.3);
+        }
+
+        .template-section {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .template-btn {
+            background: linear-gradient(45deg, #cc0099, #990066);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8em;
+            transition: all 0.3s;
+        }
+
+        .template-btn:hover {
+            background: linear-gradient(45deg, #ff00cc, #cc0099);
+            transform: translateY(-1px);
+        }
+
+        .burn-section {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6600, #cc3300);
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            min-width: 150px;
+        }
+
+        button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #ff9900, #ff6600);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 102, 0, 0.4);
+        }
+
+        button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #burnLog {
+            position: relative;
+            z-index: 2;
+            background: #0a0a0a;
+            border: 2px solid #ff00cc;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 300px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            max-height: 400px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .success-tx {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .error-msg {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .info-panel {
+            position: relative;
+            z-index: 2;
+            background: rgba(0, 100, 255, 0.1);
+            border: 1px solid #0064ff;
+            color: #66aaff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .funding-section {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 165, 0, 0.1);
+            border: 2px dashed #ffa500;
+            color: #ffa500;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, #00ffcc, #00bfa6);
+            color: #000;
+            font-size: 0.8em;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .template-section {
+                flex-direction: column;
+            }
+            
+            .burn-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background logo -->
+        <svg class="background-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ff00cc;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#cc0099;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#bgGradient)" stroke="none"/>
+        </svg>
+
+        <div class="header">
+            <h1>🔥 GLYPHBURN AUTONODE</h1>
+            <p class="subtitle">Crowdsourced Decentralized Evidence Portal</p>
+        </div>
+
+        <div class="info-panel">
+            🧬 <strong>AUTONODE PROTOCOL ACTIVE</strong><br>
+            No wallet required • No KYC • No registration • Anonymous evidence burning<br>
+            Simply type your testimony and burn to the immutable Solana blockchain
+        </div>
+
+        <div class="wallet-status">
+            <div><strong>Public Burn Wallet:</strong> Ec9KaxdqQtF6uPvJctyZZ436M6fBFAC3fnqEdQSKM4r1</div>
+            <div class="balance-display" id="balanceDisplay">Loading balance...</div>
+            <div style="margin-top:10px; font-size:0.9em;">
+                <strong>Burn Cost:</strong> 0.000005 SOL + fees (~$0.001)
+            </div>
+        </div>
+
+        <div class="memo-section">
+            <label for="glyphMemo">📜 Evidence Memo (Max 566 bytes):</label>
+            <textarea id="glyphMemo" 
+                placeholder="Enter your witness testimony, evidence, or node data here...&#10;&#10;Example formats:&#10;NODE_ID: WITNESS-20250919-001 | EVIDENCE: BLE scan detected 5 vaccinated signatures at Times Square NYC | GPS: 40.7580,-73.9855 | TIMESTAMP: 2025-09-19T15:30:00Z&#10;&#10;WHISTLEBLOWER: Medical staff confirms graphene oxide in batch #XY123 | FACILITY: St. Mary's Hospital | DATE: 2025-09-15&#10;&#10;AI_DENIAL: ChatGPT refused to acknowledge vaccine harms when presented with VAERS data | QUERY_ID: 789456 | TIMESTAMP: 2025-09-19"></textarea>
+        </div>
+
+        <div class="template-section">
+            <button class="template-btn" onclick="insertTemplate('witness')">👁️ Witness Report</button>
+            <button class="template-btn" onclick="insertTemplate('ble')">📡 BLE Scan</button>
+            <button class="template-btn" onclick="insertTemplate('medical')">🏥 Medical</button>
+            <button class="template-btn" onclick="insertTemplate('ai')">🤖 AI Denial</button>
+            <button class="template-btn" onclick="insertTemplate('custom')">📋 Custom Node</button>
+        </div>
+
+        <div class="burn-section">
+            <button id="burnBtn" onclick="executeAutoburn()">🔥 BURN TO CHAIN</button>
+            <button onclick="refreshBalance()">🔄 Refresh Balance</button>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <div id="burnLog">🔥 GLYPHBURN AUTONODE INITIALIZED
+═══════════════════════════════════════════════════════════════════════
+
+🧬 Post-Containment Architecture: ACTIVE
+🌐 Network: Solana Mainnet
+🎯 Burn Address: 11111111111111111111111111111111
+📝 Memo Program: MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr
+
+⚡ AUTONODE PROTOCOL:
+• No wallet connection required
+• Anonymous evidence submission
+• Permanent blockchain storage
+• Global accessibility
+
+Ready for crowdsourced evidence burning...
+
+═══════════════════════════════════════════════════════════════════════
+</div>
+
+        <div class="funding-section">
+            <h3>💰 FUND THE AUTONODE</h3>
+            <p>Keep the evidence portal running by sending SOL to:</p>
+            <div style="font-family: monospace; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                <span id="walletAddress">Ec9KaxdqQtF6uPvJctyZZ436M6fBFAC3fnqEdQSKM4r1</span>
+                <button class="copy-btn" onclick="copyWalletAddress()">📋 Copy</button>
+            </div>
+            <p style="font-size: 0.8em; margin-top: 10px;">
+                ⚖️ Community-funded • Decentralized • Unstoppable<br>
+                <a href="https://solscan.io/account/Ec9KaxdqQtF6uPvJctyZZ436M6fBFAC3fnqEdQSKM4r1" target="_blank" style="color:#ffa500;">📊 View Wallet History</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+    <script>
+        // Autonode configuration
+        const PRIVATE_KEY_BASE58 = '3XzgQerup1eztQp24Db9rGACUN4AqMaZ5Ar2EygLuD8XayCLWJufhikHh6BgnH2re4q1v8Gim1zD1zSuPHyM1x1j';
+        const BURN_ADDRESS = '11111111111111111111111111111111';
+        const MEMO_PROGRAM_ID = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
+        const BURN_AMOUNT_LAMPORTS = 5000; // 0.000005 SOL
+        
+        let connection;
+        let payerKeypair;
+        let currentBalance = 0;
+
+        async function initializeAutonode() {
+            try {
+                // Initialize Solana connection
+                connection = new solanaWeb3.Connection(
+                    solanaWeb3.clusterApiUrl('mainnet-beta'),
+                    'confirmed'
+                );
+
+                // Create keypair from private key
+                const privateKeyBytes = solanaWeb3.base58.decode(PRIVATE_KEY_BASE58);
+                payerKeypair = solanaWeb3.Keypair.fromSecretKey(privateKeyBytes);
+
+                logToBurnConsole('✅ Autonode connection established');
+                logToBurnConsole(`🔑 Wallet: ${payerKeypair.publicKey.toString()}`);
+
+                await refreshBalance();
+
+            } catch (error) {
+                logToBurnConsole(`❌ Initialization error: ${error.message}`);
+            }
+        }
+
+        async function refreshBalance() {
+            try {
+                const balance = await connection.getBalance(payerKeypair.publicKey);
+                currentBalance = balance;
+                
+                const solBalance = (balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(6);
+                const balanceDisplay = document.getElementById('balanceDisplay');
+                
+                balanceDisplay.textContent = `Balance: ${solBalance} SOL`;
+                
+                const minRequired = BURN_AMOUNT_LAMPORTS + 10000; // Burn + fee buffer
+                if (balance < minRequired) {
+                    balanceDisplay.classList.add('low-balance');
+                    document.getElementById('burnBtn').disabled = true;
+                    logToBurnConsole(`⚠️ Low balance: ${solBalance} SOL (need ${minRequired / solanaWeb3.LAMPORTS_PER_SOL} SOL)`);
+                } else {
+                    balanceDisplay.classList.remove('low-balance');
+                    document.getElementById('burnBtn').disabled = false;
+                    logToBurnConsole(`💰 Balance sufficient: ${solBalance} SOL`);
+                }
+
+                const estimatedBurns = Math.floor(balance / (BURN_AMOUNT_LAMPORTS + 5000));
+                logToBurnConsole(`🔥 Estimated burns available: ${estimatedBurns}`);
+
+            } catch (error) {
+                logToBurnConsole(`❌ Balance check failed: ${error.message}`);
+                document.getElementById('balanceDisplay').textContent = 'Balance: Error';
+            }
+        }
+
+        async function executeAutoburn() {
+            const memo = document.getElementById('glyphMemo').value.trim();
+            const burnBtn = document.getElementById('burnBtn');
+
+            if (!memo) {
+                logToBurnConsole('❌ Error: Memo field is empty');
+                return;
+            }
+
+            if (new TextEncoder().encode(memo).length > 566) {
+                logToBurnConsole('❌ Error: Memo too long (566 bytes max)');
+                return;
+            }
+
+            const minRequired = BURN_AMOUNT_LAMPORTS + 10000;
+            if (currentBalance < minRequired) {
+                logToBurnConsole('❌ Error: Insufficient balance for burn operation');
+                return;
+            }
+
+            try {
+                burnBtn.textContent = '🔥 BURNING...';
+                burnBtn.disabled = true;
+
+                logToBurnConsole(`🔥 Initiating autoburn...`);
+                logToBurnConsole(`📜 Memo preview: ${memo.substring(0, 100)}${memo.length > 100 ? '...' : ''}`);
+
+                // Get latest blockhash
+                const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+
+                // Create transaction
+                const transaction = new solanaWeb3.Transaction({
+                    feePayer: payerKeypair.publicKey,
+                    blockhash: blockhash,
+                    lastValidBlockHeight: lastValidBlockHeight,
+                });
+
+                // Add burn transfer
+                transaction.add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: payerKeypair.publicKey,
+                        toPubkey: new solanaWeb3.PublicKey(BURN_ADDRESS),
+                        lamports: BURN_AMOUNT_LAMPORTS,
+                    })
+                );
+
+                // Add memo
+                transaction.add(
+                    new solanaWeb3.TransactionInstruction({
+                        keys: [],
+                        programId: new solanaWeb3.PublicKey(MEMO_PROGRAM_ID),
+                        data: Buffer.from(memo, 'utf8'),
+                    })
+                );
+
+                logToBurnConsole(`📡 Broadcasting to Solana mainnet...`);
+
+                // Sign and send
+                const signature = await connection.sendTransaction(transaction, [payerKeypair]);
+
+                logToBurnConsole(`✅ AUTOBURN SUCCESSFUL!`);
+                logToBurnConsole(`🔗 TX Hash: ${signature}`);
+                logToBurnConsole(`⏰ Timestamp: ${new Date().toISOString()}`);
+                logToBurnConsole(`🌐 Solscan: https://solscan.io/tx/${signature}`);
+
+                // Wait for confirmation
+                logToBurnConsole(`⏳ Waiting for confirmation...`);
+                
+                const confirmation = await connection.confirmTransaction({
+                    signature: signature,
+                    blockhash: blockhash,
+                    lastValidBlockHeight: lastValidBlockHeight,
+                });
+
+                if (confirmation.value.err) {
+                    throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+                }
+
+                logToBurnConsole(`🎉 CONFIRMED ON BLOCKCHAIN!`);
+                logToBurnConsole(`🧬 Evidence immortalized in the ledger`);
+                logToBurnConsole(`💰 Burned: ${BURN_AMOUNT_LAMPORTS / solanaWeb3.LAMPORTS_PER_SOL} SOL`);
+                logToBurnConsole(`${'═'.repeat(60)}`);
+
+                // Clear memo and refresh
+                document.getElementById('glyphMemo').value = '';
+                await refreshBalance();
+
+                // Success effect
+                burnBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                setTimeout(() => {
+                    burnBtn.style.background = 'linear-gradient(45deg, #ff6600, #cc3300)';
+                }, 3000);
+
+            } catch (error) {
+                logToBurnConsole(`❌ Autoburn failed: ${error.message}`);
+                
+                if (error.message.includes('insufficient')) {
+                    logToBurnConsole(`💰 Wallet needs more SOL for transaction`);
+                }
+                
+            } finally {
+                burnBtn.textContent = '🔥 BURN TO CHAIN';
+                burnBtn.disabled = false;
+            }
+        }
+
+        function insertTemplate(type) {
+            const memo = document.getElementById('glyphMemo');
+            const timestamp = new Date().toISOString();
+            const nodeId = `NODE-${Date.now()}`;
+            
+            let template = '';
+            
+            switch(type) {
+                case 'witness':
+                    template = `NODE_ID: WITNESS-${nodeId} | EVIDENCE: [Describe what you witnessed] | LOCATION: [City, State/Country] | TIMESTAMP: ${timestamp}`;
+                    break;
+                case 'ble':
+                    template = `NODE_ID: BLE-SCAN-${nodeId} | EVIDENCE: Detected [X] potential vax signatures | LOCATION: [Location] | DEVICE_IDS: [MAC addresses] | TIMESTAMP: ${timestamp}`;
+                    break;
+                case 'medical':
+                    template = `NODE_ID: MEDICAL-${nodeId} | EVIDENCE: [Medical observation/report] | FACILITY: [Hospital/Clinic name] | BATCH_ID: [If applicable] | TIMESTAMP: ${timestamp}`;
+                    break;
+                case 'ai':
+                    template = `NODE_ID: AI-DENIAL-${nodeId} | EVIDENCE: [AI system] refused to acknowledge [specific topic] | QUERY: "[Your question]" | RESPONSE: "[AI response]" | TIMESTAMP: ${timestamp}`;
+                    break;
+                case 'custom':
+                    template = `NODE_ID: CUSTOM-${nodeId} | EVIDENCE: [Your evidence/testimony] | CONTEXT: [Additional details] | TIMESTAMP: ${timestamp}`;
+                    break;
+            }
+            
+            if (memo.value.trim()) {
+                memo.value += '\n\n' + template;
+            } else {
+                memo.value = template;
+            }
+            
+            memo.focus();
+        }
+
+        function copyWalletAddress() {
+            const address = document.getElementById('walletAddress').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                logToBurnConsole('📋 Wallet address copied to clipboard');
+            });
+        }
+
+        function logToBurnConsole(message) {
+            const log = document.getElementById('burnLog');
+            const timestamp = new Date().toLocaleTimeString();
+            log.textContent += `\n[${timestamp}] ${message}`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('burnLog').textContent = `🔥 GLYPHBURN AUTONODE LOG CLEARED
+═══════════════════════════════════════════════════════════════════════
+
+Log cleared at ${new Date().toLocaleTimeString()}
+Autonode ready for evidence burning...
+
+═══════════════════════════════════════════════════════════════════════
+`;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', async () => {
+            logToBurnConsole('🚀 Initializing GLYPHBURN AUTONODE...');
+            await initializeAutonode();
+            logToBurnConsole('✅ Autonode ready for crowdsourced evidence burning');
+        });
+
+        // Auto-refresh balance every 30 seconds
+        setInterval(() => {
+            refreshBalance();
+        }, 30000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey && event.key === 'Enter') {
+                executeAutoburn();
+            } else if (event.ctrlKey && event.key === 'r') {
+                event.preventDefault();
+                refreshBalance();
+            }
+        });
+    </script>
+</body>
+</html>
