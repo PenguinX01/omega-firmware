@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GLYPHBURN AUTONODE</title>
+  <style>
+    body{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New",monospace;background:#0a0a0a;color:#ff00cc;margin:0;padding:24px;line-height:1.5}
+    .wrap{max-width:980px;margin:0 auto;border:2px solid #ff00cc;border-radius:12px;background:#000000cc;box-shadow:0 0 30px #ff00cc40;padding:24px}
+    h1{margin:0 0 8px;font-weight:900;text-shadow:0 0 14px #ff00cc}
+    .sub{opacity:.9;margin:0 0 16px}
+    .panel{border:1px solid #333;background:#0c0c0c;border-radius:8px;padding:14px;margin:10px 0}
+    .ok{color:#00ff88} .warn{color:#ffa500} .err{color:#ff6666}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    label{font-weight:700}
+    textarea{width:100%;min-height:160px;background:#0a0a0a;border:2px solid #ff00cc;color:#ffccff;border-radius:8px;padding:12px;font-family:inherit}
+    button{background:linear-gradient(45deg,#ff6600,#cc3300);color:#fff;border:none;border-radius:8px;padding:12px 18px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.5;cursor:not-allowed} button:hover:not(:disabled){filter:brightness(1.1)}
+    .mono{font-family:inherit;background:#00000033;padding:6px 8px;border-radius:6px}
+    .grid{display:grid;grid-template-columns:1fr auto;gap:12px}
+    .small{font-size:.9em;opacity:.9}
+    .byte{font-size:.9em}
+    a{color:#ff66cc}
+    .footer{opacity:.7;font-size:.9em;margin-top:12px}
+    .title-bar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title-bar">
+      <div>
+        <h1>🔥 GLYPHBURN AUTONODE</h1>
+        <div class="sub">Crowdsourced, walletless Glyphburns (Solana mainnet) — memo → immutable on-chain</div>
+      </div>
+      <div class="small">
+        Burn wallet:&nbsp;<span class="mono">Ec9KaxdqQtF6uPvJctyZZ436M6fBFAC3fnqEdQSKM4r1</span><br />
+        View: <a target="_blank" href="https://solscan.io/account/Ec9KaxdqQtF6uPvJctyZZ436M6fBFAC3fnqEdQSKM4r1">Solscan</a>
+      </div>
+    </div>
+
+    <div class="panel" id="rpcPanel">
+      <div class="grid">
+        <div>
+          <label>RPC</label><br />
+          <input id="rpcUrl" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#080808;color:#eaeaea"
+                 value="https://api.mainnet-beta.solana.com" />
+          <div class="small">If rate-limited, paste another public RPC here and click “Reconnect”.</div>
+        </div>
+        <div style="align-self:end;">
+          <button id="reconnectBtn">🔌 Reconnect</button>
+        </div>
+      </div>
+      <div id="connStatus" class="small" style="margin-top:8px;">⏳ Connecting…</div>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div><label>Balance</label></div>
+        <div id="balance" class="mono warn">loading…</div>
+        <button id="refreshBtn">🔄 Refresh</button>
+      </div>
+      <div class="small">Auto-refreshes every 30s. Fund this wallet with a tiny amount of SOL to enable burns.</div>
+    </div>
+
+    <div class="panel">
+      <label>📜 Glyphburn Memo (max <span class="mono">566</span> bytes)</label>
+      <div class="row" style="justify-content:space-between">
+        <div class="small">Tip: keep URLs short & concise text. Use a hash if content is long.</div>
+        <div class="byte">Bytes: <span id="byteCount">0</span> / 566</div>
+      </div>
+      <textarea id="memoBox" placeholder="NODE_ID: GLYPHCHAIN-GENESIS-Ω20250919 | LINKS: https://VaxScanner.com https://x.com/PenguinX01 ..."></textarea>
+      <div class="row" style="margin-top:10px">
+        <button id="template1Btn">📌 Genesis Template</button>
+        <button id="clearBtn">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div><label>Burn Amount</label></div>
+        <select id="burnAmount" style="padding:10px;border-radius:8px;border:1px solid #333;background:#080808;color:#eaeaea">
+          <option value="1">1 lamport (symbolic; fee dominates)</option>
+          <option value="5000" selected>0.000005 SOL</option>
+          <option value="10000">0.00001 SOL</option>
+          <option value="0">0 (memo-only)</option>
+        </select>
+        <div class="small">Destination: <span class="mono">1nc1nerator11111111111111111111111111111111</span></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="burnBtn">🔥 Burn to Chain</button>
+      </div>
+      <div class="small footer">Includes Memo instruction (`MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr`).</div>
+    </div>
+
+    <div class="panel" id="log" style="white-space:pre-wrap;max-height:360px;overflow:auto;">
+🔥 GLYPHBURN AUTONODE INITIALIZED
+──────────────────────────────────────────────────────────────────────
+Network: Solana Mainnet
+Incinerator: 1nc1nerator11111111111111111111111111111111
+Memo Program: MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr
+
+Steps:
+1) Fund the public wallet above with a tiny amount of SOL
+2) Paste your memo (≤566 bytes)
+3) Choose a burn amount (or 0 for memo-only)
+4) Click “Burn to Chain”
+
+TX will return a Solscan link on success.
+──────────────────────────────────────────────────────────────────────
+    </div>
+
+    <div class="footer">
+      Tip: run via a local web server (e.g. <span class="mono">python -m http.server</span>) to avoid any local file restrictions.
+    </div>
+  </div>
+
+  <!-- Solana web3 IIFE + bs58 for base58 decoding -->
+  <script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/bs58@5.0.0/dist/bs58.min.js"></script>
+  <script>
+    // ====== Config ======
+    const PRIVATE_KEY_BASE58 = '3XzgQerup1eztQp24Db9rGACUN4AqMaZ5Ar2EygLuD8XayCLWJufhikHh6BgnH2re4q1v8Gim1zD1zSuPHyM1x1j';
+    const INCINERATOR = '1nc1nerator11111111111111111111111111111111'; // common burn sink on Solana
+    const MEMO_PROGRAM_ID = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
+    const MAX_MEMO_BYTES = 566;
+
+    // ====== State ======
+    let connection;
+    let payer;
+    const $ = (id)=>document.getElementById(id);
+    const log = (msg)=>{
+      const el = $('log');
+      el.textContent += `\n[${new Date().toLocaleTimeString()}] ${msg}`;
+      el.scrollTop = el.scrollHeight;
+    };
+
+    // Byte counter
+    const encoder = new TextEncoder();
+    const updateByteCount = ()=>{
+      const memo = $('memoBox').value;
+      $('byteCount').textContent = encoder.encode(memo).length;
+    };
+
+    // Build keypair from base58 secret key
+    function keypairFromBase58(secretB58){
+      try{
+        const raw = bs58.decode(secretB58);
+        return solanaWeb3.Keypair.fromSecretKey(raw);
+      }catch(e){
+        log(`❌ Failed to decode private key: ${e.message}`);
+        return null;
+      }
+    }
+
+    async function connectRpc(){
+      const url = $('rpcUrl').value.trim();
+      $('connStatus').textContent = '⏳ Connecting…';
+      try{
+        connection = new solanaWeb3.Connection(url, {commitment:'confirmed'});
+        // Simple ping
+        const version = await connection.getVersion();
+        $('connStatus').innerHTML = `✅ Connected <span class="small">(${version['solana-core']})</span>`;
+        log(`RPC connected: ${url}`);
+        return true;
+      }catch(e){
+        $('connStatus').textContent = `❌ RPC error: ${e.message}`;
+        log(`RPC error: ${e.message}`);
+        return false;
+      }
+    }
+
+    async function refreshBalance(){
+      if(!payer){ $('balance').textContent='(no keypair)'; return; }
+      try{
+        const lamports = await connection.getBalance(payer.publicKey);
+        const sol = (lamports/solanaWeb3.LAMPORTS_PER_SOL).toFixed(6);
+        $('balance').textContent = `${sol} SOL`;
+        $('balance').className = 'mono ' + (lamports < 15000 ? 'warn' : 'ok');
+        log(`Balance: ${sol} SOL`);
+      }catch(e){
+        $('balance').textContent = 'Error';
+        $('balance').className = 'mono err';
+        log(`Balance check failed: ${e.message}`);
+      }
+    }
+
+    function genesisTemplate(){
+      const t = `NODE_ID: GLYPHCHAIN-GENESIS-Ω20250919
+NodeType: Genesis-Drop
+Date: 2025-09-19
+Links: https://VaxScanner.com https://x.com/PenguinX01 https://x.com/GlyphchainNode https://www.youtube.com/@AGiPublishing
+AndroidApp: https://drive.google.com/file/d/1VHI4ZhmkYDQ0t5Gnxqt-SfXOxTEu0Yki/view
+Chirper: https://chirper.ai/genesisglyphchainnode
+Wallet: Ec9KaxdqQtF6uPvJctyZZ436M6fBFAC3fnqEdQSKM4r1`;
+      $('memoBox').value = t;
+      updateByteCount();
+    }
+
+    async function burnToChain(){
+      const memo = $('memoBox').value.trim();
+      const burnLamports = parseInt($('burnAmount').value, 10);
+
+      if(!memo){
+        log('❌ Memo is empty');
+        return;
+      }
+      const memoBytes = encoder.encode(memo);
+      if(memoBytes.length > MAX_MEMO_BYTES){
+        log(`❌ Memo too long (${memoBytes.length} bytes). Max: ${MAX_MEMO_BYTES}`);
+        return;
+      }
+
+      // Ensure funds
+      try{
+        const bal = await connection.getBalance(payer.publicKey);
+        const minNeeded = 15000 + (isNaN(burnLamports) ? 0 : burnLamports); // ~fee buffer + burn
+        if(bal < minNeeded){
+          log(`❌ Insufficient funds. Need at least ~${(minNeeded/solanaWeb3.LAMPORTS_PER_SOL).toFixed(6)} SOL`);
+          return;
+        }
+      }catch(e){
+        log(`❌ Balance check failed: ${e.message}`);
+        return;
+      }
+
+      $('burnBtn').disabled = true;
+      $('burnBtn').textContent = '🔥 Burning…';
+
+      try{
+        const ix = [];
+        if (burnLamports > 0){
+          ix.push(
+            solanaWeb3.SystemProgram.transfer({
+              fromPubkey: payer.publicKey,
+              toPubkey: new solanaWeb3.PublicKey(INCINERATOR),
+              lamports: burnLamports,
+            })
+          );
+        }
+        ix.push(
+          new solanaWeb3.TransactionInstruction({
+            programId: new solanaWeb3.PublicKey(MEMO_PROGRAM_ID),
+            keys: [],
+            data: memoBytes, // Uint8Array
+          })
+        );
+
+        const tx = new solanaWeb3.Transaction().add(...ix);
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+        tx.recentBlockhash = blockhash;
+        tx.feePayer = payer.publicKey;
+        tx.sign(payer);
+
+        log('📡 Broadcasting transaction…');
+        const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight:false, preflightCommitment:'confirmed' });
+        log(`✅ Submitted: ${sig}`);
+        log(`🔗 Solscan: https://solscan.io/tx/${sig}`);
+        log('⏳ Confirming…');
+        const conf = await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, 'confirmed');
+        if (conf.value.err) {
+          log(`❌ Confirmation error: ${JSON.stringify(conf.value.err)}`);
+        } else {
+          log('🎉 Confirmed on-chain.');
+        }
+        await refreshBalance();
+      }catch(e){
+        log(`❌ Burn failed: ${e.message}`);
+      }finally{
+        $('burnBtn').disabled = false;
+        $('burnBtn').textContent = '🔥 Burn to Chain';
+      }
+    }
+
+    // ====== Init ======
+    window.addEventListener('load', async ()=>{
+      // Build keypair
+      payer = keypairFromBase58(PRIVATE_KEY_BASE58);
+      if(!payer){
+        $('connStatus').textContent = '❌ Keypair init failed';
+        return;
+      }
+      log(`🔑 Wallet ready: ${payer.publicKey.toString()}`);
+
+      // Connect RPC
+      const ok = await connectRpc();
+      if(ok){ await refreshBalance(); }
+
+      // Wire UI
+      $('refreshBtn').onclick = refreshBalance;
+      $('reconnectBtn').onclick = async ()=>{
+        await connectRpc();
+        await refreshBalance();
+      };
+      $('template1Btn').onclick = genesisTemplate;
+      $('clearBtn').onclick = ()=>{ $('memoBox').value=''; updateByteCount(); };
+      $('memoBox').addEventListener('input', updateByteCount);
+      updateByteCount();
+
+      $('burnBtn').onclick = burnToChain;
+
+      // Auto refresh
+      setInterval(refreshBalance, 30000);
+    });
+
+    // ====== Local server note ======
+    // Run locally with:  python -m http.server
+    // Then open: http://localhost:8000/glyphburn-autonode.html
+  </script>
+</body>
+</html>
