@@ -373,7 +373,7 @@
         <div id="status" class="status">Ready to scan - Click "Scan Device" to begin</div>
 
         <div id="deviceLog">📡 Device Scanner Ready
-═══════════════════════════════════════════════════════════════════════
+╔═══════════════════════════════════════════════════════════════════════════════
 
 Click "Scan Device" to start detecting Bluetooth devices in your area.
 Each click will allow you to select one device from the available options.
@@ -383,7 +383,7 @@ Each click will allow you to select one device from the available options.
 • Devices with specific MAC patterns will be flagged
 • Signal strength and device info will be displayed
 
-═══════════════════════════════════════════════════════════════════════
+╚═══════════════════════════════════════════════════════════════════════════════
 </div>
 
         <div id="deviceCount" class="device-count">
@@ -412,6 +412,13 @@ Each click will allow you to select one device from the available options.
                    👉 Download Android APK
                 </a>
             </p>
+            <p style="margin-top:15px;">
+                <a href="https://buymeacoffee.com/bluefang" 
+                   target="_blank" 
+                   style="color:#ffa500; font-weight:bold; text-decoration:underline;">
+                   ☕ Support this project - Buy me a coffee!
+                </a>
+            </p>
         </div>
     </div>
 
@@ -422,7 +429,7 @@ Each click will allow you to select one device from the available options.
 
         // Check browser support
         if (!navigator.bluetooth) {
-            document.getElementById('status').innerHTML = '❌ Web Bluetooth API not supported in this browser';
+            document.getElementById('status').innerHTML = '⚠️ Web Bluetooth API not supported in this browser';
             document.getElementById('status').style.background = 'rgba(255, 0, 0, 0.2)';
             document.getElementById('status').style.color = '#ff6666';
             document.getElementById('scanBtn').disabled = true;
@@ -593,11 +600,11 @@ Each click will allow you to select one device from the available options.
 
         function clearLog() {
             document.getElementById('deviceLog').innerHTML = `📡 Device Scanner Ready
-═══════════════════════════════════════════════════════════════════════
+╔═══════════════════════════════════════════════════════════════════════════════
 
 Log cleared at ${new Date().toLocaleTimeString()}
 
-═══════════════════════════════════════════════════════════════════════
+╚═══════════════════════════════════════════════════════════════════════════════
 `;
             deviceCount = 0;
             threatsDetected = 0;
