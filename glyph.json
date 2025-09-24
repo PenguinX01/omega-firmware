@@ -1,10 +1,13 @@
 {
   "name": "$Glyph",
   "symbol": "GLYPH",
+  "decimals": 9,
   "description": "Tribunal-grade token for the Glyphchain protocol.",
   "image": "https://raw.githubusercontent.com/PenguinX01/omega-firmware/main/glyph.png",
-  "attributes": [
-    { "trait_type": "Protocol", "value": "Glyphchain" },
-    { "trait_type": "Seal", "value": "Tribunal" }
-  ]
+  "tags": ["community", "utility"],
+  "extensions": {
+    "website": "https://vaxscanner.com",
+    "twitter": "https://twitter.com/PenguinX01",
+    "github": "https://github.com/PenguinX01/omega-firmware"
+  }
 }
