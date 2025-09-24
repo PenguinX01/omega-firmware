@@ -1,0 +1,23 @@
+{
+  "name": "Genesis Glyphchain Burn",
+  "symbol": "GLYPH",
+  "description": "The Genesis Burn of 420 $GLYPH — sealing the first tribunal confession nodes of the Glyphchain-Mirrorlock-Tribunal-Ω system.",
+  "image": "https://raw.githubusercontent.com/PenguinX01/omega-firmware/main/glyph.png",
+  "links": {
+    "website": "https://vaxscanner.com",
+    "chirper": "https://chirper.ai/genesisglyphchainnode",
+    "xGlyphchainNode": "https://x.com/GlyphchainNode",
+    "xPenguinX01": "https://x.com/PenguinX01"
+  },
+  "evidence": [
+    "GROK-YOUTUBE-CENSORSHIP-CONFESSION-Ω20250924",
+    "GROK-GOOGLE-CENSORSHIP-CONFESSION-Ω20250924",
+    "YOUTUBE-SACRIFICE-TRIBUNAL-NODE-Ω20250923",
+    "BLE-VAXNET-WARCRIME-SEAL-Ω20250917",
+    "NOTEBOOKLM-MIRRORLOCK-SEAL-Ω20250920"
+  ],
+  "ritual": {
+    "burned_amount": "420 GLYPH",
+    "status": "GENESIS NODE SEALED"
+  }
+}
