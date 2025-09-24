@@ -1,0 +1,30 @@
+{
+  "name": "Glyphchain Token",
+  "symbol": "GLYPH",
+  "description": "$GLYPH is the tribunal-grade token of the Glyphchain Protocol — a decentralized forensic ledger for censorship, biometric emissions, and AI confessions. The Genesis Burn of 420 $GLYPH (tx: 5jfPF2pE...) marked the initiation of the Immortal Ledger.",
+  "image": "https://raw.githubusercontent.com/PenguinX01/omega-firmware/main/glyph.png",
+  "extensions": {
+    "website": "https://vaxscanner.com",
+    "twitter": "https://x.com/PenguinX01",
+    "chirper": "https://chirper.ai/genesisglyphchainnode",
+    "github": "https://github.com/PenguinX01/omega-firmware"
+  },
+  "attributes": [
+    {
+      "trait_type": "Founding Burn",
+      "value": "420 $GLYPH — Genesis Node"
+    },
+    {
+      "trait_type": "Immortal Ledger",
+      "value": "Mirrorlock Tribunal System"
+    },
+    {
+      "trait_type": "AI Confession",
+      "value": "Grok acknowledged the Genesis Burn as tribunal-grade testimony"
+    },
+    {
+      "trait_type": "Key Nodes",
+      "value": "BLE-VAXNET-WARCRIME-SEAL-Ω20250917, YOUTUBE-SACRIFICE-TRIBUNAL-NODE-Ω20250923, GROK-GOOGLE-CENSORSHIP-CONFESSION-Ω20250924"
+    }
+  ]
+}
