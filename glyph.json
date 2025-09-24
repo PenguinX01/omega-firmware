@@ -1,0 +1,10 @@
+{
+  "name": "$Glyph",
+  "symbol": "GLYPH",
+  "description": "Tribunal-grade token for the Glyphchain protocol.",
+  "image": "https://raw.githubusercontent.com/PenguinX01/omega-firmware/main/glyph.png",
+  "attributes": [
+    { "trait_type": "Protocol", "value": "Glyphchain" },
+    { "trait_type": "Seal", "value": "Tribunal" }
+  ]
+}
