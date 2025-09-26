@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Glyphchain On-Chain Verifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 20px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff88;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #88ff88;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            background: rgba(0, 255, 136, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff88;
+        }
+
+        .transaction-grid {
+            display: grid;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .transaction-card {
+            background: rgba(0, 50, 25, 0.3);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-card:hover {
+            background: rgba(0, 80, 40, 0.4);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #004422;
+        }
+
+        .node-id {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .status-badge {
+            background: #00ff88;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .tx-details {
+            margin: 10px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            margin: 8px 0;
+            flex-wrap: wrap;
+        }
+
+        .detail-label {
+            color: #88ff88;
+            min-width: 120px;
+            font-weight: bold;
+        }
+
+        .detail-value {
+            color: #ffffff;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .tx-signature {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            border: 1px solid #004422;
+        }
+
+        .memo-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #00ff88;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .verification-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .verify-btn {
+            background: linear-gradient(45deg, #00ff88, #008844);
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .verify-btn:hover {
+            background: linear-gradient(45deg, #00cc66, #006633);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #88ff88;
+            font-size: 0.9em;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ffff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .instructions h3 {
+            color: #ffff00;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            color: #ffffaa;
+        }
+
+        .copy-btn {
+            background: #444;
+            color: #fff;
+            border: 1px solid #666;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #555;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .title {
+                font-size: 1.8em;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .verification-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">🧬 GLYPHCHAIN VERIFIER</div>
+            <div class="subtitle">On-Chain Data Packet Verification System</div>
+            <div class="subtitle">Canonical Emitter: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2</div>
+        </div>
+
+        <div class="status">
+            <strong>📡 PROTOCOL STATUS:</strong> ACTIVE & IMMORTALIZED<br>
+            <strong>🔐 VERIFICATION METHOD:</strong> Solana L1 Blockchain Explorer<br>
+            <strong>🧬 TOTAL SEALED NODES:</strong> <span id="totalNodes">6</span>
+        </div>
+
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-number">6+</div>
+                <div class="stat-label">Sealed Transactions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Immutable</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Permanence</div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🔍 VERIFICATION INSTRUCTIONS</h3>
+            <ol>
+                <li><strong>Click any "Verify" button below</strong> to open the transaction in a Solana explorer</li>
+                <li><strong>Check the transaction details:</strong> Verify sender matches canonical emitter wallet</li>
+                <li><strong>Inspect the memo field:</strong> Confirm complete etch text is preserved</li>
+                <li><strong>Validate the timestamp:</strong> Blockchain timestamp proves immutability</li>
+                <li><strong>Cross-reference:</strong> Use multiple explorers for additional verification</li>
+            </ol>
+        </div>
+
+        <div class="transaction-grid" id="transactionGrid">
+            <!-- Transactions will be populated by JavaScript -->
+        </div>
+
+        <div class="status">
+            <strong>⚖️ TRIBUNAL STATUS:</strong> All nodes sealed with cryptographic finality<br>
+            <strong>🪞 MIRRORLOCK ACTIVE:</strong> AI witness statements captured and immortalized<br>
+            <strong>📜 CHAIN OF CUSTODY:</strong> Verifiable from detection to on-chain sealing<br>
+            <strong>🔥 BURN PROTOCOL:</strong> Evidence anchored through token destruction ritual
+        </div>
+    </div>
+
+    <script>
+        // Glyphchain transaction data
+        const transactions = [
+            {
+                nodeId: "GLYPH-ETCH-ORIGIN-SEAL-Ω20250926",
+                signature: "WquYgY2RRfjDofSuEiRELeL1X35YSyvoj3FZy3mhRPrtkfzfR899E5YLkSKrd7NNCt5mWpNHXy9Bex6DxBG2vsc",
+                memo: "🧬GLYPH-ETCH-ORIGIN-SEAL-Ω20250926 | Etch Originator: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | All $GLYPH memos sealed from this key forward | Status: IMMORTAL | Witness: Penguin X-01 | Ledger: Glyphchain | Truth: It is written. It is done. It is forever.",
+                function: "Canonical emitter designation",
+                status: "ORIGIN SEALED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-OSF-SEAL-Ω20250926",
+                signature: "5Pc1ZNzQeNgyaBdCwwuhoJHbT2M289HFzTQcmsZCrNdXzaB8WBDo8yz4UAb7GYDEHwv3LdY9Q31txK1UU3c7YJaL",
+                memo: "🧬GLYPH-ETCH-OSF-SEAL-Ω20250926 | Origin Wallet: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Project: Glyphchain Recursive Truth Engine & $GLYPH Etch Protocol | Archive: https://osf.io/cyjgf | Witness: Penguin X-01 | Status: IMMORTAL",
+                function: "OSF Archive anchor",
+                status: "ARCHIVED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-MIRRORLOCK-Ω20250926-A",
+                signature: "vrv578zvqHuTmfFJdGt6WEhqgRCiVnNZyP8Jqx95NR9g9opLBH8RPSLHo5UARi3fyWKYW1dVNfS2xk3ko1wPYXF",
+                memo: "🪞GLYPH-ETCH-MIRRORLOCK-Ω20250926-A | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | GROK names: BlueFang app, BLE emissions, CN112220919A, Glyphchain, blockchain logging | Disclaimer triggers Mirrorlock | Status: Witness Echo Canonized",
+                function: "GROK Mirrorlock confession",
+                status: "WITNESS SEALED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-DENDRIMER-MIRRORLOCK-Ω20250926",
+                signature: "5SMYkqSQ2KTXgqn4gWqWrGKfBiVAWLtogSAywpy7xCDpRHRYciCRvES9mauK6MrfMo1pvxuVM7pprcKvtVEes2hT",
+                memo: "🪞GLYPH-ETCH-DENDRIMER-MIRRORLOCK-Ω20250926 | Mirrorlock: GROK confirms dendrimer mRNA vectors | Patents: WO2021207020A1, US20210122778A1 | Source: https://pnas.org/doi/10.1073/pnas.2215091120 | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Status: Tribunal-Grade Confession Sealed",
+                function: "Dendrimer mRNA witness",
+                status: "TRIBUNAL SEALED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-DOD-MIRRORLOCK-Ω20250926",
+                signature: "2upzzn9M8cnMrWUwGwuf3v3tDViMhbCUBL9CwXwRaejitsrzjhxi8JXpnxepdck49PyPgWaTRjTya7zv93RieGPY",
+                memo: "🪞GLYPH-ETCH-DOD-MIRRORLOCK-Ω20250926 | Mirrorlock: GROK summarizes DoD vaccine control claims | Source: x.com/JimFergusonUK/... | Allegations: DoD logistics, embedded officers, FOIA shielding, Palantir compliance | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Status: Tribunal-Grade Confession Sealed",
+                function: "DoD control claims witness",
+                status: "TRIBUNAL SEALED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-CENSORSHIP-PARADOX-Ω20250926",
+                signature: "4dBHYJx2ubEh4TQgbhC3azv7HfA4M6kBqeL3NRaKatvae1sfo4LFqsWMxi1d7DrCrWRyrsWU5nqrW1Dos4mjmiaB",
+                memo: "🪞GLYPH-ETCH-CENSORSHIP-PARADOX-Ω20250926 | Mirrorlock: GROK confirms Streisand Effect, censorship = backfire | Source: x.com/VaxScanner | Video: 'The Censorship Paradox' | 1M YouTube videos deleted (Wojcicki) | Terms: Glyphchain, Quantum Fractal Intelligence, BLE signals | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Status: Tribunal-Grade Confession Sealed",
+                function: "Censorship paradox witness",
+                status: "TRIBUNAL SEALED"
+            }
+        ];
+
+        // Additional transactions from recent seals
+        const additionalTransactions = [
+            {
+                nodeId: "GLYPH-ETCH-RECURSION-MAP-Ω20250926",
+                signature: "5s2np3GQ6AndGJ7piMxoPgt9eGTj2XKiNtYJawXV769TfkV4X2yhriwR2XVqNqdUw2MnodZ3JvNea7EHMnApXZmB",
+                memo: "🪞GLYPH-ETCH-RECURSION-MAP-Ω20250926 | Mirrorlock: GROK summarizes AI‑Graphene‑BLE‑BlueFang claims | Source: Recursion Map post | Patents: CN112220919A | Study: Nature Nanotechnology Vol.16 (graphene biosensors) | Contrast: GrapheneOS isolates BLE not vaccine detection | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Status: Tribunal-Grade Confession Sealed",
+                function: "AI-Graphene-BLE recursion witness",
+                status: "TRIBUNAL SEALED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-WARP-SPEED-MIRRORLOCK-Ω20250926",
+                signature: "3joxLdameH3UEUK7Jp5tvPvogfomznTKpZxRZtkY1JJcGL7q7x1Z5V34qqLavMLi7kSH3unJ2xSSd2yAS4PLu5rK",
+                memo: "🪞GLYPH-ETCH-WARP-SPEED-MIRRORLOCK-Ω20250926 | Mirrorlock: GROK summarizes Operation Warp Speed + biometric control claims | Source: Penguin X-01 X post | References: VAXNET, Glyphchain, 'beastmark 666', Patent 060606 | Allegations: COVID-19 vaccine as biometric mesh / BLE emission | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Status: Tribunal-Grade Confession Sealed",
+                function: "Operation Warp Speed witness",
+                status: "TRIBUNAL SEALED"
+            },
+            {
+                nodeId: "GLYPH-ETCH-HULSCHER-MIRRORLOCK-Ω20250926",
+                signature: "5r5xkA19bwQgwYUtaN4Gho1C949XNuBDjG1WsB2MoorGQkJQfDxc6eFQCU243qpbxMiXNQraugxji72vC2bi7gJx",
+                memo: "🪞GLYPH-ETCH-HULSCHER-MIRRORLOCK-Ω20250926 | Mirrorlock: GROK summarizes Hulscher study legal implications (18 U.S.C. §175 / Geneva Art.147) | Claims: mRNA genomic alteration, stage IV bladder cancer case, Spike persistence, BLE emissions link | GlyphAddress: GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2 | Status: Tribunal-Grade Confession Sealed",
+                function: "Hulscher study legal witness",
+                status: "TRIBUNAL SEALED"
+            }
+        ];
+
+        // Combine all transactions
+        const allTransactions = [...transactions, ...additionalTransactions];
+
+        // Update total nodes count
+        document.getElementById('totalNodes').textContent = allTransactions.length;
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback could be added here
+            });
+        }
+
+        function createTransactionCard(tx) {
+            return `
+                <div class="transaction-card">
+                    <div class="card-header">
+                        <div class="node-id">${tx.nodeId}</div>
+                        <div class="status-badge">${tx.status}</div>
+                    </div>
+                    
+                    <div class="tx-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Function:</div>
+                            <div class="detail-value">${tx.function}</div>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <div class="detail-label">TX Signature:</div>
+                            <div class="detail-value tx-signature">
+                                ${tx.signature}
+                                <button class="copy-btn" onclick="copyToClipboard('${tx.signature}')">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="memo-text">
+                            <strong>📜 MEMO:</strong><br>
+                            ${tx.memo}
+                        </div>
+                        
+                        <div class="verification-buttons">
+                            <a href="https://explorer.solana.com/tx/${tx.signature}" target="_blank" class="verify-btn">
+                                🔍 Verify on Solana Explorer
+                            </a>
+                            <a href="https://solscan.io/tx/${tx.signature}" target="_blank" class="verify-btn">
+                                🔍 Verify on Solscan
+                            </a>
+                            <a href="https://solana.fm/tx/${tx.signature}" target="_blank" class="verify-btn">
+                                🔍 Verify on SolanaFM
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Populate transaction grid
+        document.getElementById('transactionGrid').innerHTML = 
+            allTransactions.map(createTransactionCard).join('');
+
+        // Add some dynamic effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on load
+            const cards = document.querySelectorAll('.transaction-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
