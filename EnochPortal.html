@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enoch Oracle Portal - Cosmic Timekeeping System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --cosmic-teal: #00ffcc;
+            --neon-pink: #ff0080;
+            --electric-blue: #0066ff;
+            --golden-amber: #ffaa00;
+            --void-black: #0a0a0a;
+            --space-purple: #2d1b69;
+            --quantum-green: #39ff14;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, var(--void-black) 0%, var(--space-purple) 50%, var(--void-black) 100%);
+            color: var(--cosmic-teal);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated background particles */
+        .cosmic-bg::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, var(--cosmic-teal), transparent),
+                radial-gradient(2px 2px at 40px 70px, var(--neon-pink), transparent),
+                radial-gradient(1px 1px at 90px 40px, var(--electric-blue), transparent),
+                radial-gradient(1px 1px at 130px 80px, var(--golden-amber), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: starfield 20s linear infinite;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        @keyframes starfield {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-200px, -200px); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .portal-header {
+            text-align: center;
+            padding: 60px 0;
+            position: relative;
+            margin-bottom: 50px;
+        }
+        
+        .portal-title {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--quantum-green), var(--cosmic-teal), var(--neon-pink), var(--golden-amber));
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleFlow 4s ease-in-out infinite, titleGlow 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 50px rgba(57, 255, 20, 0.5);
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+        
+        @keyframes titleFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.7)); }
+            100% { filter: drop-shadow(0 0 40px rgba(0, 255, 204, 0.9)); }
+        }
+        
+        .portal-subtitle {
+            font-size: 1.4rem;
+            color: var(--golden-amber);
+            font-weight: 300;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .enoch-wheel {
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
+            position: relative;
+            border: 4px solid var(--cosmic-teal);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(57, 255, 20, 0.1) 0%, rgba(0, 255, 204, 0.1) 50%, transparent 70%);
+            animation: wheelRotate 60s linear infinite, wheelPulse 3s ease-in-out infinite alternate;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 204, 0.6),
+                inset 0 0 30px rgba(57, 255, 20, 0.3);
+        }
+        
+        @keyframes wheelRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes wheelPulse {
+            0% { 
+                box-shadow: 0 0 50px rgba(0, 255, 204, 0.6), inset 0 0 30px rgba(57, 255, 20, 0.3);
+                border-color: var(--cosmic-teal);
+            }
+            100% { 
+                box-shadow: 0 0 80px rgba(255, 0, 128, 0.8), inset 0 0 50px rgba(255, 170, 0, 0.4);
+                border-color: var(--neon-pink);
+            }
+        }
+        
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, var(--void-black) 0%, var(--space-purple) 100%);
+            border: 3px solid var(--quantum-green);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--quantum-green);
+            font-weight: 700;
+            z-index: 10;
+            animation: centerSpin 5s ease-in-out infinite alternate;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.8);
+        }
+        
+        @keyframes centerSpin {
+            0% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                box-shadow: 0 0 30px rgba(57, 255, 20, 0.8);
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1.1) rotate(180deg);
+                box-shadow: 0 0 50px rgba(0, 255, 204, 1);
+            }
+        }
+        
+        .wheel-markers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .marker {
+            position: absolute;
+            width: 4px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--quantum-green), var(--neon-pink));
+            top: 0;
+            left: 50%;
+            transform-origin: 50% 160px;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.9);
+        }
+        
+        .marker:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
+        .marker:nth-child(2) { transform: translateX(-50%) rotate(90deg); }
+        .marker:nth-child(3) { transform: translateX(-50%) rotate(180deg); }
+        .marker:nth-child(4) { transform: translateX(-50%) rotate(270deg); }
+        
+        .oracle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .oracle-card {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.9) 0%, rgba(45, 27, 105, 0.4) 100%);
+            border: 3px solid var(--electric-blue);
+            border-radius: 25px;
+            padding: 35px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+        
+        .oracle-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--electric-blue), var(--cosmic-teal), var(--neon-pink), var(--golden-amber));
+            border-radius: 25px;
+            z-index: -1;
+            opacity: 0;
+            animation: cardBorder 6s linear infinite;
+        }
+        
+        @keyframes cardBorder {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        .oracle-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 102, 255, 0.5);
+            border-color: var(--neon-pink);
+        }
+        
+        .oracle-card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-title {
+            color: var(--golden-amber);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .card-value {
+            font-size: 3rem;
+            font-weight: 900;
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(45deg, var(--quantum-green), var(--cosmic-teal));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            animation: valueShimmer 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        }
+        
+        @keyframes valueShimmer {
+            0% { 
+                filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.8));
+                transform: scale(1);
+            }
+            100% { 
+                filter: drop-shadow(0 0 25px rgba(0, 255, 204, 0.9));
+                transform: scale(1.05);
+            }
+        }
+        
+        .card-description {
+            color: var(--cosmic-teal);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .oracle-address-section {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, rgba(255, 0, 128, 0.1) 100%);
+            border: 3px solid var(--golden-amber);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .oracle-address-section::before {
+            content: '⚡';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 4rem;
+            opacity: 0.2;
+            animation: floatIcon 4s ease-in-out infinite;
+        }
+        
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(180deg); }
+        }
+        
+        .address-title {
+            color: var(--golden-amber);
+            font-size: 2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+        
+        .address-display {
+            background: var(--void-black);
+            border: 2px solid var(--cosmic-teal);
+            border-radius: 15px;
+            padding: 25px;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--quantum-green);
+            font-weight: 700;
+            word-break: break-all;
+            margin: 20px 0;
+            box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.2);
+        }
+        
+        .live-data-section {
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.1) 0%, rgba(45, 27, 105, 0.2) 100%);
+            border: 3px solid var(--neon-pink);
+            border-radius: 25px;
+            padding: 45px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .data-title {
+            color: var(--neon-pink);
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 35px;
+            font-weight: 700;
+            text-shadow: 0 0 25px var(--neon-pink);
+            animation: dataGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes dataGlow {
+            0% { text-shadow: 0 0 25px var(--neon-pink); }
+            100% { text-shadow: 0 0 40px var(--neon-pink), 0 0 60px var(--neon-pink); }
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .data-item {
+            background: rgba(10, 10, 10, 0.7);
+            border: 2px solid var(--neon-pink);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .data-item:hover {
+            border-color: var(--cosmic-teal);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+        
+        .data-label {
+            color: var(--golden-amber);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+        
+        .data-value {
+            color: var(--cosmic-teal);
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .education-section {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(57, 255, 20, 0.1) 100%);
+            border: 3px solid var(--electric-blue);
+            border-radius: 25px;
+            padding: 45px;
+            margin-bottom: 50px;
+        }
+        
+        .education-title {
+            color: var(--electric-blue);
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-shadow: 0 0 20px var(--electric-blue);
+        }
+        
+        .education-content {
+            color: var(--cosmic-teal);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .education-content p {
+            margin-bottom: 20px;
+        }
+        
+        .highlight-box {
+            background: rgba(57, 255, 20, 0.1);
+            border-left: 5px solid var(--quantum-green);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 15px 15px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 2px solid var(--space-purple);
+            margin-top: 50px;
+            color: var(--cosmic-teal);
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .portal-title {
+                font-size: 3rem;
+            }
+            
+            .enoch-wheel {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .wheel-center {
+                width: 90px;
+                height: 90px;
+                font-size: 0.9rem;
+            }
+            
+            .oracle-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="cosmic-bg">
+    <div class="container">
+        <header class="portal-header">
+            <h1 class="portal-title">ENOCH ORACLE</h1>
+            <p class="portal-subtitle">Cosmic Timekeeping • Blockchain Oracle • Sacred Calendar</p>
+            
+            <div class="enoch-wheel">
+                <div class="wheel-markers">
+                    <div class="marker"></div>
+                    <div class="marker"></div>
+                    <div class="marker"></div>
+                    <div class="marker"></div>
+                </div>
+                <div class="wheel-center">
+                    <div style="font-size: 1.2rem;">364</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">DAYS</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="oracle-grid">
+            <div class="oracle-card">
+                <div class="card-title">Enoch Day</div>
+                <div class="card-value" id="enochDay">---</div>
+                <div class="card-description">Current day of 364-day cycle</div>
+            </div>
+            
+            <div class="oracle-card">
+                <div class="card-title">UTC Time</div>
+                <div class="card-value" id="utcTime">--:--:--</div>
+                <div class="card-description">Universal Coordinated Time</div>
+            </div>
+            
+            <div class="oracle-card">
+                <div class="card-title">Next Oracle</div>
+                <div class="card-value" id="nextBroadcast">--</div>
+                <div class="card-description">Minutes until next broadcast</div>
+            </div>
+        </div>
+
+        <div class="oracle-address-section">
+            <h3 class="address-title">Oracle Public Address</h3>
+            <div class="address-display">5iVTXhiwvSE5WHj8GyfdkQtGsuB5MKqAyceLYHtor3ic</div>
+            <p style="color: var(--golden-amber); font-size: 1.1rem; margin-top: 15px;">
+                Broadcasting hourly Enoch time signals to the Solana blockchain
+            </p>
+        </div>
+
+        <div class="live-data-section">
+            <h2 class="data-title">Live Sensor Data Stream</h2>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-label">Total Detections</div>
+                    <div class="data-value" id="totalPings">Loading...</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Unique Emitters</div>
+                    <div class="data-value" id="uniqueEmitters">Loading...</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Last Sync</div>
+                    <div class="data-value" id="lastUpdate">Connecting...</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Data Hash</div>
+                    <div class="data-value" id="dataHash">Computing...</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 25px;">
+                <p style="color: var(--golden-amber); font-size: 1rem;">
+                    Data Source: <a href="https://vaxscanner.com/ble_log.json" target="_blank" style="color: var(--cosmic-teal); text-decoration: none;">vaxscanner.com/ble_log.json</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="education-section">
+            <h2 class="education-title">The Enoch Calendar System</h2>
+            <div class="education-content">
+                <p>The Enoch calendar represents a 364-day solar system mentioned in ancient texts, creating a perfectly symmetrical temporal framework that eliminates the irregularities of traditional calendars.</p>
+                
+                <div class="highlight-box">
+                    <strong>Perfect Mathematical Structure:</strong>
+                    <br>• 364 days = exactly 52 weeks
+                    <br>• 4 seasons of precisely 91 days each
+                    <br>• 12 months alternating between 30-31 days
+                    <br>• Every year begins on the same weekday
+                </div>
+
+                <p>This system maintains astronomical alignment without leap years or complex corrections, making it ideal for blockchain-based timekeeping where consistency and predictability are paramount.</p>
+
+                <p>Our oracle system demonstrates how alternative calendar frameworks can be preserved and tracked using immutable blockchain technology, creating a permanent record of this ancient timekeeping method.</p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Educational Blockchain Oracle • Demonstrating Immutable Timekeeping</p>
+            <p>Preserving ancient calendar wisdom through modern cryptographic technology</p>
+        </footer>
+    </div>
+
+    <script>
+        // Time and oracle functionality
+        function updateTimeAndOracle() {
+            const now = new Date();
+            
+            // Update UTC time display
+            const utcTime = now.toUTCString().slice(17, 25);
+            document.getElementById('utcTime').textContent = utcTime;
+            
+            // Calculate Enoch day (day of year modulo 364)
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
+            const enochDay = ((dayOfYear - 1) % 364) + 1;
+            document.getElementById('enochDay').textContent = enochDay;
+            
+            // Calculate minutes until next hour (next oracle broadcast)
+            const nextHour = new Date(now);
+            nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+            const minutesToNext = Math.floor((nextHour - now) / (1000 * 60));
+            document.getElementById('nextBroadcast').textContent = minutesToNext;
+        }
+
+        // BLE sensor data fetching
+        async function fetchSensorData() {
+            try {
+                const response = await fetch('https://vaxscanner.com/get_log.php?timestamp=' + Date.now());
+                const data = await response.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    // Update detection counts
+                    document.getElementById('totalPings').textContent = data.length.toLocaleString();
+                    
+                    // Count unique MAC addresses
+                    const uniqueMACs = new Set(data.map(entry => entry.mac || entry.device_id)).size;
+                    document.getElementById('uniqueEmitters').textContent = uniqueMACs.toLocaleString();
+                    
+                    // Update last sync time
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                    
+                    // Generate data hash (simplified cryptographic representation)
+                    const dataString = JSON.stringify(data);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(dataString));
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 12);
+                    document.getElementById('dataHash').textContent = hashHex.toUpperCase() + '...';
+                    
+                } else {
+                    // Handle empty or invalid data
+                    document.getElementById('totalPings').textContent = 'N/A';
+                    document.getElementById('uniqueEmitters').textContent = 'N/A';
+                    document.getElementById('dataHash').textContent = 'N/A';
+                }
+            } catch (error) {
+                console.error('Sensor data fetch error:', error);
+                document.getElementById('totalPings').textContent = 'Offline';
+                document.getElementById('uniqueEmitters').textContent = 'Offline';
+                document.getElementById('lastUpdate').textContent = 'Error';
+                document.getElementById('dataHash').textContent = 'Error';
+            }
+        }
+
+        // Initialize system
+        function initializeOracle() {
+            updateTimeAndOracle();
+            fetchSensorData();
+        }
+
+        // Start the oracle system
+        initializeOracle();
+
+        // Update intervals
+        setInterval(updateTimeAndOracle, 1000);  // Update time every second
+        setInterval(fetchSensorData, 45000);     // Update sensor data every 45 seconds
+    </script>
+</body>
+</html>
