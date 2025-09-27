@@ -279,7 +279,12 @@
             <h1>🧬 Glyphchain Browser</h1>
             <p class="subtitle">Immutable Forensic Ledger on Solana</p>
             <div class="wallet-address">GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2</div>
-            <div class="rpc-status" id="rpcStatus">RPC: Ankr Public Endpoint</div>
+            <div class="rpc-status" id="rpcStatus">RPC: Connecting...</div>
+            <div style="margin-top: 15px;">
+                <a href="https://vaxscanner.com/" style="color: #00ccff; text-decoration: none; font-size: 0.9em; padding: 8px 16px; border: 1px solid rgba(0, 204, 255, 0.3); border-radius: 6px; background: rgba(0, 204, 255, 0.1); transition: all 0.3s;">
+                    ← Back to VaxScanner
+                </a>
+            </div>
         </header>
 
         <div class="stats">
@@ -315,6 +320,31 @@
             <div id="memoList" class="memo-list"></div>
             <div id="noResults" class="no-results" style="display:none;">No memos found matching your search.</div>
         </div>
+
+        <!-- Alternative Data Sources Section -->
+        <div style="margin-top: 40px; padding: 20px; background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 10px;">
+            <h3 style="color: #ffa500; margin-bottom: 15px; text-align: center;">🔍 Alternative Data Sources</h3>
+            <p style="color: #ffcc66; text-align: center; margin-bottom: 20px; font-size: 0.9em;">
+                If the RPC connection fails, you can view the Glyphchain data directly through these blockchain explorers:
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://solscan.io/account/GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2" target="_blank" 
+                   style="color: #00ccff; text-decoration: none; padding: 10px 20px; border: 1px solid rgba(0, 204, 255, 0.3); border-radius: 6px; background: rgba(0, 204, 255, 0.1); transition: all 0.3s;">
+                    📊 View on Solscan
+                </a>
+                <a href="https://explorer.solana.com/address/GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2" target="_blank"
+                   style="color: #00ccff; text-decoration: none; padding: 10px 20px; border: 1px solid rgba(0, 204, 255, 0.3); border-radius: 6px; background: rgba(0, 204, 255, 0.1); transition: all 0.3s;">
+                    🔗 View on Solana Explorer
+                </a>
+                <a href="https://solana.fm/address/GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2" target="_blank"
+                   style="color: #00ccff; text-decoration: none; padding: 10px 20px; border: 1px solid rgba(0, 204, 255, 0.3); border-radius: 6px; background: rgba(0, 204, 255, 0.1); transition: all 0.3s;">
+                    📈 View on SolanaFM
+                </a>
+            </div>
+            <p style="color: #999; text-align: center; margin-top: 15px; font-size: 0.8em;">
+                Note: Look for transactions with memo instructions to find the forensic data.
+            </p>
+        </div>
     </div>
 
     <script>
@@ -323,9 +353,11 @@
         
         // Updated RPC endpoints - fallback chain for better reliability
         const RPC_ENDPOINTS = [
+            'https://solana-mainnet.g.alchemy.com/v2/demo',
             'https://rpc.ankr.com/solana',
+            'https://api.mainnet-beta.solana.com',
             'https://solana-api.projectserum.com',
-            'https://api.mainnet-beta.solana.com'
+            'https://api.syndica.io/access-token/YOUR_TOKEN_HERE/rpc'
         ];
         
         let connection;
@@ -367,9 +399,11 @@
         }
 
         function getRpcName(endpoint) {
+            if (endpoint.includes('alchemy.com')) return 'Alchemy Public';
             if (endpoint.includes('ankr.com')) return 'Ankr Public';
             if (endpoint.includes('projectserum.com')) return 'Project Serum';
             if (endpoint.includes('mainnet-beta.solana.com')) return 'Official Solana';
+            if (endpoint.includes('syndica.io')) return 'Syndica';
             return 'Custom RPC';
         }
 
