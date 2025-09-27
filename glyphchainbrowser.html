@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glyphchain Browser</title>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        .memo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .memo-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .memo-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 255, 136, 0.3);
+            transform: translateX(5px);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .memo-index {
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .memo-date {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .memo-text {
+            line-height: 1.6;
+            word-wrap: break-word;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid rgba(0, 255, 136, 0.5);
+        }
+
+        .memo-footer {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tx-link {
+            color: #00ccff;
+            text-decoration: none;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .tx-link:hover {
+            color: #00ff88;
+        }
+
+        .tx-signature {
+            font-family: monospace;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            word-break: break-all;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: #ff6666;
+        }
+
+        .filter-box {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            width: 300px;
+            max-width: 100%;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .rpc-status {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧬 Glyphchain Browser</h1>
+            <p class="subtitle">Immutable Forensic Ledger on Solana</p>
+            <div class="wallet-address">GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2</div>
+            <div class="rpc-status" id="rpcStatus">RPC: Ankr Public Endpoint</div>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalMemos">0</div>
+                <div class="stat-label">Total Memos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="loadedMemos">0</div>
+                <div class="stat-label">Loaded</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="connectionStatus">Connecting...</div>
+                <div class="stat-label">Status</div>
+            </div>
+        </div>
+
+        <div class="filter-box">
+            <input type="text" id="searchInput" placeholder="Search memos...">
+            <button onclick="filterMemos()">Search</button>
+            <button onclick="clearSearch()">Clear</button>
+        </div>
+
+        <div class="controls">
+            <button onclick="fetchMemos()" id="fetchBtn">Fetch Memos</button>
+            <button onclick="loadMore()" id="loadMoreBtn" style="display:none;">Load More</button>
+            <button onclick="exportMemos()">Export as JSON</button>
+        </div>
+
+        <div id="content">
+            <div class="loading" id="loading" style="display:none;">Loading memo transactions</div>
+            <div id="error" class="error" style="display:none;"></div>
+            <div id="memoList" class="memo-list"></div>
+            <div id="noResults" class="no-results" style="display:none;">No memos found matching your search.</div>
+        </div>
+    </div>
+
+    <script>
+        const WALLET_ADDRESS = 'GoDs6EFRjb9gsv3HTr7fZjfeyz6rsaT62fSQqc1T9Pa2';
+        const BURN_ADDRESS = '1nc1nerator11111111111111111111111111111111';
+        
+        // Updated RPC endpoints - fallback chain for better reliability
+        const RPC_ENDPOINTS = [
+            'https://rpc.ankr.com/solana',
+            'https://solana-api.projectserum.com',
+            'https://api.mainnet-beta.solana.com'
+        ];
+        
+        let connection;
+        let currentRpcIndex = 0;
+        let allMemos = [];
+        let filteredMemos = [];
+        let displayedMemos = [];
+        let lastSignature = null;
+        const BATCH_SIZE = 10;
+
+        async function initConnection() {
+            for (let i = 0; i < RPC_ENDPOINTS.length; i++) {
+                try {
+                    currentRpcIndex = i;
+                    connection = new solanaWeb3.Connection(RPC_ENDPOINTS[i]);
+                    
+                    // Test the connection
+                    await connection.getSlot();
+                    
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('connectionStatus').style.color = '#00ff88';
+                    
+                    const rpcName = getRpcName(RPC_ENDPOINTS[i]);
+                    document.getElementById('rpcStatus').textContent = `RPC: ${rpcName}`;
+                    
+                    console.log(`Connected to RPC: ${RPC_ENDPOINTS[i]}`);
+                    return;
+                } catch (error) {
+                    console.warn(`Failed to connect to RPC ${RPC_ENDPOINTS[i]}:`, error);
+                    continue;
+                }
+            }
+            
+            // If we get here, all RPCs failed
+            document.getElementById('connectionStatus').textContent = 'Error';
+            document.getElementById('connectionStatus').style.color = '#ff6666';
+            document.getElementById('rpcStatus').textContent = 'RPC: All endpoints failed';
+            showError('Failed to connect to any Solana RPC endpoint');
+        }
+
+        function getRpcName(endpoint) {
+            if (endpoint.includes('ankr.com')) return 'Ankr Public';
+            if (endpoint.includes('projectserum.com')) return 'Project Serum';
+            if (endpoint.includes('mainnet-beta.solana.com')) return 'Official Solana';
+            return 'Custom RPC';
+        }
+
+        async function fetchMemos() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const memoList = document.getElementById('memoList');
+            const fetchBtn = document.getElementById('fetchBtn');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            memoList.innerHTML = '';
+            fetchBtn.disabled = true;
+            allMemos = [];
+            
+            try {
+                const publicKey = new solanaWeb3.PublicKey(WALLET_ADDRESS);
+                let signatures = [];
+                let hasMore = true;
+                let options = { limit: 100 };
+                
+                // Fetch all signatures in batches
+                while (hasMore) {
+                    const batch = await connection.getSignaturesForAddress(publicKey, options);
+                    signatures = signatures.concat(batch);
+                    
+                    if (batch.length < 100) {
+                        hasMore = false;
+                    } else {
+                        options.before = batch[batch.length - 1].signature;
+                    }
+                    
+                    // Update stats
+                    document.getElementById('totalMemos').textContent = signatures.length;
+                    
+                    // Add small delay to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                // Process transactions in smaller batches to avoid rate limits
+                for (let i = 0; i < signatures.length; i += 20) {
+                    const batch = signatures.slice(i, i + 20);
+                    
+                    try {
+                        const txs = await connection.getParsedTransactions(
+                            batch.map(s => s.signature),
+                            { maxSupportedTransactionVersion: 0 }
+                        );
+                        
+                        for (let j = 0; j < txs.length; j++) {
+                            const tx = txs[j];
+                            const sig = batch[j];
+                            
+                            if (tx && tx.meta && !tx.meta.err) {
+                                // Check if transaction is to burn address
+                                const instructions = tx.transaction.message.instructions;
+                                let isBurnTx = false;
+                                
+                                for (const inst of instructions) {
+                                    if (inst.parsed && inst.parsed.info && inst.parsed.info.destination === BURN_ADDRESS) {
+                                        isBurnTx = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (isBurnTx) {
+                                    // Look for memo in log messages
+                                    const logs = tx.meta.logMessages || [];
+                                    let memoText = null;
+                                    
+                                    for (const log of logs) {
+                                        if (log.includes('Memo (len ')) {
+                                            // Extract memo from log
+                                            const memoMatch = log.match(/Memo \(len \d+\): "(.*)"/);
+                                            if (memoMatch) {
+                                                memoText = memoMatch[1];
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Also check for SPL Memo instruction
+                                    for (const inst of instructions) {
+                                        if (inst.program === 'spl-memo' && inst.parsed) {
+                                            memoText = inst.parsed;
+                                        }
+                                    }
+                                    
+                                    if (memoText) {
+                                        allMemos.push({
+                                            signature: sig.signature,
+                                            blockTime: sig.blockTime,
+                                            memo: memoText,
+                                            slot: sig.slot
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Update loaded count
+                        document.getElementById('loadedMemos').textContent = allMemos.length;
+                        
+                        // Add delay between batches to be respectful to RPC
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        
+                    } catch (batchError) {
+                        console.warn(`Error processing batch ${i}-${i+20}:`, batchError);
+                        // Continue with next batch instead of failing entirely
+                    }
+                }
+                
+                // Sort by block time (newest first)
+                allMemos.sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
+                
+                filteredMemos = [...allMemos];
+                displayMemos();
+                
+            } catch (err) {
+                console.error('Error fetching memos:', err);
+                showError(`Error fetching memos: ${err.message}. Try refreshing or the RPC might be temporarily unavailable.`);
+            } finally {
+                loading.style.display = 'none';
+                fetchBtn.disabled = false;
+            }
+        }
+
+        function displayMemos() {
+            const memoList = document.getElementById('memoList');
+            const noResults = document.getElementById('noResults');
+            
+            if (filteredMemos.length === 0) {
+                noResults.style.display = 'block';
+                memoList.innerHTML = '';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            memoList.innerHTML = '';
+            displayedMemos = filteredMemos.slice(0, BATCH_SIZE);
+            
+            displayedMemos.forEach((memo, index) => {
+                const card = createMemoCard(memo, index);
+                memoList.appendChild(card);
+            });
+            
+            // Show/hide load more button
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (filteredMemos.length > BATCH_SIZE) {
+                loadMoreBtn.style.display = 'inline-block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+
+        function loadMore() {
+            const memoList = document.getElementById('memoList');
+            const currentLength = displayedMemos.length;
+            const nextBatch = filteredMemos.slice(currentLength, currentLength + BATCH_SIZE);
+            
+            nextBatch.forEach((memo, index) => {
+                const card = createMemoCard(memo, currentLength + index);
+                memoList.appendChild(card);
+            });
+            
+            displayedMemos = [...displayedMemos, ...nextBatch];
+            
+            // Hide load more if all loaded
+            if (displayedMemos.length >= filteredMemos.length) {
+                document.getElementById('loadMoreBtn').style.display = 'none';
+            }
+        }
+
+        function createMemoCard(memo, index) {
+            const card = document.createElement('div');
+            card.className = 'memo-card';
+            
+            const date = memo.blockTime ? new Date(memo.blockTime * 1000).toLocaleString() : 'Unknown date';
+            const shortSig = memo.signature.substring(0, 8) + '...' + memo.signature.substring(memo.signature.length - 8);
+            
+            card.innerHTML = `
+                <div class="memo-header">
+                    <span class="memo-index">Memo #${index + 1}</span>
+                    <span class="memo-date">${date}</span>
+                </div>
+                <div class="memo-text">${escapeHtml(memo.memo)}</div>
+                <div class="memo-footer">
+                    <a href="https://solscan.io/tx/${memo.signature}" target="_blank" class="tx-link">
+                        View on Solscan ↗
+                    </a>
+                    <a href="https://explorer.solana.com/tx/${memo.signature}" target="_blank" class="tx-link">
+                        View on Explorer ↗
+                    </a>
+                </div>
+                <div class="tx-signature">TX: ${memo.signature}</div>
+            `;
+            
+            return card;
+        }
+
+        function filterMemos() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                filteredMemos = [...allMemos];
+            } else {
+                filteredMemos = allMemos.filter(memo => 
+                    memo.memo.toLowerCase().includes(searchTerm) ||
+                    memo.signature.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displayMemos();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filteredMemos = [...allMemos];
+            displayMemos();
+        }
+
+        function exportMemos() {
+            if (allMemos.length === 0) {
+                alert('No memos to export. Please fetch memos first.');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(allMemos, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `glyphchain_memos_${Date.now()}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initConnection();
+        });
+    </script>
+</body>
+</html>
