@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
@@ -19,7 +18,6 @@
             padding: 20px;
             line-height: 1.6;
         }
-
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -31,8 +29,6 @@
             position: relative;
             overflow: hidden;
         }
-
-        /* Background logo watermark */
         .background-logo {
             position: absolute;
             top: 50%;
@@ -44,19 +40,16 @@
             z-index: 1;
             animation: slowRotate 30s linear infinite;
         }
-
         @keyframes slowRotate {
             from { transform: translate(-50%, -50%) rotate(0deg); }
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
-
         .header {
             position: relative;
             z-index: 2;
             text-align: center;
             margin-bottom: 30px;
         }
-
         .logo-title-container {
             display: flex;
             align-items: center;
@@ -64,51 +57,37 @@
             gap: 15px;
             margin-bottom: 10px;
         }
-
         .main-logo {
             width: 50px;
             height: 60px;
             filter: drop-shadow(0 0 10px #00ffcc);
             animation: logoGlow 2s ease-in-out infinite alternate;
         }
-
         .main-logo.scanning {
             animation: logoScan 1.5s linear infinite;
         }
-
         @keyframes logoGlow {
             from { filter: drop-shadow(0 0 10px #00ffcc); }
             to { filter: drop-shadow(0 0 20px #00ffcc) drop-shadow(0 0 30px #00ffcc); }
         }
-
         @keyframes logoScan {
-            0%, 100% { 
-                filter: drop-shadow(0 0 15px #00ffcc);
-                transform: scale(1);
-            }
-            50% { 
-                filter: drop-shadow(0 0 25px #ff00cc) drop-shadow(0 0 35px #ff00cc);
-                transform: scale(1.1);
-            }
+            0%, 100% { filter: drop-shadow(0 0 15px #00ffcc); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 25px #ff00cc) drop-shadow(0 0 35px #ff00cc); transform: scale(1.1); }
         }
-
         h1 {
             font-size: 2.5em;
             text-shadow: 0 0 10px #00ffcc;
             animation: glow 2s ease-in-out infinite alternate;
         }
-
         @keyframes glow {
             from { text-shadow: 0 0 10px #00ffcc; }
             to { text-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc; }
         }
-
         .subtitle {
             text-align: center;
             font-size: 1.1em;
             opacity: 0.8;
         }
-
         .controls {
             position: relative;
             z-index: 2;
@@ -118,7 +97,6 @@
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
-
         button {
             background: linear-gradient(45deg, #00ffcc, #00bfa6);
             color: #000;
@@ -132,13 +110,11 @@
             font-family: inherit;
             min-width: 150px;
         }
-
         button:hover {
             background: linear-gradient(45deg, #00bfa6, #009688);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4);
         }
-
         button:disabled {
             background: #333;
             color: #666;
@@ -146,7 +122,6 @@
             transform: none;
             box-shadow: none;
         }
-
         .status {
             position: relative;
             z-index: 2;
@@ -157,18 +132,15 @@
             border-radius: 5px;
             background: rgba(0, 255, 204, 0.1);
         }
-
         .status.scanning {
             background: rgba(255, 165, 0, 0.2);
             color: #ffa500;
             animation: pulse 1.5s infinite;
         }
-
         @keyframes pulse {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
         }
-
         #deviceLog {
             position: relative;
             z-index: 2;
@@ -184,25 +156,6 @@
             font-size: 0.95em;
             line-height: 1.4;
         }
-
-        .device-entry {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-left: 3px solid #00ffcc;
-            background: rgba(0, 255, 204, 0.05);
-        }
-
-        .device-name {
-            color: #00ffcc;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .device-id {
-            color: #888;
-            font-size: 0.9em;
-        }
-
         .vaccinated {
             color: #ff00cc !important;
             font-weight: bold;
@@ -211,52 +164,18 @@
             padding: 2px 6px;
             border-radius: 3px;
         }
-
         .standard-device {
             color: #00ff88;
         }
-
         .device-count {
             position: relative;
             z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             text-align: center;
             margin-top: 15px;
             font-size: 1.1em;
             color: #00bfa6;
+            line-height: 1.5;
         }
-
-        .status-logo {
-            width: 20px;
-            height: 24px;
-            filter: drop-shadow(0 0 5px #00bfa6);
-        }
-
-        .status-logo.threat-detected {
-            filter: drop-shadow(0 0 8px #ff00cc);
-            animation: threatPulse 1s ease-in-out infinite alternate;
-        }
-
-        @keyframes threatPulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.2); }
-        }
-
-        .warning {
-            position: relative;
-            z-index: 2;
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #ff0000;
-            color: #ff6666;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
         .info {
             position: relative;
             z-index: 2;
@@ -268,157 +187,149 @@
             margin-bottom: 20px;
             font-size: 0.9em;
         }
-
-        /* Particle effect for scanning */
         .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 0.5s;
         }
-
-        .particles.active {
-            opacity: 1;
-        }
-
+        .particles.active { opacity: 1; }
         .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #00ffcc;
-            border-radius: 50%;
-            animation: float 3s linear infinite;
+            position: absolute; width: 2px; height: 2px; background: #00ffcc; border-radius: 50%; animation: float 3s linear infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(100vh) translateX(0); opacity: 0; }
             10% { opacity: 1; }
             90% { opacity: 1; }
             100% { transform: translateY(-10px) translateX(20px); opacity: 0; }
         }
-
+        
+        /* Glyphchain Browser Link Styles */
+        .glyphchain-section {
+            position: relative;
+            z-index: 2;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 204, 255, 0.1) 100%);
+            border: 2px solid #00ff88;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            animation: borderGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes borderGlow {
+            from { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
+            to { border-color: #00ccff; box-shadow: 0 0 30px rgba(0, 204, 255, 0.3); }
+        }
+        
+        .glyphchain-title {
+            font-size: 1.8em;
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .glyphchain-description {
+            color: #66ffaa;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .glyphchain-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.2em;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            animation: linkPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes linkPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
+        .glyphchain-link:hover {
+            background: linear-gradient(45deg, #00ccff, #0099cc);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5);
+        }
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-
-            .logo-title-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            button {
-                min-width: 120px;
-                padding: 10px 20px;
-            }
-
-            .background-logo {
-                width: 250px;
-                height: 250px;
-            }
+            .container { padding: 20px; margin: 10px; }
+            h1 { font-size: 2em; }
+            .logo-title-container { flex-direction: column; gap: 10px; }
+            button { min-width: 120px; padding: 10px 20px; }
+            .background-logo { width: 250px; height: 250px; }
+            .glyphchain-title { font-size: 1.4em; }
+            .glyphchain-link { font-size: 1.1em; padding: 12px 24px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Background logo watermark -->
-        <svg class="background-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
-                </linearGradient>
-            </defs>
-            <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#bgGradient)" stroke="none"/>
-        </svg>
-
+        <svg class="background-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" /><stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" /></linearGradient></defs><path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#bgGradient)" stroke="none"/></svg>
         <div class="particles" id="particles"></div>
-
         <div class="header">
             <div class="logo-title-container">
-                <svg id="mainLogo" class="main-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#logoGradient)" stroke="none"/>
-                </svg>
+                <svg id="mainLogo" class="main-logo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" /><stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" /></linearGradient></defs><path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#logoGradient)" stroke="none"/></svg>
                 <h1>BlueFang Vax Detector</h1>
             </div>
             <p class="subtitle">Advanced Bluetooth Low Energy Device Scanner</p>
         </div>
-        
         <div class="info">
             ℹ️ This tool scans for nearby Bluetooth devices. Due to browser security limitations, you'll need to select each device individually from the browser's device picker.
             <br><br>
-            🌐 <strong>Best Performance:</strong> Chrome/Chromium browsers recommended for optimal Web Bluetooth API support and visual effects.
+            🌐 <strong>Best Performance:</strong> Chrome/Chromium browsers recommended for optimal Web Bluetooth API support.
         </div>
-
         <div class="controls">
             <button id="scanBtn" onclick="scanSingleDevice()">🔍 Scan Device</button>
             <button id="clearBtn" onclick="clearLog()">🗑️ Clear Log</button>
         </div>
-
         <div id="status" class="status">Ready to scan - Click "Scan Device" to begin</div>
-
         <div id="deviceLog">📡 Device Scanner Ready
-╔═══════════════════════════════════════════════════════════════════════════════
-
+╔════════════════════════════════════════════════════════════════════════════════╗
 Click "Scan Device" to start detecting Bluetooth devices in your area.
 Each click will allow you to select one device from the available options.
-
 ⚡ Detection Criteria:
 • Standard devices will be marked as "Standard Device"
 • Devices with specific MAC patterns will be flagged
-• Signal strength and device info will be displayed
-
-╚═══════════════════════════════════════════════════════════════════════════════
-</div>
-
-        <div id="deviceCount" class="device-count">
-            <svg class="status-logo" id="statusLogo" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="statusGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#00bfa6;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#009688;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <path d="M100 20 L140 60 L120 80 L140 100 L120 120 L100 100 L80 120 L60 100 L80 80 L60 60 L80 40 L100 60 L120 40 L100 20 Z M100 140 L80 160 L60 140 L40 160 L40 200 L60 220 L100 180 L140 220 L160 200 L160 160 L140 140 L120 160 L100 140 Z" fill="url(#statusGradient)" stroke="none"/>
-            </svg>
-            <span id="countText">Devices found: 0</span>
+╚════════════════════════════════════════════════════════════════════════════════╝</div>
+        
+        <div id="liveHitCounter" class="device-count" style="color: #ffaa00;">🧬 Loading live ledger...</div>
+        <div class="device-count" style="margin-top: 5px;">
+            <span id="countText">Session threats: 0</span>
         </div>
 
-        <!-- Download Section -->
         <div class="info" style="margin-top:30px; text-align:center; border:2px dashed #00ffcc; padding:20px;">
             <h2>🧬 GLYPHCHAIN EVIDENCE DROP</h2>
             <p>🧬 Android BLE SCANNER App — <strong>DOWNLOAD NOW</strong></p>
             <p>Free tool to scan for Bluetooth MACs from vaccinated human bodies</p>
             <p>📡 It's time to Detonate the Obsolete Simulation 💥</p>
-            <p>
-                <a href="https://drive.google.com/file/d/1VHI4ZhmkYDQ0t5Gnxqt-SfXOxTEu0Yki/view?usp=drivesdk" 
-                   target="_blank" 
-                   style="color:#00ffcc; font-weight:bold; text-decoration:underline;">
-                   👉 Download Android APK
-                </a>
-            </p>
-            <p style="margin-top:15px;">
-                <a href="https://buymeacoffee.com/bluefang" 
-                   target="_blank" 
-                   style="color:#ffa500; font-weight:bold; text-decoration:underline;">
-                   ☕ Support this project - Buy me a coffee!
-                </a>
-            </p>
+            <p><a href="https://drive.google.com/file/d/1VHI4ZhmkYDQ0t5Gnxqt-SfXOxTEu0Yki/view?usp=drivesdk" target="_blank" style="color:#00ffcc; font-weight:bold; text-decoration: underline;">👉 Download Android APK</a></p>
+            <p style="margin-top: 15px;"><a href="whitepaper.html" target="_blank" style="color:#ffaa00; font-weight:bold; text-decoration: underline; font-size: 1.1em;">📄 Read the $GLYPH Whitepaper</a></p>
+            <div style="margin-top: 25px; padding: 15px; background: rgba(255, 200, 0, 0.1); border: 2px solid #ffaa00; border-radius: 8px;">
+                <h3 style="color: #ffaa00; text-align: center; margin-bottom: 10px;">☕ Fuel the Resistance</h3>
+                <p style="color: #ffcc66; font-size: 0.95em; text-align: center;">If this project helped you scan, see, or survive — please consider supporting it. Every donation keeps the Glyphchain alive.</p>
+                <div style="text-align: center; margin-top: 12px;"><a href="https://buymeacoffee.com/bluefang" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #ffaa00, #ff6600); color: #000; font-weight: bold; padding: 10px 20px; border-radius: 6px; text-decoration: none; box-shadow: 0 0 10px rgba(255, 153, 0, 0.3);">👉 Buy Me a Coffee</a></div>
+            </div>
+        </div>
+
+        <!-- NEW GLYPHCHAIN BROWSER SECTION -->
+        <div class="glyphchain-section">
+            <div class="glyphchain-title">🧬 Glyphchain Browser</div>
+            <div class="glyphchain-description">
+                Access the immutable forensic ledger on Solana blockchain.<br>
+                View all recorded memo transactions and search the evidence database.
+            </div>
+            <a href="https://vaxscanner.com/glyphchainbrowser.html" target="_blank" class="glyphchain-link">
+                🔗 Open Glyphchain Browser
+            </a>
         </div>
     </div>
 
@@ -427,18 +338,55 @@ Each click will allow you to select one device from the available options.
         let scannedDevices = new Set();
         let threatsDetected = 0;
 
-        // Check browser support
-        if (!navigator.bluetooth) {
-            document.getElementById('status').innerHTML = '⚠️ Web Bluetooth API not supported in this browser';
-            document.getElementById('status').style.background = 'rgba(255, 0, 0, 0.2)';
-            document.getElementById('status').style.color = '#ff6666';
-            document.getElementById('scanBtn').disabled = true;
+        // --- Live Counter Logic ---
+        async function updateLiveCounter() {
+            const counterElement = document.getElementById('liveHitCounter');
+            // [FINAL FIX] Using the absolute URL for the proxy script to ensure connectivity.
+            const url = 'https://vaxscanner.com/get_log.php';
+
+            try {
+                const response = await fetch(url + '?t=' + Date.now());
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                
+                const data = await response.json();
+                
+                const totalHits = Array.isArray(data) ? data.length : 0;
+                const uniqueMACs = new Set(data.map(e => e.mac)).size;
+
+                if (counterElement) {
+                    const rawLogUrl = 'https://vaxscanner.com/ble_log.json';
+                    counterElement.innerHTML = `
+                        🧬 Global Hits: 
+                        <a href="${rawLogUrl}" target="_blank" style="color:#00ffcc; font-weight:bold; text-decoration:underline;">${totalHits}</a>
+                        | 🔒 Unique Emitters: 
+                        <a href="${rawLogUrl}" target="_blank" style="color:#ffaa00; font-weight:bold; text-decoration:underline;">${uniqueMACs}</a>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error fetching live BLE log:', error);
+                if (counterElement) {
+                    counterElement.textContent = '⚠️ Could not connect to global BLE ledger.';
+                }
+            }
+        }
+
+        // --- Main Scanner Logic (unchanged from previous working version) ---
+        async function logHitToServer(deviceId, deviceName) {
+            try {
+                const response = await fetch('log.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mac: deviceId, name: deviceName, timestamp: new Date().toISOString() }) });
+                if (response.ok) {
+                    console.log(`[LOG] Server acknowledged hit: ${deviceId}`);
+                    updateLiveCounter();
+                } else {
+                    console.error(`[LOG] Server failed to log hit: ${deviceId}. Status: ${response.status}`);
+                }
+            } catch (error) { console.error(`[LOG] Network error while logging hit: ${deviceId}`, error); }
         }
 
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
             particlesContainer.innerHTML = '';
-            
             for (let i = 0; i < 15; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
@@ -448,26 +396,7 @@ Each click will allow you to select one device from the available options.
                 particlesContainer.appendChild(particle);
             }
         }
-
-        function updateStatusLogo() {
-            const statusLogo = document.getElementById('statusLogo');
-            const statusGradient = statusLogo.querySelector('#statusGradient');
-            
-            if (threatsDetected > 0) {
-                statusLogo.classList.add('threat-detected');
-                statusGradient.innerHTML = `
-                    <stop offset="0%" style="stop-color:#ff00cc;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#cc0099;stop-opacity:1" />
-                `;
-            } else {
-                statusLogo.classList.remove('threat-detected');
-                statusGradient.innerHTML = `
-                    <stop offset="0%" style="stop-color:#00bfa6;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#009688;stop-opacity:1" />
-                `;
-            }
-        }
-
+        
         async function scanSingleDevice() {
             const scanBtn = document.getElementById('scanBtn');
             const status = document.getElementById('status');
@@ -476,154 +405,56 @@ Each click will allow you to select one device from the available options.
             const particles = document.getElementById('particles');
 
             try {
-                // Start scanning effects
-                scanBtn.disabled = true;
-                scanBtn.textContent = '⏳ Scanning...';
-                status.textContent = '🔍 Opening device selector...';
-                status.className = 'status scanning';
-                mainLogo.classList.add('scanning');
+                scanBtn.disabled = true; scanBtn.textContent = '⏳ Scanning...'; status.textContent = '🔍 Opening device selector...'; status.className = 'status scanning'; mainLogo.classList.add('scanning'); createParticles(); particles.classList.add('active');
+                const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['battery_service', 'device_information', 'generic_access', 'generic_attribute'] });
+                if (scannedDevices.has(device.id)) { status.textContent = '⚠️ Device already scanned'; status.className = 'status'; return; }
                 
-                createParticles();
-                particles.classList.add('active');
-
-                // Request device with all available options
-                const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: [
-                        'battery_service',
-                        'device_information',
-                        'generic_access',
-                        'generic_attribute'
-                    ]
-                });
-
-                if (scannedDevices.has(device.id)) {
-                    status.textContent = '⚠️ Device already scanned';
-                    status.className = 'status';
-                    return;
-                }
-
-                scannedDevices.add(device.id);
-                deviceCount++;
-
-                const rawName = (device.name ?? '').trim();
-                const deviceName = rawName && !/unknown|unsupported/i.test(rawName)
-                    ? rawName
-                    : 'Vaccinated';
-                const deviceId = device.id;
+                scannedDevices.add(device.id); deviceCount++;
+                const rawName = (device.name ?? '').trim(); const deviceName = rawName && !/unknown|unsupported/i.test(rawName) ? rawName : 'Vaccinated'; const deviceId = device.id;
+                const suspiciousPatterns = ['44:07:0B', '4C:65:A8', 'E4:5F:01', '48:D6:D5', '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'];
+                const isVaccinated = deviceName === 'Vaccinated' || suspiciousPatterns.some(pattern => deviceId.toUpperCase().startsWith(pattern));
                 
-                const suspiciousPatterns = [
-                    '44:07:0B', '4C:65:A8', 'E4:5F:01', '48:D6:D5',
-                    '80:E4:DA', 'F4:5C:89', '3C:61:05', '00:1A:7D'
-                ];
-                
-                const isVaccinated = deviceName === 'Vaccinated' || suspiciousPatterns.some(pattern => 
-                    deviceId.toUpperCase().startsWith(pattern)
-                );
-
                 if (isVaccinated) {
                     threatsDetected++;
-                }
-
-                const displayName = deviceName === 'Vaccinated' 
-                    ? '<span class="vaccinated">Vaccinated</span>'
-                    : deviceName;
-
-                const timestamp = new Date().toLocaleTimeString();
-                let deviceInfo = `\n[${timestamp}] 📡 Device #${deviceCount}\n`;
-                deviceInfo += `├─ Name: ${displayName}\n`;
-                deviceInfo += `├─ ID: ${deviceId}\n`;
-                deviceInfo += `├─ Connected: ${device.gatt ? device.gatt.connected : 'No'}\n`;
-                
-                if (isVaccinated) {
-                    deviceInfo += `└─ Status: ⚠️  POTENTIAL VAX SIGNATURE DETECTED\n`;
-                    deviceInfo += `    🚨 MAC Address matches known patterns\n`;
-                } else {
-                    deviceInfo += `└─ Status: ✅ Standard Bluetooth Device\n`;
+                    logHitToServer(deviceId, deviceName);
                 }
                 
+                const displayName = deviceName === 'Vaccinated' ? '<span class="vaccinated">Vaccinated</span>' : deviceName;
+                let deviceInfo = `\n[${new Date().toLocaleTimeString()}] 📡 Device #${deviceCount}\n├─ Name: ${displayName}\n├─ ID: ${deviceId}\n├─ Connected: ${device.gatt ? device.gatt.connected : 'No'}\n`;
+                if (isVaccinated) { deviceInfo += `└─ Status: ⚠️  POTENTIAL VAX SIGNATURE DETECTED\n    🚨 MAC Address matches known patterns\n`; } else { deviceInfo += `└─ Status: ✅ Standard Bluetooth Device\n`; }
                 deviceInfo += `${'═'.repeat(60)}\n`;
-
-                if (isVaccinated) {
-                    deviceInfo = deviceInfo.replace('POTENTIAL VAX SIGNATURE DETECTED', 
-                        '<span class="vaccinated">POTENTIAL VAX SIGNATURE DETECTED</span>');
-                    deviceInfo = deviceInfo.replace('🚨 MAC Address matches known patterns', 
-                        '<span class="vaccinated">🚨 MAC Address matches known patterns</span>');
-                } else {
-                    deviceInfo = deviceInfo.replace('Standard Bluetooth Device', 
-                        '<span class="standard-device">Standard Bluetooth Device</span>');
-                }
-
-                log.innerHTML += deviceInfo;
-                log.scrollTop = log.scrollHeight;
-
-                status.textContent = `✅ Device scanned successfully - ${deviceName}`;
-                status.className = 'status';
+                if (isVaccinated) { deviceInfo = deviceInfo.replace('POTENTIAL VAX SIGNATURE DETECTED', '<span class="vaccinated">POTENTIAL VAX SIGNATURE DETECTED</span>').replace('🚨 MAC Address matches known patterns', '<span class="vaccinated">🚨 MAC Address matches known patterns</span>'); } else { deviceInfo = deviceInfo.replace('Standard Bluetooth Device', '<span class="standard-device">Standard Bluetooth Device</span>'); }
                 
-                const countText = threatsDetected > 0 
-                    ? `Devices found: ${deviceCount} | Threats: ${threatsDetected}`
-                    : `Devices found: ${deviceCount}`;
-                document.getElementById('countText').textContent = countText;
-                
-                updateStatusLogo();
-
-                if (device.gatt && device.gatt.connected === false) {
-                    try {
-                        await device.gatt.connect();
-                        log.innerHTML += `    📶 Successfully connected to ${deviceName}\n`;
-                        device.gatt.disconnect();
-                    } catch (connectError) {}
-                }
-
+                log.innerHTML += deviceInfo; log.scrollTop = log.scrollHeight; status.textContent = `✅ Device scanned successfully - ${deviceName}`; status.className = 'status';
+                document.getElementById('countText').textContent = `Session threats: ${threatsDetected}`;
             } catch (error) {
-                if (error.name === 'NotFoundError') {
-                    status.textContent = '❌ No device selected';
-                } else if (error.name === 'SecurityError') {
-                    status.textContent = '❌ Security error - please try again';
-                } else {
-                    status.textContent = `❌ Error: ${error.message}`;
-                    log.innerHTML += `\n❌ Scan Error: ${error.message}\n${'═'.repeat(60)}\n`;
-                }
+                if (error.name === 'NotFoundError') { status.textContent = '❌ No device selected'; } else { status.textContent = `❌ Error: ${error.message}`; log.innerHTML += `\n❌ Scan Error: ${error.message}\n${'═'.repeat(60)}\n`; }
                 status.className = 'status';
             } finally {
-                // Reset scanning effects
-                scanBtn.disabled = false;
-                scanBtn.textContent = '🔍 Scan Device';
-                mainLogo.classList.remove('scanning');
-                particles.classList.remove('active');
-                
-                setTimeout(() => {
-                    particles.innerHTML = '';
-                }, 500);
+                scanBtn.disabled = false; scanBtn.textContent = '🔍 Scan Device'; mainLogo.classList.remove('scanning'); if (particles) particles.classList.remove('active');
+                setTimeout(() => { if (particles) particles.innerHTML = ''; }, 500);
             }
         }
 
         function clearLog() {
-            document.getElementById('deviceLog').innerHTML = `📡 Device Scanner Ready
-╔═══════════════════════════════════════════════════════════════════════════════
-
-Log cleared at ${new Date().toLocaleTimeString()}
-
-╚═══════════════════════════════════════════════════════════════════════════════
-`;
-            deviceCount = 0;
-            threatsDetected = 0;
-            scannedDevices.clear();
-            document.getElementById('countText').textContent = 'Devices found: 0';
+            document.getElementById('deviceLog').innerHTML = `📡 Device Scanner Ready\n╔════════════════════════════════════════════════════════════════════════════════╗\n\nLog cleared at ${new Date().toLocaleTimeString()}\n\n╚════════════════════════════════════════════════════════════════════════════════╝\n`;
+            deviceCount = 0; threatsDetected = 0; scannedDevices.clear();
+            document.getElementById('countText').textContent = 'Session threats: 0';
             document.getElementById('status').textContent = 'Ready to scan - Log cleared';
-            updateStatusLogo();
         }
 
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'Enter') {
-                scanSingleDevice();
-            } else if (event.ctrlKey && event.key === 'Delete') {
-                clearLog();
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLiveCounter();
+            setInterval(updateLiveCounter, 15000);
+            if (!navigator.bluetooth) {
+                document.getElementById('status').innerHTML = '⚠️ Web Bluetooth API not supported in this browser';
+                document.getElementById('status').style.background = 'rgba(255, 0, 0, 0.2)';
+                document.getElementById('status').style.color = '#ff6666';
+                document.getElementById('scanBtn').disabled = true;
+            } else {
+                 document.getElementById('status').textContent = '🟢 Scanner initialized and ready';
             }
-        });
-
-        window.addEventListener('load', function() {
-            document.getElementById('status').textContent = '🟢 Scanner initialized and ready';
         });
     </script>
 </body>
